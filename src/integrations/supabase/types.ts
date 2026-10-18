@@ -14,16 +14,722 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      account_heads: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          kind: string
+          name: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          kind: string
+          name: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          kind?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      cash_entries: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          head_id: string | null
+          id: string
+          kind: string
+          note: string | null
+          txn_date: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          head_id?: string | null
+          id?: string
+          kind: string
+          note?: string | null
+          txn_date?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          head_id?: string | null
+          id?: string
+          kind?: string
+          note?: string | null
+          txn_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cash_entries_head_id_fkey"
+            columns: ["head_id"]
+            isOneToOne: false
+            referencedRelation: "account_heads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      centers: {
+        Row: {
+          address: string | null
+          code: string | null
+          created_at: string
+          id: string
+          meeting_day: string | null
+          name: string
+        }
+        Insert: {
+          address?: string | null
+          code?: string | null
+          created_at?: string
+          id?: string
+          meeting_day?: string | null
+          name: string
+        }
+        Update: {
+          address?: string | null
+          code?: string | null
+          created_at?: string
+          id?: string
+          meeting_day?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      dps_accounts: {
+        Row: {
+          account_no: string
+          created_at: string
+          id: string
+          installment_amount: number
+          member_id: string
+          scheme_id: string | null
+          start_date: string
+          status: string
+        }
+        Insert: {
+          account_no: string
+          created_at?: string
+          id?: string
+          installment_amount: number
+          member_id: string
+          scheme_id?: string | null
+          start_date?: string
+          status?: string
+        }
+        Update: {
+          account_no?: string
+          created_at?: string
+          id?: string
+          installment_amount?: number
+          member_id?: string
+          scheme_id?: string | null
+          start_date?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dps_accounts_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dps_accounts_scheme_id_fkey"
+            columns: ["scheme_id"]
+            isOneToOne: false
+            referencedRelation: "dps_schemes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dps_schemes: {
+        Row: {
+          active: boolean
+          created_at: string
+          duration_months: number
+          id: string
+          installment_type: string
+          name: string
+          profit_rate: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          duration_months?: number
+          id?: string
+          installment_type?: string
+          name: string
+          profit_rate?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          duration_months?: number
+          id?: string
+          installment_type?: string
+          name?: string
+          profit_rate?: number
+        }
+        Relationships: []
+      }
+      dps_transactions: {
+        Row: {
+          account_id: string
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          member_id: string
+          note: string | null
+          txn_date: string
+          type: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          member_id: string
+          note?: string | null
+          txn_date?: string
+          type: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          member_id?: string
+          note?: string | null
+          txn_date?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dps_transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "dps_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dps_transactions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fdr_accounts: {
+        Row: {
+          account_no: string
+          amount: number
+          created_at: string
+          id: string
+          maturity_date: string | null
+          member_id: string
+          scheme_id: string | null
+          start_date: string
+          status: string
+        }
+        Insert: {
+          account_no: string
+          amount: number
+          created_at?: string
+          id?: string
+          maturity_date?: string | null
+          member_id: string
+          scheme_id?: string | null
+          start_date?: string
+          status?: string
+        }
+        Update: {
+          account_no?: string
+          amount?: number
+          created_at?: string
+          id?: string
+          maturity_date?: string | null
+          member_id?: string
+          scheme_id?: string | null
+          start_date?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fdr_accounts_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fdr_accounts_scheme_id_fkey"
+            columns: ["scheme_id"]
+            isOneToOne: false
+            referencedRelation: "fdr_schemes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fdr_schemes: {
+        Row: {
+          active: boolean
+          created_at: string
+          duration_months: number
+          id: string
+          name: string
+          payout_type: string
+          profit_rate: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          duration_months?: number
+          id?: string
+          name: string
+          payout_type?: string
+          profit_rate?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          duration_months?: number
+          id?: string
+          name?: string
+          payout_type?: string
+          profit_rate?: number
+        }
+        Relationships: []
+      }
+      fdr_transactions: {
+        Row: {
+          account_id: string
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          member_id: string
+          note: string | null
+          txn_date: string
+          type: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          member_id: string
+          note?: string | null
+          txn_date?: string
+          type: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          member_id?: string
+          note?: string | null
+          txn_date?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fdr_transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "fdr_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fdr_transactions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loan_repayments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          late_fee: number
+          loan_id: string
+          member_id: string
+          note: string | null
+          txn_date: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          late_fee?: number
+          loan_id: string
+          member_id: string
+          note?: string | null
+          txn_date?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          late_fee?: number
+          loan_id?: string
+          member_id?: string
+          note?: string | null
+          txn_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_repayments_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_repayments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loans: {
+        Row: {
+          created_at: string
+          disburse_date: string
+          first_due_date: string
+          guarantor: string | null
+          id: string
+          installment_amount: number
+          installment_count: number
+          installment_type: string
+          interest_rate: number
+          loan_no: string
+          member_id: string
+          principal: number
+          purpose: string | null
+          service_charge: number
+          status: string
+          total_payable: number
+        }
+        Insert: {
+          created_at?: string
+          disburse_date?: string
+          first_due_date?: string
+          guarantor?: string | null
+          id?: string
+          installment_amount: number
+          installment_count?: number
+          installment_type?: string
+          interest_rate?: number
+          loan_no: string
+          member_id: string
+          principal: number
+          purpose?: string | null
+          service_charge?: number
+          status?: string
+          total_payable: number
+        }
+        Update: {
+          created_at?: string
+          disburse_date?: string
+          first_due_date?: string
+          guarantor?: string | null
+          id?: string
+          installment_amount?: number
+          installment_count?: number
+          installment_type?: string
+          interest_rate?: number
+          loan_no?: string
+          member_id?: string
+          principal?: number
+          purpose?: string | null
+          service_charge?: number
+          status?: string
+          total_payable?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loans_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_fees: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          fee_type: string
+          id: string
+          member_id: string
+          note: string | null
+          txn_date: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          fee_type: string
+          id?: string
+          member_id: string
+          note?: string | null
+          txn_date?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          fee_type?: string
+          id?: string
+          member_id?: string
+          note?: string | null
+          txn_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_fees_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      members: {
+        Row: {
+          address: string | null
+          admission_date: string
+          center_id: string | null
+          created_at: string
+          dob: string | null
+          father_name: string | null
+          gender: string | null
+          id: string
+          member_no: string
+          mother_name: string | null
+          name: string
+          nid: string | null
+          nominee_name: string | null
+          nominee_phone: string | null
+          nominee_relation: string | null
+          occupation: string | null
+          phone: string | null
+          spouse_name: string | null
+          status: string
+        }
+        Insert: {
+          address?: string | null
+          admission_date?: string
+          center_id?: string | null
+          created_at?: string
+          dob?: string | null
+          father_name?: string | null
+          gender?: string | null
+          id?: string
+          member_no: string
+          mother_name?: string | null
+          name: string
+          nid?: string | null
+          nominee_name?: string | null
+          nominee_phone?: string | null
+          nominee_relation?: string | null
+          occupation?: string | null
+          phone?: string | null
+          spouse_name?: string | null
+          status?: string
+        }
+        Update: {
+          address?: string | null
+          admission_date?: string
+          center_id?: string | null
+          created_at?: string
+          dob?: string | null
+          father_name?: string | null
+          gender?: string | null
+          id?: string
+          member_no?: string
+          mother_name?: string | null
+          name?: string
+          nid?: string | null
+          nominee_name?: string | null
+          nominee_phone?: string | null
+          nominee_relation?: string | null
+          occupation?: string | null
+          phone?: string | null
+          spouse_name?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "members_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      savings_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          member_id: string
+          note: string | null
+          txn_date: string
+          type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          member_id: string
+          note?: string | null
+          txn_date?: string
+          type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          member_id?: string
+          note?: string | null
+          txn_date?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "savings_transactions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      somiti_settings: {
+        Row: {
+          address: string | null
+          admission_fee: number
+          email: string | null
+          id: number
+          monthly_fee: number
+          name: string
+          phone: string | null
+          reg_no: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          admission_fee?: number
+          email?: string | null
+          id?: number
+          monthly_fee?: number
+          name?: string
+          phone?: string | null
+          reg_no?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          admission_fee?: number
+          email?: string | null
+          id?: number
+          monthly_fee?: number
+          name?: string
+          phone?: string | null
+          reg_no?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_access: { Args: { _user_id: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "staff"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +856,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "staff"],
+    },
   },
 } as const
