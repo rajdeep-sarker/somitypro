@@ -40,6 +40,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const loading = useRouterState({ select: (state) => state.isLoading });
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const qc = useQueryClient();
   const { data: settings = [] } = useRows("somiti_settings", { order: "id" });
   const name = settings[0]?.name ?? "সমিতি";
@@ -97,7 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
           {loading && <LoaderCircle aria-label="পৃষ্ঠা লোড হচ্ছে" className="size-5 shrink-0 animate-spin text-primary" />}
         </header>
-        <main className="min-w-0 p-4 md:p-6">{children}</main>
+        <main key={pathname} className="page-transition min-w-0 p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

@@ -12,3 +12,4 @@
 - Phase-two shares, projects, security funds and bank accounts use a module-tagged immutable ledger; database triggers validate balances and RPCs commit transfers and bulk collections atomically.
 - Staff provisioning is an admin-authorized server function; module permissions live separately from profiles and govern phase-two ledgers through RLS.
 - New feature pages reuse the shared form/table kit and leaf-route metadata helper to keep Bengali workflows consistent.
+- Uploaded Bengali fonts use CDN asset pointers and a Bengali-only font-face range to preserve Latin text; motion is CSS-only and respects reduced-motion preferences to keep interaction immediate.
