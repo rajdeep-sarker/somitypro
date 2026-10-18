@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/fees")({
   component: Fees,
 });
 
-export const feeLabel: Record<string, string> = { admission: "ভর্তি ফি", monthly: "মাসিক সমিতি ফি", late: "বিলম্ব চার্জ", service: "সার্ভিস চার্জ", other: "অন্যান্য" };
+const feeLabel: Record<string, string> = { admission: "ভর্তি ফি", monthly: "মাসিক সমিতি ফি", late: "বিলম্ব চার্জ", service: "সার্ভিস চার্জ", other: "অন্যান্য" };
 
 function Fees() {
   const { data: fees = [] } = useRows("member_fees");
