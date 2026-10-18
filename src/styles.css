@@ -4,9 +4,18 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: "SutonnyOMJ";
+  src: url("/__l5e/assets-v1/b8b63e3b-9b71-45ea-b7fb-3e65f933b49b/SutonnyOMJ_Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0980-09FF, U+200C-200D;
+}
+
 @theme inline {
-  --font-sans: "Hind Siliguri", "Noto Sans Bengali", system-ui, sans-serif;
-  --font-display: "Tiro Bangla", "Hind Siliguri", serif;
+  --font-sans: "SutonnyOMJ", "Hind Siliguri", system-ui, sans-serif;
+  --font-display: "SutonnyOMJ", "Hind Siliguri", sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -150,3 +159,39 @@
 }
 
 .print-only { display: none; }
+
+@keyframes page-arrive {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .page-transition, [role="tabpanel"][data-state="active"] {
+    animation: page-arrive 180ms ease-out both;
+  }
+  button, a[role="button"], [role="tab"] {
+    transition-property: color, background-color, border-color, box-shadow, transform;
+    transition-duration: 140ms;
+    transition-timing-function: ease-out;
+  }
+  button:active:not(:disabled), a[role="button"]:active {
+    transform: scale(0.98);
+  }
+  nav a svg { transition: transform 140ms ease-out; }
+  @media (hover: hover) {
+    nav a:hover svg { transform: translateX(2px); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .page-transition, [role="tabpanel"] { animation: none !important; transform: none !important; opacity: 1 !important; }
+}
