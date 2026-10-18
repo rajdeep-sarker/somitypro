@@ -28,9 +28,9 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent): Promise<void> {
     e.preventDefault();
-    if (phone.replace(/\D/g, "").length < 11) return toast.error("সঠিক মোবাইল নম্বর দিন");
+    if (phone.replace(/\D/g, "").length < 11) { toast.error("সঠিক মোবাইল নম্বর দিন"); return; }
     setBusy(true);
     const email = phoneToEmail(phone);
     const res =
@@ -38,8 +38,8 @@ function AuthPage() {
         ? await supabase.auth.signInWithPassword({ email, password })
         : await supabase.auth.signUp({ email, password, options: { data: { full_name: name, phone }, emailRedirectTo: window.location.origin } });
     setBusy(false);
-    if (res.error) return toast.error(mode === "login" ? "মোবাইল নম্বর বা পাসওয়ার্ড ভুল" : res.error.message);
-    if (!res.data.session) return toast.success("অ্যাকাউন্ট তৈরি হয়েছে, এখন লগইন করুন");
+    if (res.error) { toast.error(mode === "login" ? "মোবাইল নম্বর বা পাসওয়ার্ড ভুল" : res.error.message); return; }
+    if (!res.data.session) { toast.success("অ্যাকাউন্ট তৈরি হয়েছে, এখন লগইন করুন"); return; }
     navigate({ to: "/dashboard" });
   }
 

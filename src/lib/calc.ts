@@ -15,7 +15,7 @@ export function calcLoan(principal: number, ratePercent: number, count: number) 
 }
 
 function toDate(s: string) {
-  const [y, m, d] = s.split("-").map(Number);
+  const [y = 1970, m = 1, d = 1] = s.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d));
 }
 

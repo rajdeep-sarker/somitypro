@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/fdr")({
   component: Fdr,
 });
 
-const tLabel: Record<string, string> = { deposit: "জমা", withdraw: "উত্তোলন", profit: "মুনাফা প্রদান", service_charge: "সার্ভিস চার্জ কর্তন" };
+const tLabel = { deposit: "জমা", withdraw: "উত্তোলন", profit: "মুনাফা প্রদান", service_charge: "সার্ভিস চার্জ কর্তন" } as Record<string, string> & { profit: string; service_charge: string };
 const payout: Record<string, string> = { maturity: "মেয়াদ শেষে", monthly: "মাসিক" };
 
 function Fdr() {
