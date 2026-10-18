@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedBanksRouteImport } from './routes/_authenticated/banks'
 import { Route as AuthenticatedCashRouteImport } from './routes/_authenticated/cash'
 import { Route as AuthenticatedCentersRouteImport } from './routes/_authenticated/centers'
+import { Route as AuthenticatedCollectionRouteImport } from './routes/_authenticated/collection'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDpsRouteImport } from './routes/_authenticated/dps'
 import { Route as AuthenticatedFdrRouteImport } from './routes/_authenticated/fdr'
@@ -22,7 +23,9 @@ import { Route as AuthenticatedFeesRouteImport } from './routes/_authenticated/f
 import { Route as AuthenticatedFundRouteImport } from './routes/_authenticated/fund'
 import { Route as AuthenticatedImportRouteImport } from './routes/_authenticated/import'
 import { Route as AuthenticatedInvestmentsRouteImport } from './routes/_authenticated/investments'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedRulesRouteImport } from './routes/_authenticated/rules'
 import { Route as AuthenticatedSavingsRouteImport } from './routes/_authenticated/savings'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSharesRouteImport } from './routes/_authenticated/shares'
@@ -62,6 +65,11 @@ const AuthenticatedCentersRoute = AuthenticatedCentersRouteImport.update({
   path: '/centers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCollectionRoute = AuthenticatedCollectionRouteImport.update({
+  id: '/collection',
+  path: '/collection',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -98,9 +106,20 @@ const AuthenticatedInvestmentsRoute =
     path: '/investments',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRulesRoute = AuthenticatedRulesRouteImport.update({
+  id: '/rules',
+  path: '/rules',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSavingsRoute = AuthenticatedSavingsRouteImport.update({
@@ -157,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/banks': typeof AuthenticatedBanksRoute
   '/cash': typeof AuthenticatedCashRoute
   '/centers': typeof AuthenticatedCentersRoute
+  '/collection': typeof AuthenticatedCollectionRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/dps': typeof AuthenticatedDpsRoute
   '/fdr': typeof AuthenticatedFdrRoute
@@ -164,7 +184,9 @@ export interface FileRoutesByFullPath {
   '/fund': typeof AuthenticatedFundRoute
   '/import': typeof AuthenticatedImportRoute
   '/investments': typeof AuthenticatedInvestmentsRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/rules': typeof AuthenticatedRulesRoute
   '/savings': typeof AuthenticatedSavingsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shares': typeof AuthenticatedSharesRoute
@@ -181,6 +203,7 @@ export interface FileRoutesByTo {
   '/banks': typeof AuthenticatedBanksRoute
   '/cash': typeof AuthenticatedCashRoute
   '/centers': typeof AuthenticatedCentersRoute
+  '/collection': typeof AuthenticatedCollectionRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/dps': typeof AuthenticatedDpsRoute
   '/fdr': typeof AuthenticatedFdrRoute
@@ -188,7 +211,9 @@ export interface FileRoutesByTo {
   '/fund': typeof AuthenticatedFundRoute
   '/import': typeof AuthenticatedImportRoute
   '/investments': typeof AuthenticatedInvestmentsRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/rules': typeof AuthenticatedRulesRoute
   '/savings': typeof AuthenticatedSavingsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shares': typeof AuthenticatedSharesRoute
@@ -207,6 +232,7 @@ export interface FileRoutesById {
   '/_authenticated/banks': typeof AuthenticatedBanksRoute
   '/_authenticated/cash': typeof AuthenticatedCashRoute
   '/_authenticated/centers': typeof AuthenticatedCentersRoute
+  '/_authenticated/collection': typeof AuthenticatedCollectionRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/dps': typeof AuthenticatedDpsRoute
   '/_authenticated/fdr': typeof AuthenticatedFdrRoute
@@ -214,7 +240,9 @@ export interface FileRoutesById {
   '/_authenticated/fund': typeof AuthenticatedFundRoute
   '/_authenticated/import': typeof AuthenticatedImportRoute
   '/_authenticated/investments': typeof AuthenticatedInvestmentsRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/rules': typeof AuthenticatedRulesRoute
   '/_authenticated/savings': typeof AuthenticatedSavingsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/shares': typeof AuthenticatedSharesRoute
@@ -233,6 +261,7 @@ export interface FileRouteTypes {
     | '/banks'
     | '/cash'
     | '/centers'
+    | '/collection'
     | '/dashboard'
     | '/dps'
     | '/fdr'
@@ -240,7 +269,9 @@ export interface FileRouteTypes {
     | '/fund'
     | '/import'
     | '/investments'
+    | '/notifications'
     | '/reports'
+    | '/rules'
     | '/savings'
     | '/settings'
     | '/shares'
@@ -257,6 +288,7 @@ export interface FileRouteTypes {
     | '/banks'
     | '/cash'
     | '/centers'
+    | '/collection'
     | '/dashboard'
     | '/dps'
     | '/fdr'
@@ -264,7 +296,9 @@ export interface FileRouteTypes {
     | '/fund'
     | '/import'
     | '/investments'
+    | '/notifications'
     | '/reports'
+    | '/rules'
     | '/savings'
     | '/settings'
     | '/shares'
@@ -282,6 +316,7 @@ export interface FileRouteTypes {
     | '/_authenticated/banks'
     | '/_authenticated/cash'
     | '/_authenticated/centers'
+    | '/_authenticated/collection'
     | '/_authenticated/dashboard'
     | '/_authenticated/dps'
     | '/_authenticated/fdr'
@@ -289,7 +324,9 @@ export interface FileRouteTypes {
     | '/_authenticated/fund'
     | '/_authenticated/import'
     | '/_authenticated/investments'
+    | '/_authenticated/notifications'
     | '/_authenticated/reports'
+    | '/_authenticated/rules'
     | '/_authenticated/savings'
     | '/_authenticated/settings'
     | '/_authenticated/shares'
@@ -351,6 +388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCentersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/collection': {
+      id: '/_authenticated/collection'
+      path: '/collection'
+      fullPath: '/collection'
+      preLoaderRoute: typeof AuthenticatedCollectionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -400,11 +444,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInvestmentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rules': {
+      id: '/_authenticated/rules'
+      path: '/rules'
+      fullPath: '/rules'
+      preLoaderRoute: typeof AuthenticatedRulesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/savings': {
@@ -477,6 +535,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBanksRoute: typeof AuthenticatedBanksRoute
   AuthenticatedCashRoute: typeof AuthenticatedCashRoute
   AuthenticatedCentersRoute: typeof AuthenticatedCentersRoute
+  AuthenticatedCollectionRoute: typeof AuthenticatedCollectionRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDpsRoute: typeof AuthenticatedDpsRoute
   AuthenticatedFdrRoute: typeof AuthenticatedFdrRoute
@@ -484,7 +543,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFundRoute: typeof AuthenticatedFundRoute
   AuthenticatedImportRoute: typeof AuthenticatedImportRoute
   AuthenticatedInvestmentsRoute: typeof AuthenticatedInvestmentsRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedRulesRoute: typeof AuthenticatedRulesRoute
   AuthenticatedSavingsRoute: typeof AuthenticatedSavingsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSharesRoute: typeof AuthenticatedSharesRoute
@@ -500,6 +561,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBanksRoute: AuthenticatedBanksRoute,
   AuthenticatedCashRoute: AuthenticatedCashRoute,
   AuthenticatedCentersRoute: AuthenticatedCentersRoute,
+  AuthenticatedCollectionRoute: AuthenticatedCollectionRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDpsRoute: AuthenticatedDpsRoute,
   AuthenticatedFdrRoute: AuthenticatedFdrRoute,
@@ -507,7 +569,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFundRoute: AuthenticatedFundRoute,
   AuthenticatedImportRoute: AuthenticatedImportRoute,
   AuthenticatedInvestmentsRoute: AuthenticatedInvestmentsRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedRulesRoute: AuthenticatedRulesRoute,
   AuthenticatedSavingsRoute: AuthenticatedSavingsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSharesRoute: AuthenticatedSharesRoute,
