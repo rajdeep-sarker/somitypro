@@ -14,6 +14,10 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCentersRouteImport } from './routes/_authenticated/centers'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedSavingsRouteImport } from './routes/_authenticated/savings'
+import { Route as AuthenticatedLoansIndexRouteImport } from './routes/_authenticated/loans.index'
+import { Route as AuthenticatedLoansCollectRouteImport } from './routes/_authenticated/loans.collect'
+import { Route as AuthenticatedLoansDueRouteImport } from './routes/_authenticated/loans.due'
 import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
 import { Route as AuthenticatedMembersIdRouteImport } from './routes/_authenticated/members.$id'
 
@@ -41,6 +45,27 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSavingsRoute = AuthenticatedSavingsRouteImport.update({
+  id: '/savings',
+  path: '/savings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLoansIndexRoute = AuthenticatedLoansIndexRouteImport.update({
+  id: '/loans/',
+  path: '/loans/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLoansCollectRoute =
+  AuthenticatedLoansCollectRouteImport.update({
+    id: '/loans/collect',
+    path: '/loans/collect',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLoansDueRoute = AuthenticatedLoansDueRouteImport.update({
+  id: '/loans/due',
+  path: '/loans/due',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMembersIndexRoute =
   AuthenticatedMembersIndexRouteImport.update({
     id: '/members/',
@@ -58,7 +83,11 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/centers': typeof AuthenticatedCentersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/savings': typeof AuthenticatedSavingsRoute
+  '/loans/collect': typeof AuthenticatedLoansCollectRoute
+  '/loans/due': typeof AuthenticatedLoansDueRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
+  '/loans/': typeof AuthenticatedLoansIndexRoute
   '/members/': typeof AuthenticatedMembersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -66,7 +95,11 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/centers': typeof AuthenticatedCentersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/savings': typeof AuthenticatedSavingsRoute
+  '/loans/collect': typeof AuthenticatedLoansCollectRoute
+  '/loans/due': typeof AuthenticatedLoansDueRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
+  '/loans': typeof AuthenticatedLoansIndexRoute
   '/members': typeof AuthenticatedMembersIndexRoute
 }
 export interface FileRoutesById {
@@ -76,15 +109,38 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/centers': typeof AuthenticatedCentersRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/savings': typeof AuthenticatedSavingsRoute
+  '/_authenticated/loans/collect': typeof AuthenticatedLoansCollectRoute
+  '/_authenticated/loans/due': typeof AuthenticatedLoansDueRoute
   '/_authenticated/members/$id': typeof AuthenticatedMembersIdRoute
+  '/_authenticated/loans/': typeof AuthenticatedLoansIndexRoute
   '/_authenticated/members/': typeof AuthenticatedMembersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/centers' | '/dashboard' | '/members/$id' | '/members/'
+    | '/'
+    | '/auth'
+    | '/centers'
+    | '/dashboard'
+    | '/savings'
+    | '/loans/collect'
+    | '/loans/due'
+    | '/members/$id'
+    | '/loans/'
+    | '/members/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/centers' | '/dashboard' | '/members/$id' | '/members'
+  to:
+    | '/'
+    | '/auth'
+    | '/centers'
+    | '/dashboard'
+    | '/savings'
+    | '/loans/collect'
+    | '/loans/due'
+    | '/members/$id'
+    | '/loans'
+    | '/members'
   id:
     | '__root__'
     | '/'
@@ -92,7 +148,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/centers'
     | '/_authenticated/dashboard'
+    | '/_authenticated/savings'
+    | '/_authenticated/loans/collect'
+    | '/_authenticated/loans/due'
     | '/_authenticated/members/$id'
+    | '/_authenticated/loans/'
     | '/_authenticated/members/'
   fileRoutesById: FileRoutesById
 }
@@ -139,6 +199,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/savings': {
+      id: '/_authenticated/savings'
+      path: '/savings'
+      fullPath: '/savings'
+      preLoaderRoute: typeof AuthenticatedSavingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/loans/': {
+      id: '/_authenticated/loans/'
+      path: '/loans'
+      fullPath: '/loans/'
+      preLoaderRoute: typeof AuthenticatedLoansIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/loans/collect': {
+      id: '/_authenticated/loans/collect'
+      path: '/loans/collect'
+      fullPath: '/loans/collect'
+      preLoaderRoute: typeof AuthenticatedLoansCollectRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/loans/due': {
+      id: '/_authenticated/loans/due'
+      path: '/loans/due'
+      fullPath: '/loans/due'
+      preLoaderRoute: typeof AuthenticatedLoansDueRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/members/': {
       id: '/_authenticated/members/'
       path: '/members'
@@ -159,14 +247,22 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCentersRoute: typeof AuthenticatedCentersRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSavingsRoute: typeof AuthenticatedSavingsRoute
+  AuthenticatedLoansCollectRoute: typeof AuthenticatedLoansCollectRoute
+  AuthenticatedLoansDueRoute: typeof AuthenticatedLoansDueRoute
   AuthenticatedMembersIdRoute: typeof AuthenticatedMembersIdRoute
+  AuthenticatedLoansIndexRoute: typeof AuthenticatedLoansIndexRoute
   AuthenticatedMembersIndexRoute: typeof AuthenticatedMembersIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCentersRoute: AuthenticatedCentersRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSavingsRoute: AuthenticatedSavingsRoute,
+  AuthenticatedLoansCollectRoute: AuthenticatedLoansCollectRoute,
+  AuthenticatedLoansDueRoute: AuthenticatedLoansDueRoute,
   AuthenticatedMembersIdRoute: AuthenticatedMembersIdRoute,
+  AuthenticatedLoansIndexRoute: AuthenticatedLoansIndexRoute,
   AuthenticatedMembersIndexRoute: AuthenticatedMembersIndexRoute,
 }
 
