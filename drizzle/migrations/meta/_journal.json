@@ -8,6 +8,13 @@
       "when": 1792343565570,
       "tag": "0000_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792344779474,
+      "tag": "0001_phase_two_ledgers_staff_and_bulk",
+      "breakpoints": true
     }
   ]
 }
