@@ -10,33 +10,228 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedCashRouteImport } from './routes/_authenticated/cash'
+import { Route as AuthenticatedCentersRouteImport } from './routes/_authenticated/centers'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDpsRouteImport } from './routes/_authenticated/dps'
+import { Route as AuthenticatedFdrRouteImport } from './routes/_authenticated/fdr'
+import { Route as AuthenticatedFeesRouteImport } from './routes/_authenticated/fees'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedSavingsRouteImport } from './routes/_authenticated/savings'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedLoansIndexRouteImport } from './routes/_authenticated/loans.index'
+import { Route as AuthenticatedLoansCollectRouteImport } from './routes/_authenticated/loans.collect'
+import { Route as AuthenticatedLoansDueRouteImport } from './routes/_authenticated/loans.due'
+import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
+import { Route as AuthenticatedMembersIdRouteImport } from './routes/_authenticated/members.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCashRoute = AuthenticatedCashRouteImport.update({
+  id: '/cash',
+  path: '/cash',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCentersRoute = AuthenticatedCentersRouteImport.update({
+  id: '/centers',
+  path: '/centers',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDpsRoute = AuthenticatedDpsRouteImport.update({
+  id: '/dps',
+  path: '/dps',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFdrRoute = AuthenticatedFdrRouteImport.update({
+  id: '/fdr',
+  path: '/fdr',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFeesRoute = AuthenticatedFeesRouteImport.update({
+  id: '/fees',
+  path: '/fees',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSavingsRoute = AuthenticatedSavingsRouteImport.update({
+  id: '/savings',
+  path: '/savings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLoansIndexRoute = AuthenticatedLoansIndexRouteImport.update({
+  id: '/loans/',
+  path: '/loans/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLoansCollectRoute =
+  AuthenticatedLoansCollectRouteImport.update({
+    id: '/loans/collect',
+    path: '/loans/collect',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLoansDueRoute = AuthenticatedLoansDueRouteImport.update({
+  id: '/loans/due',
+  path: '/loans/due',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMembersIndexRoute =
+  AuthenticatedMembersIndexRouteImport.update({
+    id: '/members/',
+    path: '/members/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMembersIdRoute = AuthenticatedMembersIdRouteImport.update({
+  id: '/members/$id',
+  path: '/members/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/cash': typeof AuthenticatedCashRoute
+  '/centers': typeof AuthenticatedCentersRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dps': typeof AuthenticatedDpsRoute
+  '/fdr': typeof AuthenticatedFdrRoute
+  '/fees': typeof AuthenticatedFeesRoute
+  '/reports': typeof AuthenticatedReportsRoute
+  '/savings': typeof AuthenticatedSavingsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/loans/collect': typeof AuthenticatedLoansCollectRoute
+  '/loans/due': typeof AuthenticatedLoansDueRoute
+  '/members/$id': typeof AuthenticatedMembersIdRoute
+  '/loans/': typeof AuthenticatedLoansIndexRoute
+  '/members/': typeof AuthenticatedMembersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/cash': typeof AuthenticatedCashRoute
+  '/centers': typeof AuthenticatedCentersRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dps': typeof AuthenticatedDpsRoute
+  '/fdr': typeof AuthenticatedFdrRoute
+  '/fees': typeof AuthenticatedFeesRoute
+  '/reports': typeof AuthenticatedReportsRoute
+  '/savings': typeof AuthenticatedSavingsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/loans/collect': typeof AuthenticatedLoansCollectRoute
+  '/loans/due': typeof AuthenticatedLoansDueRoute
+  '/members/$id': typeof AuthenticatedMembersIdRoute
+  '/loans': typeof AuthenticatedLoansIndexRoute
+  '/members': typeof AuthenticatedMembersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/cash': typeof AuthenticatedCashRoute
+  '/_authenticated/centers': typeof AuthenticatedCentersRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/dps': typeof AuthenticatedDpsRoute
+  '/_authenticated/fdr': typeof AuthenticatedFdrRoute
+  '/_authenticated/fees': typeof AuthenticatedFeesRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/savings': typeof AuthenticatedSavingsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/loans/collect': typeof AuthenticatedLoansCollectRoute
+  '/_authenticated/loans/due': typeof AuthenticatedLoansDueRoute
+  '/_authenticated/members/$id': typeof AuthenticatedMembersIdRoute
+  '/_authenticated/loans/': typeof AuthenticatedLoansIndexRoute
+  '/_authenticated/members/': typeof AuthenticatedMembersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/cash'
+    | '/centers'
+    | '/dashboard'
+    | '/dps'
+    | '/fdr'
+    | '/fees'
+    | '/reports'
+    | '/savings'
+    | '/settings'
+    | '/loans/collect'
+    | '/loans/due'
+    | '/members/$id'
+    | '/loans/'
+    | '/members/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/cash'
+    | '/centers'
+    | '/dashboard'
+    | '/dps'
+    | '/fdr'
+    | '/fees'
+    | '/reports'
+    | '/savings'
+    | '/settings'
+    | '/loans/collect'
+    | '/loans/due'
+    | '/members/$id'
+    | '/loans'
+    | '/members'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/cash'
+    | '/_authenticated/centers'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/dps'
+    | '/_authenticated/fdr'
+    | '/_authenticated/fees'
+    | '/_authenticated/reports'
+    | '/_authenticated/savings'
+    | '/_authenticated/settings'
+    | '/_authenticated/loans/collect'
+    | '/_authenticated/loans/due'
+    | '/_authenticated/members/$id'
+    | '/_authenticated/loans/'
+    | '/_authenticated/members/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +243,162 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/cash': {
+      id: '/_authenticated/cash'
+      path: '/cash'
+      fullPath: '/cash'
+      preLoaderRoute: typeof AuthenticatedCashRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/centers': {
+      id: '/_authenticated/centers'
+      path: '/centers'
+      fullPath: '/centers'
+      preLoaderRoute: typeof AuthenticatedCentersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dps': {
+      id: '/_authenticated/dps'
+      path: '/dps'
+      fullPath: '/dps'
+      preLoaderRoute: typeof AuthenticatedDpsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/fdr': {
+      id: '/_authenticated/fdr'
+      path: '/fdr'
+      fullPath: '/fdr'
+      preLoaderRoute: typeof AuthenticatedFdrRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/fees': {
+      id: '/_authenticated/fees'
+      path: '/fees'
+      fullPath: '/fees'
+      preLoaderRoute: typeof AuthenticatedFeesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/savings': {
+      id: '/_authenticated/savings'
+      path: '/savings'
+      fullPath: '/savings'
+      preLoaderRoute: typeof AuthenticatedSavingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/loans/': {
+      id: '/_authenticated/loans/'
+      path: '/loans'
+      fullPath: '/loans/'
+      preLoaderRoute: typeof AuthenticatedLoansIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/loans/collect': {
+      id: '/_authenticated/loans/collect'
+      path: '/loans/collect'
+      fullPath: '/loans/collect'
+      preLoaderRoute: typeof AuthenticatedLoansCollectRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/loans/due': {
+      id: '/_authenticated/loans/due'
+      path: '/loans/due'
+      fullPath: '/loans/due'
+      preLoaderRoute: typeof AuthenticatedLoansDueRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/members/': {
+      id: '/_authenticated/members/'
+      path: '/members'
+      fullPath: '/members/'
+      preLoaderRoute: typeof AuthenticatedMembersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/members/$id': {
+      id: '/_authenticated/members/$id'
+      path: '/members/$id'
+      fullPath: '/members/$id'
+      preLoaderRoute: typeof AuthenticatedMembersIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCashRoute: typeof AuthenticatedCashRoute
+  AuthenticatedCentersRoute: typeof AuthenticatedCentersRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDpsRoute: typeof AuthenticatedDpsRoute
+  AuthenticatedFdrRoute: typeof AuthenticatedFdrRoute
+  AuthenticatedFeesRoute: typeof AuthenticatedFeesRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedSavingsRoute: typeof AuthenticatedSavingsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedLoansCollectRoute: typeof AuthenticatedLoansCollectRoute
+  AuthenticatedLoansDueRoute: typeof AuthenticatedLoansDueRoute
+  AuthenticatedMembersIdRoute: typeof AuthenticatedMembersIdRoute
+  AuthenticatedLoansIndexRoute: typeof AuthenticatedLoansIndexRoute
+  AuthenticatedMembersIndexRoute: typeof AuthenticatedMembersIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCashRoute: AuthenticatedCashRoute,
+  AuthenticatedCentersRoute: AuthenticatedCentersRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDpsRoute: AuthenticatedDpsRoute,
+  AuthenticatedFdrRoute: AuthenticatedFdrRoute,
+  AuthenticatedFeesRoute: AuthenticatedFeesRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedSavingsRoute: AuthenticatedSavingsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedLoansCollectRoute: AuthenticatedLoansCollectRoute,
+  AuthenticatedLoansDueRoute: AuthenticatedLoansDueRoute,
+  AuthenticatedMembersIdRoute: AuthenticatedMembersIdRoute,
+  AuthenticatedLoansIndexRoute: AuthenticatedLoansIndexRoute,
+  AuthenticatedMembersIndexRoute: AuthenticatedMembersIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
