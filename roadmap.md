@@ -3,7 +3,8 @@
 ## Phase 1 — done
 - [x] Mobile login, dashboard, centers, members (+ledger), savings, loans (disburse/collect/schedule/due/overdue/close), DPS, FDR, fees, cash in/out, reports, settings
 
-## Phase 2 — next
+## Phase 2 — in progress
+- [ ] Phone: immediate menu feedback, fast repeat navigation, narrow-screen layouts
 - [ ] Share management (create, buy, withdraw, dividend, holders)
 - [ ] Investment/project management
 - [ ] Insurance / security fund (deposit, loan waiver, P/L)
