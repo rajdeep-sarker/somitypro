@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "সোনালী সঞ্চয় ও ঋণদান সমবায় সমিতি লিমিটেড" },
       { name: "description", content: "সঞ্চয়, ঋণ, DPS, FDR ও হিসাব — সমিতির সম্পূর্ণ ডিজিটাল ব্যবস্থাপনা।" },
       { property: "og:title", content: "সোনালী সঞ্চয় ও ঋণদান সমবায় সমিতি লিমিটেড" },

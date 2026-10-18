@@ -103,6 +103,18 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    letter-spacing: 0;
+  }
+  button, a, input, select {
+    touch-action: manipulation;
+  }
+  input, select, textarea {
+    min-width: 0;
+  }
+  @media (max-width: 639px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
   }
 }
 
@@ -124,6 +136,17 @@
     display: none !important;
   }
   body {
-    background: white;
+    background: var(--card);
+  }
+  main {
+    padding: 0 !important;
+  }
+  .lg\:pl-64 {
+    padding-left: 0 !important;
+  }
+  .print-only {
+    display: block !important;
   }
 }
+
+.print-only { display: none; }

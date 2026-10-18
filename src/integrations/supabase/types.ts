@@ -38,6 +38,71 @@ export type Database = {
         }
         Relationships: []
       }
+      attendance: {
+        Row: {
+          attendance_date: string
+          check_in: string | null
+          check_out: string | null
+          created_at: string
+          id: string
+          note: string | null
+          staff_id: string
+          status: string
+        }
+        Insert: {
+          attendance_date?: string
+          check_in?: string | null
+          check_out?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          staff_id: string
+          status: string
+        }
+        Update: {
+          attendance_date?: string
+          check_in?: string | null
+          check_out?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          staff_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bulk_batches: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          row_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id: string
+          kind: string
+          row_count: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          row_count?: number
+        }
+        Relationships: []
+      }
       cash_entries: {
         Row: {
           amount: number
@@ -102,6 +167,24 @@ export type Database = {
           created_at?: string
           id?: string
           meeting_day?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      designations: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
           name?: string
         }
         Relationships: []
@@ -367,6 +450,135 @@ export type Database = {
           },
         ]
       }
+      ledger_accounts: {
+        Row: {
+          account_no: string | null
+          bank_name: string | null
+          branch: string | null
+          budget: number
+          created_at: string
+          id: string
+          member_id: string | null
+          module: string
+          name: string
+          note: string | null
+          opening_balance: number
+          start_date: string
+          status: string
+          unit_price: number
+        }
+        Insert: {
+          account_no?: string | null
+          bank_name?: string | null
+          branch?: string | null
+          budget?: number
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          module: string
+          name: string
+          note?: string | null
+          opening_balance?: number
+          start_date?: string
+          status?: string
+          unit_price?: number
+        }
+        Update: {
+          account_no?: string | null
+          bank_name?: string | null
+          branch?: string | null
+          budget?: number
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          module?: string
+          name?: string
+          note?: string | null
+          opening_balance?: number
+          start_date?: string
+          status?: string
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ledger_accounts_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ledger_transactions: {
+        Row: {
+          account_id: string
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          loan_id: string | null
+          member_id: string | null
+          note: string | null
+          reference: string | null
+          transfer_id: string | null
+          txn_date: string
+          type: string
+          units: number
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          loan_id?: string | null
+          member_id?: string | null
+          note?: string | null
+          reference?: string | null
+          transfer_id?: string | null
+          txn_date?: string
+          type: string
+          units?: number
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          loan_id?: string | null
+          member_id?: string | null
+          note?: string | null
+          reference?: string | null
+          transfer_id?: string | null
+          txn_date?: string
+          type?: string
+          units?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ledger_transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "ledger_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ledger_transactions_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ledger_transactions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loan_repayments: {
         Row: {
           amount: number
@@ -598,6 +810,33 @@ export type Database = {
           },
         ]
       }
+      notification_drafts: {
+        Row: {
+          channel: string
+          created_at: string
+          id: string
+          message: string
+          recipients: Json
+          status: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          id?: string
+          message: string
+          recipients?: Json
+          status?: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          id?: string
+          message?: string
+          recipients?: Json
+          status?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -618,6 +857,44 @@ export type Database = {
           phone?: string | null
         }
         Relationships: []
+      }
+      salary_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          month: string
+          note: string | null
+          staff_id: string
+          txn_date: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          month: string
+          note?: string | null
+          staff_id: string
+          txn_date?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          month?: string
+          note?: string | null
+          staff_id?: string
+          txn_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salary_payments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       savings_transactions: {
         Row: {
@@ -660,6 +937,27 @@ export type Database = {
           },
         ]
       }
+      somiti_rules: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       somiti_settings: {
         Row: {
           address: string | null
@@ -696,6 +994,77 @@ export type Database = {
         }
         Relationships: []
       }
+      staff: {
+        Row: {
+          address: string | null
+          created_at: string
+          designation_id: string | null
+          id: string
+          join_date: string
+          name: string
+          phone: string | null
+          salary: number
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          designation_id?: string | null
+          id?: string
+          join_date?: string
+          name: string
+          phone?: string | null
+          salary?: number
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          designation_id?: string | null
+          id?: string
+          join_date?: string
+          name?: string
+          phone?: string | null
+          salary?: number
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_designation_id_fkey"
+            columns: ["designation_id"]
+            isOneToOne: false
+            referencedRelation: "designations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_permissions: {
+        Row: {
+          can_write: boolean
+          created_at: string
+          id: string
+          module: string
+          user_id: string
+        }
+        Insert: {
+          can_write?: boolean
+          created_at?: string
+          id?: string
+          module: string
+          user_id: string
+        }
+        Update: {
+          can_write?: boolean
+          created_at?: string
+          id?: string
+          module?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -719,13 +1088,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      bulk_collect: {
+        Args: { p_batch: string; p_date: string; p_rows: Json }
+        Returns: number
+      }
       has_access: { Args: { _user_id: string }; Returns: boolean }
+      has_module_access: {
+        Args: { p_module: string; p_write?: boolean }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      import_members: {
+        Args: { p_batch: string; p_rows: Json }
+        Returns: number
+      }
+      transfer_bank: {
+        Args: {
+          p_amount: number
+          p_date: string
+          p_from: string
+          p_note?: string
+          p_to: string
+        }
+        Returns: string
       }
     }
     Enums: {

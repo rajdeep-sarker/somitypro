@@ -15,7 +15,7 @@ export function useRows<T extends TableName>(table: T, opts?: { order?: string; 
       const { data, error } = await supabase
         .from(table)
         .select("*")
-        .order(opts?.order ?? "created_at", { ascending: opts?.ascending ?? false })
+        .order(opts?.order ?? (table === "user_roles" || table === "somiti_settings" ? "id" : "created_at"), { ascending: opts?.ascending ?? false })
         .limit(5000);
       if (error) throw error;
       return data as unknown as Row<T>[];

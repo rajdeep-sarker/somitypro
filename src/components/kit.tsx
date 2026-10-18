@@ -7,12 +7,12 @@ import { cn } from "@/lib/utils";
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-      <div>
+    <div className="mb-6 grid min-w-0 gap-3 sm:flex sm:items-end sm:justify-between">
+      <div className="min-w-0">
         <h1 className="font-display text-2xl text-foreground md:text-3xl">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
       </div>
-      {actions && <div className="no-print flex flex-wrap gap-2">{actions}</div>}
+      {actions && <div className="no-print flex shrink-0 flex-wrap gap-2">{actions}</div>}
     </div>
   );
 }
@@ -82,8 +82,8 @@ export function SimpleSelect({ value, onChange, options, placeholder }: { value:
 
 export function DataTable({ head, rows, empty = "কোনো তথ্য পাওয়া যায়নি", foot }: { head: ReactNode[]; rows: ReactNode[][]; empty?: string; foot?: ReactNode[] }) {
   return (
-    <Card className="overflow-hidden shadow-card">
-      <div className="overflow-x-auto">
+    <Card className="min-w-0 max-w-full overflow-hidden shadow-card">
+      <div className="overflow-x-auto overscroll-x-contain">
         <table className="w-full text-sm">
           <thead className="bg-secondary text-secondary-foreground">
             <tr>

@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/metadata";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Users, PiggyBank, HandCoins, Wallet, CalendarClock, Landmark, AlertTriangle, Receipt } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -7,7 +8,7 @@ import { bn, sum, taka, todayISO } from "@/lib/format";
 import { loanStatus } from "@/lib/calc";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "ড্যাশবোর্ড — সোনালী সমিতি" }] }),
+  head: () => pageHead("ড্যাশবোর্ড"),
   component: Dashboard,
 });
 
@@ -50,7 +51,7 @@ function Dashboard() {
   return (
     <div>
       <PageHeader title="ড্যাশবোর্ড" subtitle="সমিতির আজকের সার্বিক অবস্থা" />
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="মোট সদস্য" value={bn(members.length)} hint={`সক্রিয় ${bn(members.filter((m) => m.status === "active").length)}`} icon={<Users className="size-5" />} />
         <StatCard label="মোট সঞ্চয়" value={taka(savBal)} tone="success" icon={<PiggyBank className="size-5" />} />
         <StatCard label="অবশিষ্ট ঋণ" value={taka(loanOut)} hint={`সক্রিয় লোন ${bn(active.length)}`} tone="gold" icon={<HandCoins className="size-5" />} />

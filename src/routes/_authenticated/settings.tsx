@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/metadata";
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -8,7 +9,7 @@ import { useRows, useUpdate } from "@/lib/db";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "সেটিং — সোনালী সমিতি" }] }),
+  head: () => pageHead("সেটিং"),
   component: Settings,
 });
 
