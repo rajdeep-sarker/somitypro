@@ -11,6 +11,8 @@ import { phoneToEmail } from "@/lib/format";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "লগইন — সোনালী সমিতি" },
       { name: "description", content: "মোবাইল নম্বর ও পাসওয়ার্ড দিয়ে সমিতি সফটওয়্যারে লগইন করুন।" },
       { property: "og:title", content: "লগইন — সোনালী সমিতি" },

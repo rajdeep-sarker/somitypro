@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/metadata";
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus, Search } from "lucide-react";
@@ -10,7 +11,7 @@ import { nextNo, useInsert, useRows } from "@/lib/db";
 import { bnDate, todayISO } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/members/")({
-  head: () => ({ meta: [{ title: "সদস্যের তালিকা — সোনালী সমিতি" }] }),
+  head: () => pageHead("সদস্যের তালিকা"),
   component: Members,
 });
 

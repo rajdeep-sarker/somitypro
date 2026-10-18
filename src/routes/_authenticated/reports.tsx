@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Printer } from "lucide-react";
@@ -9,7 +10,7 @@ import { useRows } from "@/lib/db";
 import { bnDate, sum, taka, todayISO } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/reports")({
-  head: () => ({ meta: [{ title: "সমিতির রিপোর্ট — সোনালী সমিতি" }] }),
+  head: () => pageHead("সমিতির রিপোর্ট"),
   component: Reports,
 });
 
@@ -28,6 +29,10 @@ function Reports() {
   const { data: fees = [] } = useRows("member_fees");
   const { data: cash = [] } = useRows("cash_entries");
 
+  const { data: ledgerAccounts = [] } = useRows("ledger_accounts");
+  const { data: ledgerTx = [] } = useRows("ledger_transactions");
+  const { data: salaries = [] } = useRows("salary_payments");
+  const accountMap = new Map(ledgerAccounts.map(a => [a.id, a]));
   const inR = <T extends { txn_date: string }>(r: T[]) => r.filter((x) => x.txn_date >= from && x.txn_date <= to);
   const upto = <T extends { txn_date: string }>(r: T[]) => r.filter((x) => x.txn_date <= to);
 
@@ -42,6 +47,8 @@ function Reports() {
       ["DPS জমা", sum(pick(dps).filter((x) => x.type === "deposit"), (x) => x.amount)],
       ["FDR জমা", sum(fdrOpen, (a) => a.amount)],
       ["সমিতি ফি / চার্জ", sum(pick(fees), (x) => x.amount)],
+      ["শেয়ার ক্রয় / তহবিল জমা / বিনিয়োগ ফেরত", sum(pick(ledgerTx).filter(t => ["purchase","deposit","return","profit"].includes(t.type) && accountMap.get(t.account_id)?.module !== "banks"), t => t.amount)],
+      ["ব্যাংক থেকে নগদ উত্তোলন", sum(pick(ledgerTx).filter(t => t.type === "withdraw" && accountMap.get(t.account_id)?.module === "banks"), t => t.amount)],
       ["অন্যান্য আয়", sum(pick(cash).filter((x) => x.kind === "income"), (x) => x.amount)],
     ];
     const expense: [string, number][] = [
@@ -50,6 +57,9 @@ function Reports() {
       ["DPS উত্তোলন", sum(pick(dps).filter((x) => x.type === "withdraw" || x.type === "profit_withdraw"), (x) => x.amount)],
       ["FDR উত্তোলন", sum(pick(fdrT).filter((x) => x.type === "withdraw"), (x) => x.amount)],
       ["FDR মুনাফা প্রদান", sum(pick(fdrT).filter((x) => x.type === "profit"), (x) => x.amount)],
+      ["শেয়ার ফেরত / লভ্যাংশ / বিনিয়োগ / তহবিল খরচ", sum(pick(ledgerTx).filter(t => ["withdraw","dividend","invest","expense"].includes(t.type) && accountMap.get(t.account_id)?.module !== "banks"), t => t.amount)],
+      ["ব্যাংকে নগদ জমা", sum(pick(ledgerTx).filter(t => t.type === "deposit" && accountMap.get(t.account_id)?.module === "banks"), t => t.amount)],
+      ["কর্মীর বেতন", sum(pick(salaries), t => t.amount)],
       ["সমিতির খরচ", sum(pick(cash).filter((x) => x.kind === "expense"), (x) => x.amount)],
     ];
     return { income, expense, inT: sum(income, (x) => x[1]), exT: sum(expense, (x) => x[1]) };

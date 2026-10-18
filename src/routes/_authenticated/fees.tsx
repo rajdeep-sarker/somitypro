@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { useInsert, useRows } from "@/lib/db";
 import { bnDate, sum, taka, todayISO } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/fees")({
-  head: () => ({ meta: [{ title: "সমিতি ফি কালেকশন — সোনালী সমিতি" }] }),
+  head: () => pageHead("সমিতি ফি কালেকশন"),
   component: Fees,
 });
 

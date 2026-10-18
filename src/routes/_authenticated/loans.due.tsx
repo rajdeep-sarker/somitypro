@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/metadata";
 import { createFileRoute } from "@tanstack/react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataTable, PageHeader, useMemberMap } from "@/components/kit";
@@ -6,7 +7,7 @@ import { bn, sum, taka, todayISO } from "@/lib/format";
 import { isDueOn, loanStatus, type InstallmentType } from "@/lib/calc";
 
 export const Route = createFileRoute("/_authenticated/loans/due")({
-  head: () => ({ meta: [{ title: "আজকের কিস্তি ও বকেয়া — সোনালী সমিতি" }] }),
+  head: () => pageHead("আজকের কিস্তি ও বকেয়া"),
   component: Due,
 });
 
