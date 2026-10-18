@@ -1,5 +1,9 @@
 # Roadmap (SomityPro clone)
 
+## Typography and motion
+- [ ] Apply uploaded Unicode Sutonny font throughout
+- [ ] Add subtle page and control transitions without delaying interaction
+
 ## Phase 1 — done
 - [x] Mobile login, dashboard, centers, members (+ledger), savings, loans (disburse/collect/schedule/due/overdue/close), DPS, FDR, fees, cash in/out, reports, settings
 
