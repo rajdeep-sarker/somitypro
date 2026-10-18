@@ -32,6 +32,7 @@ const menu = [
   { to: "/notifications", label: "SMS ও ইমেইল বার্তা", icon: MessageSquare },
   { to: "/rules", label: "নিয়ম ও নীতিমালা", icon: BookOpen },
   { to: "/reports", label: "সমিতির রিপোর্ট", icon: FileBarChart },
+  { to: "/receipts", label: "লেনদেন রসিদ", icon: Receipt },
   { to: "/settings", label: "সেটিং", icon: Settings },
 ] as const;
 

@@ -24,6 +24,7 @@ import { Route as AuthenticatedFundRouteImport } from './routes/_authenticated/f
 import { Route as AuthenticatedImportRouteImport } from './routes/_authenticated/import'
 import { Route as AuthenticatedInvestmentsRouteImport } from './routes/_authenticated/investments'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedReceiptsRouteImport } from './routes/_authenticated/receipts'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRulesRouteImport } from './routes/_authenticated/rules'
 import { Route as AuthenticatedSavingsRouteImport } from './routes/_authenticated/savings'
@@ -112,6 +113,11 @@ const AuthenticatedNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedReceiptsRoute = AuthenticatedReceiptsRouteImport.update({
+  id: '/receipts',
+  path: '/receipts',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/import': typeof AuthenticatedImportRoute
   '/investments': typeof AuthenticatedInvestmentsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/receipts': typeof AuthenticatedReceiptsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/rules': typeof AuthenticatedRulesRoute
   '/savings': typeof AuthenticatedSavingsRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/import': typeof AuthenticatedImportRoute
   '/investments': typeof AuthenticatedInvestmentsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/receipts': typeof AuthenticatedReceiptsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/rules': typeof AuthenticatedRulesRoute
   '/savings': typeof AuthenticatedSavingsRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/_authenticated/import': typeof AuthenticatedImportRoute
   '/_authenticated/investments': typeof AuthenticatedInvestmentsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/receipts': typeof AuthenticatedReceiptsRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/rules': typeof AuthenticatedRulesRoute
   '/_authenticated/savings': typeof AuthenticatedSavingsRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/investments'
     | '/notifications'
+    | '/receipts'
     | '/reports'
     | '/rules'
     | '/savings'
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/investments'
     | '/notifications'
+    | '/receipts'
     | '/reports'
     | '/rules'
     | '/savings'
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/_authenticated/import'
     | '/_authenticated/investments'
     | '/_authenticated/notifications'
+    | '/_authenticated/receipts'
     | '/_authenticated/reports'
     | '/_authenticated/rules'
     | '/_authenticated/savings'
@@ -451,6 +463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/receipts': {
+      id: '/_authenticated/receipts'
+      path: '/receipts'
+      fullPath: '/receipts'
+      preLoaderRoute: typeof AuthenticatedReceiptsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
@@ -544,6 +563,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedImportRoute: typeof AuthenticatedImportRoute
   AuthenticatedInvestmentsRoute: typeof AuthenticatedInvestmentsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedReceiptsRoute: typeof AuthenticatedReceiptsRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRulesRoute: typeof AuthenticatedRulesRoute
   AuthenticatedSavingsRoute: typeof AuthenticatedSavingsRoute
@@ -570,6 +590,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedImportRoute: AuthenticatedImportRoute,
   AuthenticatedInvestmentsRoute: AuthenticatedInvestmentsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedReceiptsRoute: AuthenticatedReceiptsRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRulesRoute: AuthenticatedRulesRoute,
   AuthenticatedSavingsRoute: AuthenticatedSavingsRoute,
