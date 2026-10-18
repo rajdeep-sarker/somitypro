@@ -20,11 +20,13 @@ import { Route as AuthenticatedDpsRouteImport } from './routes/_authenticated/dp
 import { Route as AuthenticatedFdrRouteImport } from './routes/_authenticated/fdr'
 import { Route as AuthenticatedFeesRouteImport } from './routes/_authenticated/fees'
 import { Route as AuthenticatedFundRouteImport } from './routes/_authenticated/fund'
+import { Route as AuthenticatedImportRouteImport } from './routes/_authenticated/import'
 import { Route as AuthenticatedInvestmentsRouteImport } from './routes/_authenticated/investments'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedSavingsRouteImport } from './routes/_authenticated/savings'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSharesRouteImport } from './routes/_authenticated/shares'
+import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/staff'
 import { Route as AuthenticatedLoansIndexRouteImport } from './routes/_authenticated/loans.index'
 import { Route as AuthenticatedLoansCollectRouteImport } from './routes/_authenticated/loans.collect'
 import { Route as AuthenticatedLoansDueRouteImport } from './routes/_authenticated/loans.due'
@@ -85,6 +87,11 @@ const AuthenticatedFundRoute = AuthenticatedFundRouteImport.update({
   path: '/fund',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedImportRoute = AuthenticatedImportRouteImport.update({
+  id: '/import',
+  path: '/import',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedInvestmentsRoute =
   AuthenticatedInvestmentsRouteImport.update({
     id: '/investments',
@@ -109,6 +116,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
 const AuthenticatedSharesRoute = AuthenticatedSharesRouteImport.update({
   id: '/shares',
   path: '/shares',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStaffRoute = AuthenticatedStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLoansIndexRoute = AuthenticatedLoansIndexRouteImport.update({
@@ -150,11 +162,13 @@ export interface FileRoutesByFullPath {
   '/fdr': typeof AuthenticatedFdrRoute
   '/fees': typeof AuthenticatedFeesRoute
   '/fund': typeof AuthenticatedFundRoute
+  '/import': typeof AuthenticatedImportRoute
   '/investments': typeof AuthenticatedInvestmentsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/savings': typeof AuthenticatedSavingsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shares': typeof AuthenticatedSharesRoute
+  '/staff': typeof AuthenticatedStaffRoute
   '/loans/collect': typeof AuthenticatedLoansCollectRoute
   '/loans/due': typeof AuthenticatedLoansDueRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
@@ -172,11 +186,13 @@ export interface FileRoutesByTo {
   '/fdr': typeof AuthenticatedFdrRoute
   '/fees': typeof AuthenticatedFeesRoute
   '/fund': typeof AuthenticatedFundRoute
+  '/import': typeof AuthenticatedImportRoute
   '/investments': typeof AuthenticatedInvestmentsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/savings': typeof AuthenticatedSavingsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shares': typeof AuthenticatedSharesRoute
+  '/staff': typeof AuthenticatedStaffRoute
   '/loans/collect': typeof AuthenticatedLoansCollectRoute
   '/loans/due': typeof AuthenticatedLoansDueRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
@@ -196,11 +212,13 @@ export interface FileRoutesById {
   '/_authenticated/fdr': typeof AuthenticatedFdrRoute
   '/_authenticated/fees': typeof AuthenticatedFeesRoute
   '/_authenticated/fund': typeof AuthenticatedFundRoute
+  '/_authenticated/import': typeof AuthenticatedImportRoute
   '/_authenticated/investments': typeof AuthenticatedInvestmentsRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/savings': typeof AuthenticatedSavingsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/shares': typeof AuthenticatedSharesRoute
+  '/_authenticated/staff': typeof AuthenticatedStaffRoute
   '/_authenticated/loans/collect': typeof AuthenticatedLoansCollectRoute
   '/_authenticated/loans/due': typeof AuthenticatedLoansDueRoute
   '/_authenticated/members/$id': typeof AuthenticatedMembersIdRoute
@@ -220,11 +238,13 @@ export interface FileRouteTypes {
     | '/fdr'
     | '/fees'
     | '/fund'
+    | '/import'
     | '/investments'
     | '/reports'
     | '/savings'
     | '/settings'
     | '/shares'
+    | '/staff'
     | '/loans/collect'
     | '/loans/due'
     | '/members/$id'
@@ -242,11 +262,13 @@ export interface FileRouteTypes {
     | '/fdr'
     | '/fees'
     | '/fund'
+    | '/import'
     | '/investments'
     | '/reports'
     | '/savings'
     | '/settings'
     | '/shares'
+    | '/staff'
     | '/loans/collect'
     | '/loans/due'
     | '/members/$id'
@@ -265,11 +287,13 @@ export interface FileRouteTypes {
     | '/_authenticated/fdr'
     | '/_authenticated/fees'
     | '/_authenticated/fund'
+    | '/_authenticated/import'
     | '/_authenticated/investments'
     | '/_authenticated/reports'
     | '/_authenticated/savings'
     | '/_authenticated/settings'
     | '/_authenticated/shares'
+    | '/_authenticated/staff'
     | '/_authenticated/loans/collect'
     | '/_authenticated/loans/due'
     | '/_authenticated/members/$id'
@@ -362,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFundRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/import': {
+      id: '/_authenticated/import'
+      path: '/import'
+      fullPath: '/import'
+      preLoaderRoute: typeof AuthenticatedImportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/investments': {
       id: '/_authenticated/investments'
       path: '/investments'
@@ -395,6 +426,13 @@ declare module '@tanstack/react-router' {
       path: '/shares'
       fullPath: '/shares'
       preLoaderRoute: typeof AuthenticatedSharesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/staff': {
+      id: '/_authenticated/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof AuthenticatedStaffRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/loans/': {
@@ -444,11 +482,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFdrRoute: typeof AuthenticatedFdrRoute
   AuthenticatedFeesRoute: typeof AuthenticatedFeesRoute
   AuthenticatedFundRoute: typeof AuthenticatedFundRoute
+  AuthenticatedImportRoute: typeof AuthenticatedImportRoute
   AuthenticatedInvestmentsRoute: typeof AuthenticatedInvestmentsRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSavingsRoute: typeof AuthenticatedSavingsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSharesRoute: typeof AuthenticatedSharesRoute
+  AuthenticatedStaffRoute: typeof AuthenticatedStaffRoute
   AuthenticatedLoansCollectRoute: typeof AuthenticatedLoansCollectRoute
   AuthenticatedLoansDueRoute: typeof AuthenticatedLoansDueRoute
   AuthenticatedMembersIdRoute: typeof AuthenticatedMembersIdRoute
@@ -465,11 +505,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFdrRoute: AuthenticatedFdrRoute,
   AuthenticatedFeesRoute: AuthenticatedFeesRoute,
   AuthenticatedFundRoute: AuthenticatedFundRoute,
+  AuthenticatedImportRoute: AuthenticatedImportRoute,
   AuthenticatedInvestmentsRoute: AuthenticatedInvestmentsRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSavingsRoute: AuthenticatedSavingsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSharesRoute: AuthenticatedSharesRoute,
+  AuthenticatedStaffRoute: AuthenticatedStaffRoute,
   AuthenticatedLoansCollectRoute: AuthenticatedLoansCollectRoute,
   AuthenticatedLoansDueRoute: AuthenticatedLoansDueRoute,
   AuthenticatedMembersIdRoute: AuthenticatedMembersIdRoute,
