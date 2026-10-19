@@ -16,3 +16,4 @@
 - Signed-in menus warm route chunks and shared row queries through a bounded, cancellable background queue; all reads reuse the same query options to avoid duplicate network work.
 - The authenticated layout deduplicates verified-user checks in QueryClient for one minute; auth events invalidate this cache and logout clears it, while database RLS remains authoritative.
 - Interface font sizes are global typography tokens so tables, forms, menus and portal controls remain consistent.
+- Desktop and mobile navigation share one sectioned menu definition, flattened for preloading, so grouping cannot drop or duplicate preload destinations.
