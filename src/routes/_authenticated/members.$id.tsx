@@ -4,6 +4,7 @@ import { ArrowLeft, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DataTable, DateFilter, inRange, PageHeader, StatCard, useDateRange } from "@/components/kit";
+import { MemberDocs } from "@/components/MemberDocs";
 import { useRows, useUpdate } from "@/lib/db";
 import { bnDate, sum, taka } from "@/lib/format";
 
@@ -70,6 +71,7 @@ function MemberDetail() {
           <div key={k} className="flex gap-2 text-sm"><span className="w-28 shrink-0 text-muted-foreground">{k}</span><span>{v || "—"}</span></div>
         ))}
       </Card>
+      <MemberDocs memberId={id} photoPath={m.photo_path} idDocPath={m.id_doc_path} />
       <h2 className="text-lg font-semibold">লেনদেন খতিয়ান</h2>
       <DateFilter range={range} onChange={setRange} />
       <DataTable head={["তারিখ", "বিবরণ", "টাকা"]} rows={ledger.filter((l) => inRange(l.date, range)).map((l) => [bnDate(l.date), l.desc, taka(l.amt)])} />
