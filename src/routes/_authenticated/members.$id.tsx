@@ -71,7 +71,8 @@ function MemberDetail() {
         ))}
       </Card>
       <h2 className="text-lg font-semibold">লেনদেন খতিয়ান</h2>
-      <DataTable head={["তারিখ", "বিবরণ", "টাকা"]} rows={ledger.map((l) => [bnDate(l.date), l.desc, taka(l.amt)])} />
+      <DateFilter range={range} onChange={setRange} />
+      <DataTable head={["তারিখ", "বিবরণ", "টাকা"]} rows={ledger.filter((l) => inRange(l.date, range)).map((l) => [bnDate(l.date), l.desc, taka(l.amt)])} />
     </div>
   );
 }
