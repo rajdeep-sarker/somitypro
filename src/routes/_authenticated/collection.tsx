@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTable, Field, PageHeader, SimpleSelect } from "@/components/kit";
 import { useRows } from "@/lib/db";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/app-client";
 import { bn, bnDate, sum, taka, todayISO } from "@/lib/format";
 import { csvDownload } from "@/lib/import";
 import { pageHead } from "@/lib/metadata";

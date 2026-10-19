@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Landmark } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/app-client";
+import { chooseLoginPersistence, rememberChoiceKey } from "@/lib/login-storage";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/kit";
@@ -29,12 +31,16 @@ function AuthPage() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [remember, setRemember] = useState(false);
+  const [help, setHelp] = useState(false);
+  useEffect(() => { setRemember(localStorage.getItem(rememberChoiceKey) === "true"); }, []);
 
   async function submit(e: React.FormEvent): Promise<void> {
     e.preventDefault();
     if (phone.replace(/\D/g, "").length < 11) { toast.error("সঠিক মোবাইল নম্বর দিন"); return; }
     setBusy(true);
     const email = phoneToEmail(phone);
+    chooseLoginPersistence(remember, sessionStorage, localStorage);
     const res =
       mode === "login"
         ? await supabase.auth.signInWithPassword({ email, password })
@@ -62,18 +68,23 @@ function AuthPage() {
             </Field>
           )}
           <Field label="মোবাইল নম্বর">
-            <Input inputMode="tel" placeholder="01XXXXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+            <Input aria-label="মোবাইল নম্বর" autoComplete="username" inputMode="tel" placeholder="01XXXXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} required />
           </Field>
           <Field label="পাসওয়ার্ড">
-            <Input type="password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <Input aria-label="পাসওয়ার্ড" autoComplete={mode === "login" ? "current-password" : "new-password"} type="password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} required />
           </Field>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <label className="flex min-h-11 items-center gap-2 text-sm"><Checkbox checked={remember} onCheckedChange={v => setRemember(v === true)} />রিমেম্বার মি</label>
+            {mode === "login" && <Button type="button" variant="link" className="h-auto whitespace-normal p-0 text-sm" onClick={() => setHelp(!help)}>পাসওয়ার্ড ভুলে গেছেন?</Button>}
+          </div>
+          {help && mode === "login" && <div role="status" className="space-y-2 border-l-2 border-primary bg-secondary p-3 text-sm text-secondary-foreground"><p>পাসওয়ার্ড রিসেটের জন্য সমিতির অ্যাডমিনের সঙ্গে যোগাযোগ করুন। আপনার নিবন্ধিত মোবাইল নম্বর ও পরিচয় দিন।</p><p>পরিচয় যাচাইয়ের পর অ্যাডমিন নতুন পাসওয়ার্ড দেবেন। লগইনের পর সেটিং থেকে নিজের পাসওয়ার্ড পরিবর্তন করুন।</p></div>}
           <Button type="submit" className="w-full" size="lg" disabled={busy}>
             {busy ? "অপেক্ষা করুন..." : mode === "login" ? "লগইন" : "অ্যাকাউন্ট তৈরি"}
           </Button>
         </form>
-        <button className="mt-4 w-full text-center text-sm text-primary hover:underline" onClick={() => setMode(mode === "login" ? "signup" : "login")}>
+        <Button variant="link" className="mt-4 h-auto w-full whitespace-normal text-center text-sm" onClick={() => { setMode(mode === "login" ? "signup" : "login"); setHelp(false); }}>
           {mode === "login" ? "নতুন অ্যাকাউন্ট তৈরি করুন" : "আগেই অ্যাকাউন্ট আছে? লগইন করুন"}
-        </button>
+        </Button>
       </div>
     </div>
   );

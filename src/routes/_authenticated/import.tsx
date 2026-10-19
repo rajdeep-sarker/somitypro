@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTable, PageHeader } from "@/components/kit";
 import { useRows } from "@/lib/db";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/app-client";
 import { csvDownload, parseMemberRows, type MemberImport } from "@/lib/import";
 import { bn } from "@/lib/format";
 import { pageHead } from "@/lib/metadata";
