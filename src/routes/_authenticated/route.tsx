@@ -4,10 +4,19 @@ import { AppShell } from "@/components/AppShell";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/auth" });
-    return { user: data.user };
+  beforeLoad: async ({ context }) => {
+    const user = await context.queryClient.fetchQuery({
+      queryKey: ["auth", "verified-user"],
+      queryFn: async () => {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) throw redirect({ to: "/auth" });
+        return data.user;
+      },
+      staleTime: 60_000,
+      retry: false,
+    });
+    if (!user) throw redirect({ to: "/auth" });
+    return { user };
   },
   component: () => (
     <AppShell>

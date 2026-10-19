@@ -13,3 +13,6 @@
 - Staff provisioning is an admin-authorized server function; module permissions live separately from profiles and govern phase-two ledgers through RLS.
 - New feature pages reuse the shared form/table kit and leaf-route metadata helper to keep Bengali workflows consistent.
 - Uploaded Bengali fonts use CDN asset pointers and a Bengali-only font-face range to preserve Latin text; motion is CSS-only and respects reduced-motion preferences to keep interaction immediate.
+- Signed-in menus warm route chunks and shared row queries through a bounded, cancellable background queue; all reads reuse the same query options to avoid duplicate network work.
+- The authenticated layout deduplicates verified-user checks in QueryClient for one minute; auth events invalidate this cache and logout clears it, while database RLS remains authoritative.
+- Interface font sizes are global typography tokens so tables, forms, menus and portal controls remain consistent.

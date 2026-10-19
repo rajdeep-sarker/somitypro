@@ -16,6 +16,20 @@
 @theme inline {
   --font-sans: "SutonnyOMJ", "Hind Siliguri", system-ui, sans-serif;
   --font-display: "SutonnyOMJ", "Hind Siliguri", sans-serif;
+  --text-xs: 0.875rem;
+  --text-xs--line-height: 1.25rem;
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.5rem;
+  --text-base: 1.125rem;
+  --text-base--line-height: 1.75rem;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 2rem;
+  --text-2xl: 1.75rem;
+  --text-2xl--line-height: 2.25rem;
+  --text-3xl: 2rem;
+  --text-3xl--line-height: 2.5rem;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -112,6 +126,8 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
     letter-spacing: 0;
   }
   button, a, input, select {
@@ -122,7 +138,7 @@
   }
   @media (max-width: 639px) {
     input, select, textarea {
-      font-size: 16px !important;
+      font-size: var(--text-base) !important;
     }
   }
 }
