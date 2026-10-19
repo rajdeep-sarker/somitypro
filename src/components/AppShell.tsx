@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -44,11 +44,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const qc = useQueryClient();
   const router = useRouter();
+  const preloadController = useRef<AbortController | null>(null);
   const { data: settings = [] } = useRows("somiti_settings", { order: "id" });
   const name = settings[0]?.name ?? "সমিতি";
 
   useEffect(() => {
     const controller = new AbortController();
+    preloadController.current = controller;
     // Let the current screen paint before warming the remaining menus.
     const timer = window.setTimeout(() => {
       void runPreloadQueue(menu.map((item) => () => router.preloadRoute({ to: item.to })), controller.signal, 1);
@@ -61,6 +63,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [qc, router]);
 
   async function signOut() {
+    preloadController.current?.abort();
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
