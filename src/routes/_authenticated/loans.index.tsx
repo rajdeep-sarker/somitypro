@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DataTable, Field, FormCard, MemberSelect, PageHeader, SimpleSelect, useMemberMap } from "@/components/kit";
+import { DataTable, DateFilter, Field, FormCard, inRange, MemberSelect, PageHeader, SimpleSelect, useDateRange, useMemberMap } from "@/components/kit";
 import { nextNo, useInsert, useRows, useUpdate } from "@/lib/db";
 import { bn, bnDate, sum, taka, todayISO } from "@/lib/format";
 import { addPeriods, calcLoan, installmentLabels, loanStatus, type InstallmentType } from "@/lib/calc";
@@ -28,6 +28,8 @@ function Loans() {
   const [f, setF] = useState({ member_id: "", principal: "", interest_rate: "10", service_charge: "0", installment_type: "weekly", installment_count: "45", disburse_date: today, purpose: "", guarantor: "" });
   const c = calcLoan(Number(f.principal) || 0, Number(f.interest_rate) || 0, Number(f.installment_count) || 1);
   const [sched, setSched] = useState<string | null>(null);
+  const [range, setRange] = useDateRange();
+  const filteredLoans = loans.filter((l) => inRange(l.disburse_date, range));
 
   const paid = (id: string) => sum(rep.filter((r) => r.loan_id === id), (r) => r.amount);
 
@@ -80,9 +82,10 @@ function Loans() {
           </FormCard>
         </TabsContent>
         <TabsContent value="list" className="space-y-4">
+          <DateFilter range={range} onChange={setRange} />
           <DataTable
             head={["লোন নং", "সদস্য", "লোন", "মোট পরিশোধযোগ্য", "আদায়", "অবশিষ্ট", "কিস্তি", "বকেয়া", "অবস্থা", ""]}
-            rows={loans.map((l) => {
+            rows={filteredLoans.map((l) => {
               const p = paid(l.id);
               const s = loanStatus(l, p, today);
               return [

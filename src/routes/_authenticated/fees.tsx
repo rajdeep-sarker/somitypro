@@ -3,7 +3,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DataTable, Field, FormCard, MemberSelect, PageHeader, SimpleSelect, useMemberMap } from "@/components/kit";
+import { DataTable, DateFilter, Field, FormCard, inRange, MemberSelect, PageHeader, SimpleSelect, useDateRange, useMemberMap } from "@/components/kit";
 import { useInsert, useRows } from "@/lib/db";
 import { bnDate, sum, taka, todayISO } from "@/lib/format";
 
@@ -21,7 +21,8 @@ function Fees() {
   const today = todayISO();
   const [f, setF] = useState({ member_id: "", fee_type: "monthly", amount: "", txn_date: today, note: "" });
   const [type, setType] = useState("all");
-  const list = fees.filter((x) => type === "all" || x.fee_type === type);
+  const [range, setRange] = useDateRange();
+  const list = fees.filter((x) => (type === "all" || x.fee_type === type) && inRange(x.txn_date, range));
 
   return (
     <div className="space-y-6">
@@ -34,7 +35,10 @@ function Fees() {
         <Field label="মন্তব্য" className="sm:col-span-2"><Input value={f.note} onChange={(e) => setF({ ...f, note: e.target.value })} /></Field>
         <div className="sm:col-span-2"><Button type="submit" disabled={!f.member_id || ins.isPending}>সংরক্ষণ করুন</Button></div>
       </FormCard>
-      <div className="max-w-xs"><SimpleSelect value={type} onChange={setType} options={[{ value: "all", label: "সকল ফি" }, ...Object.entries(feeLabel).map(([value, label]) => ({ value, label }))]} /></div>
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="w-48"><SimpleSelect value={type} onChange={setType} options={[{ value: "all", label: "সকল ফি" }, ...Object.entries(feeLabel).map(([value, label]) => ({ value, label }))]} /></div>
+        <DateFilter range={range} onChange={setRange} />
+      </div>
       <DataTable
         head={["তারিখ", "সদস্য নং", "নাম", "ধরন", "টাকা", "মন্তব্য"]}
         rows={list.map((x) => [bnDate(x.txn_date), mm.get(x.member_id)?.member_no, mm.get(x.member_id)?.name, feeLabel[x.fee_type], taka(x.amount), x.note])}
