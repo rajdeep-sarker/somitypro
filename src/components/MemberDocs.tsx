@@ -16,7 +16,10 @@ function DocSlot({ memberId, kind, path, label, icon }: { memberId: string; kind
   const getViewUrl = useServerFn(getMemberDocViewUrl);
 
   async function upload(file: File) {
-    if (file.size > 10 * 1024 * 1024) return toast.error("ফাইল সর্বোচ্চ ১০ মেগাবাইট হতে পারে");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("ফাইল সর্বোচ্চ ১০ মেগাবাইট হতে পারে");
+      return;
+    }
     setBusy(true);
     try {
       const { url, key } = await getUploadUrl({ data: { memberId, kind, fileName: file.name } });
