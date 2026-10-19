@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { DataTable, PageHeader, StatCard } from "@/components/kit";
+import { DataTable, DateFilter, inRange, PageHeader, StatCard, useDateRange } from "@/components/kit";
 import { useRows, useUpdate } from "@/lib/db";
 import { bnDate, sum, taka } from "@/lib/format";
 
@@ -23,6 +23,7 @@ function MemberDetail() {
   const { data: dps = [] } = useRows("dps_transactions");
   const { data: fees = [] } = useRows("member_fees");
   const upd = useUpdate("members");
+  const [range, setRange] = useDateRange();
   const m = members.find((x) => x.id === id);
   if (!m) return <p className="text-muted-foreground">লোড হচ্ছে...</p>;
 
