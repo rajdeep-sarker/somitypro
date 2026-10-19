@@ -1,5 +1,9 @@
 # Roadmap (SomityPro clone)
 
+## Navigation speed and readability
+- [ ] Preload menu pages and shared data after sign-in without blocking clicks
+- [ ] Increase interface font sizes and verify menu navigation
+
 ## Typography and motion
 - [x] Apply uploaded Unicode Sutonny font throughout
 - [x] Add subtle page and control transitions without delaying interaction
