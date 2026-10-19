@@ -746,6 +746,7 @@ export type Database = {
           father_name: string | null
           gender: string | null
           id: string
+          id_doc_path: string | null
           member_no: string
           mother_name: string | null
           name: string
@@ -755,6 +756,7 @@ export type Database = {
           nominee_relation: string | null
           occupation: string | null
           phone: string | null
+          photo_path: string | null
           spouse_name: string | null
           status: string
         }
@@ -767,6 +769,7 @@ export type Database = {
           father_name?: string | null
           gender?: string | null
           id?: string
+          id_doc_path?: string | null
           member_no: string
           mother_name?: string | null
           name: string
@@ -776,6 +779,7 @@ export type Database = {
           nominee_relation?: string | null
           occupation?: string | null
           phone?: string | null
+          photo_path?: string | null
           spouse_name?: string | null
           status?: string
         }
@@ -788,6 +792,7 @@ export type Database = {
           father_name?: string | null
           gender?: string | null
           id?: string
+          id_doc_path?: string | null
           member_no?: string
           mother_name?: string | null
           name?: string
@@ -797,6 +802,7 @@ export type Database = {
           nominee_relation?: string | null
           occupation?: string | null
           phone?: string | null
+          photo_path?: string | null
           spouse_name?: string | null
           status?: string
         }

@@ -24,3 +24,7 @@
 - [x] SMS / email recipient selection, drafts and export
 - [ ] SMS / email delivery — blocked: sending-service account and credentials required
 - [x] Rules & policy page, printable receipts
+
+## Open tasks
+- [ ] Date filters on all list pages (in progress)
+- [ ] Member photo/ID upload to Cloudflare R2 (any format jpg/png/pdf) — needs Cloudflare connection

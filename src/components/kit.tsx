@@ -1,5 +1,7 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRows } from "@/lib/db";
@@ -143,6 +145,39 @@ export function FormCard({ title, children, onSubmit }: { title: string; childre
         {children}
       </form>
     </Card>
+  );
+}
+
+export type DateRange = { from: string; to: string };
+
+export function inRange(date: string | null | undefined, r: DateRange) {
+  if (!date) return false;
+  if (r.from && date < r.from) return false;
+  if (r.to && date > r.to) return false;
+  return true;
+}
+
+export function useDateRange(): [DateRange, (r: DateRange) => void] {
+  return useState<DateRange>({ from: "", to: "" });
+}
+
+export function DateFilter({ range, onChange }: { range: DateRange; onChange: (r: DateRange) => void }) {
+  return (
+    <div className="no-print flex flex-wrap items-end gap-2">
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">শুরু তারিখ</Label>
+        <Input type="date" value={range.from} onChange={(e) => onChange({ ...range, from: e.target.value })} className="w-40" />
+      </div>
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">শেষ তারিখ</Label>
+        <Input type="date" value={range.to} onChange={(e) => onChange({ ...range, to: e.target.value })} className="w-40" />
+      </div>
+      {(range.from || range.to) && (
+        <Button type="button" variant="outline" onClick={() => onChange({ from: "", to: "" })}>
+          সব দেখুন
+        </Button>
+      )}
+    </div>
   );
 }
 
