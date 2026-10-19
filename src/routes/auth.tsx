@@ -74,7 +74,7 @@ function AuthPage() {
             <Input aria-label="পাসওয়ার্ড" autoComplete={mode === "login" ? "current-password" : "new-password"} type="password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} required />
           </Field>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <label className="flex min-h-11 items-center gap-2 text-sm"><Checkbox checked={remember} onCheckedChange={v => setRemember(v === true)} />রিমেম্বার মি</label>
+            <label className="flex min-h-11 items-center gap-2 text-sm"><Checkbox checked={remember} onCheckedChange={v => setRemember(v === true)} />Remember Me</label>
             {mode === "login" && <Button type="button" variant="link" className="h-auto whitespace-normal p-0 text-sm" onClick={() => setHelp(!help)}>পাসওয়ার্ড ভুলে গেছেন?</Button>}
           </div>
           {help && mode === "login" && <div role="status" className="space-y-2 border-l-2 border-primary bg-secondary p-3 text-sm text-secondary-foreground"><p>পাসওয়ার্ড রিসেটের জন্য সমিতির অ্যাডমিনের সঙ্গে যোগাযোগ করুন। আপনার নিবন্ধিত মোবাইল নম্বর ও পরিচয় দিন।</p><p>পরিচয় যাচাইয়ের পর অ্যাডমিন নতুন পাসওয়ার্ড দেবেন। লগইনের পর সেটিং থেকে নিজের পাসওয়ার্ড পরিবর্তন করুন।</p></div>}
