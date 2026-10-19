@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FormCard, PageHeader } from "@/components/kit";
 import { useRows, useUpdate } from "@/lib/db";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/app-client";
+import { AdminPasswordReset } from "@/components/AdminPasswordReset";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => pageHead("সেটিং"),
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
 });
 
 function Settings() {
+  const { user } = Route.useRouteContext();
   const { data = [] } = useRows("somiti_settings", { order: "id" });
   const upd = useUpdate("somiti_settings");
   const [f, setF] = useState({ name: "", reg_no: "", address: "", phone: "", email: "" });
@@ -46,6 +48,7 @@ function Settings() {
         <Field label="নতুন পাসওয়ার্ড"><Input type="password" minLength={6} required value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} /></Field>
         <div className="sm:col-span-2"><Button type="submit">পরিবর্তন করুন</Button></div>
       </FormCard>
+      <AdminPasswordReset currentUserId={user.id} />
     </div>
   );
 }

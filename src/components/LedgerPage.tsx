@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTable, Field, FormCard, MemberSelect, PageHeader, SimpleSelect, StatCard, useMemberMap } from "@/components/kit";
 import { useInsert, useRows, useUpdate } from "@/lib/db";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/app-client";
 import { bn, bnDate, sum, taka, todayISO } from "@/lib/format";
 
 type Module = "shares" | "investments" | "fund" | "banks";

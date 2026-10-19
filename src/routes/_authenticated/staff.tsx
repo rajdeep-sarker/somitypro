@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable, Field, FormCard, PageHeader, SimpleSelect } from "@/components/kit";
 import { useInsert, useRows, useUpdate } from "@/lib/db";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/app-client";
 import { createStaffLogin } from "@/lib/staff.functions";
 import { bnDate, sum, taka, todayISO } from "@/lib/format";
 import { pageHead } from "@/lib/metadata";
