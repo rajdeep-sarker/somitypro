@@ -1,7 +1,7 @@
 # Roadmap (SomityPro clone)
 
 ## Navigation speed and readability
-- [ ] Group existing menu options under work-based section headings
+- [x] Group existing menu options under work-based section headings
 - [x] Preload menu pages and shared data after sign-in without blocking clicks
 - [x] Increase interface font sizes and verify menu navigation
 
