@@ -8,19 +8,24 @@ export type TableName = keyof Tables;
 export type Row<T extends TableName> = Tables[T]["Row"];
 export type Insert<T extends TableName> = Tables[T]["Insert"];
 
-export function useRows<T extends TableName>(table: T, opts?: { order?: string; ascending?: boolean }) {
-  return useQuery({
+export function rowQueryOptions<T extends TableName>(table: T, opts?: { order?: string; ascending?: boolean }) {
+  return {
     queryKey: ["t", table],
-    queryFn: async () => {
+    queryFn: async ({ signal }: { signal: AbortSignal }) => {
       const { data, error } = await supabase
         .from(table)
         .select("*")
         .order(opts?.order ?? (table === "user_roles" || table === "somiti_settings" ? "id" : "created_at"), { ascending: opts?.ascending ?? false })
-        .limit(5000);
+        .limit(5000)
+        .abortSignal(signal);
       if (error) throw error;
       return data as unknown as Row<T>[];
     },
-  });
+  };
+}
+
+export function useRows<T extends TableName>(table: T, opts?: { order?: string; ascending?: boolean }) {
+  return useQuery(rowQueryOptions(table, opts));
 }
 
 export function useInsert<T extends TableName>(table: T, success = "সফলভাবে সংরক্ষণ হয়েছে") {

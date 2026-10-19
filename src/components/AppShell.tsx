@@ -1,11 +1,12 @@
-import { useState, type ReactNode } from "react";
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Link, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   LayoutDashboard, MapPin, Users, PiggyBank, HandCoins, CalendarClock, Landmark, Receipt, Wallet, FileBarChart, Settings, LogOut, Menu, Calculator, AlertTriangle, Briefcase, Shield, Coins, Upload, ClipboardList, MessageSquare, BookOpen, LoaderCircle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useRows } from "@/lib/db";
+import { rowQueryOptions, useRows } from "@/lib/db";
+import { preloadTables, runPreloadQueue } from "@/lib/preload";
 import { bnDate, todayISO } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -42,10 +43,27 @@ export function AppShell({ children }: { children: ReactNode }) {
   const loading = useRouterState({ select: (state) => state.isLoading });
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const qc = useQueryClient();
+  const router = useRouter();
+  const preloadController = useRef<AbortController | null>(null);
   const { data: settings = [] } = useRows("somiti_settings", { order: "id" });
   const name = settings[0]?.name ?? "সমিতি";
 
+  useEffect(() => {
+    const controller = new AbortController();
+    preloadController.current = controller;
+    // Let the current screen paint before warming the remaining menus.
+    const timer = window.setTimeout(() => {
+      void runPreloadQueue(menu.map((item) => () => router.preloadRoute({ to: item.to })), controller.signal, 1);
+      void runPreloadQueue(preloadTables.map((table) => () => qc.prefetchQuery(rowQueryOptions(table))), controller.signal);
+    }, 250);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [qc, router]);
+
   async function signOut() {
+    preloadController.current?.abort();
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
