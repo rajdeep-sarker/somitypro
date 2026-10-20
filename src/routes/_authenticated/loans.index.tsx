@@ -20,6 +20,7 @@ export const Route = createFileRoute("/_authenticated/loans/")({
 const typeOpts = (Object.keys(installmentLabels) as InstallmentType[]).map((k) => ({ value: k, label: installmentLabels[k] }));
 
 function Loans() {
+  const { data: allLoans = [] } = useRows("loans");
   const { data: loans = [] } = useCenterRows("loans");
   const { data: rep = [] } = useCenterRows("loan_repayments");
   const mm = useMemberMap();
@@ -38,7 +39,7 @@ function Loans() {
   function save() {
     if (!f.member_id || !c.total) return;
     const type = f.installment_type as InstallmentType;
-    const loan_no = nextNo("L-", loans.map((l) => l.loan_no));
+    const loan_no = nextNo("L-", allLoans.map((l) => l.loan_no));
     ins.mutate(
       {
         loan_no, member_id: f.member_id, principal: Number(f.principal), interest_rate: Number(f.interest_rate), service_charge: Number(f.service_charge),

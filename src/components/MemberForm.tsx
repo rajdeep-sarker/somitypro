@@ -12,6 +12,7 @@ import { supabase } from "@/lib/app-client";
 import { todayISO } from "@/lib/format";
 import { getMemberDocUploadUrl } from "@/lib/r2.functions";
 import { validateMemberFile, type MemberFiles } from "@/lib/member-files";
+import { useCenterScope } from "@/components/CenterScope";
 
 const empty = { name: "", father_name: "", mother_name: "", spouse_name: "", phone: "", nid: "", dob: "", gender: "", occupation: "", address: "", center_id: "", nominee_name: "", nominee_relation: "", nominee_phone: "", admission_date: "", status: "active" };
 const labels: Partial<Record<keyof typeof empty, string>> = { name: "সদস্যের নাম", phone: "মোবাইল নম্বর", father_name: "পিতার নাম", mother_name: "মাতার নাম", spouse_name: "স্বামী/স্ত্রীর নাম", nid: "জাতীয় পরিচয়পত্র নং", dob: "জন্ম তারিখ", occupation: "পেশা", address: "ঠিকানা", nominee_name: "নমিনির নাম", nominee_relation: "নমিনির সম্পর্ক", nominee_phone: "নমিনির মোবাইল", admission_date: "ভর্তির তারিখ" };
@@ -21,13 +22,13 @@ export function MemberForm({ member }: { member?: Row<"members"> }) {
   const [f, setF] = useState(empty);
   const [files, setFiles] = useState<MemberFiles>({ photo: null, id_doc: null });
   const [busy, setBusy] = useState(false);
-  const { data: members = [] } = useRows("members");
+  const { center } = useCenterScope();
   const { data: centers = [] } = useRows("centers");
   const qc = useQueryClient();
   const uploadUrl = useServerFn(getMemberDocUploadUrl);
 
   function start() {
-    const values = { ...empty };
+    const values = { ...empty, center_id: center === "all" ? "" : center };
     if (member) for (const key of Object.keys(empty) as (keyof typeof empty)[]) values[key] = member[key] ?? empty[key];
     setF(values); setFiles({ photo: null, id_doc: null }); setOpen(true);
   }

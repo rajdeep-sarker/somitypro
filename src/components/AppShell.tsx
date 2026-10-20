@@ -10,7 +10,7 @@ import { preloadTables, runPreloadQueue } from "@/lib/preload";
 import { bnDate, todayISO } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { CenterProvider, CenterSelector } from "@/components/CenterScope";
+import { CenterProvider, CenterSelector, useCenterScope } from "@/components/CenterScope";
 
 const menuSections = [
   { label: "সারসংক্ষেপ", items: [
@@ -59,6 +59,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 }
 
 function ShellContent({ children }: { children: ReactNode }) {
+  const { center } = useCenterScope();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const loading = useRouterState({ select: (state) => state.isLoading });
@@ -150,7 +151,7 @@ function ShellContent({ children }: { children: ReactNode }) {
           {loading && <LoaderCircle aria-label="পৃষ্ঠা লোড হচ্ছে" className="size-5 shrink-0 animate-spin text-primary" />}
           <div className="col-span-full flex min-w-0 items-center gap-3"><span className="shrink-0 text-sm text-muted-foreground">কেন্দ্র</span><CenterSelector /></div>
         </header>
-        <main key={pathname} className="page-transition min-w-0 p-4 md:p-6">{children}</main>
+        <main key={`${pathname}-${center}`} className="page-transition min-w-0 p-4 md:p-6">{children}</main>
       </div>
     </div>
   );
