@@ -52,7 +52,7 @@ export function MemberForm({ member }: { member?: Row<"members"> }) {
       if (result.error) throw result.error;
       await qc.invalidateQueries({ queryKey: ["t", "members"] });
       toast.success(member ? "সদস্যের তথ্য সংশোধন হয়েছে" : "সদস্য তৈরি হয়েছে"); setOpen(false);
-    } catch (error) { toast.error(error instanceof Error ? error.message : "সংরক্ষণ হয়নি"); }
+    } catch (error) { toast.error(error instanceof Error ? error.message : (error as { message?: string })?.message ?? "সংরক্ষণ হয়নি"); }
     finally { setBusy(false); }
   }
   return <>
