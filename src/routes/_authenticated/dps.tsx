@@ -20,6 +20,7 @@ const tLabel: Record<string, string> = { deposit: "কিস্তি জমা"
 const typeOpts = (Object.keys(installmentLabels) as InstallmentType[]).map((k) => ({ value: k, label: installmentLabels[k] }));
 
 function Dps() {
+  const { data: allAccounts = [] } = useRows("dps_accounts");
   const today = todayISO();
   const { data: schemes = [] } = useCenterRows("dps_schemes");
   const { data: accounts = [] } = useCenterRows("dps_accounts");
@@ -98,7 +99,7 @@ function Dps() {
         </TabsContent>
 
         <TabsContent value="open">
-          <FormCard title="নতুন DPS একাউন্ট" onSubmit={() => insAcc.mutate({ ...ac, installment_amount: Number(ac.installment_amount), account_no: nextNo("DPS-", accounts.map((a) => a.account_no)) }, { onSuccess: () => setAc({ ...ac, member_id: "", installment_amount: "" }) })}>
+          <FormCard title="নতুন DPS একাউন্ট" onSubmit={() => insAcc.mutate({ ...ac, installment_amount: Number(ac.installment_amount), account_no: nextNo("DPS-", allAccounts.map((a) => a.account_no)) }, { onSuccess: () => setAc({ ...ac, member_id: "", installment_amount: "" }) })}>
             <Field label="সদস্য"><MemberSelect value={ac.member_id} onChange={(v) => setAc({ ...ac, member_id: v })} /></Field>
             <Field label="স্কিম"><SimpleSelect value={ac.scheme_id} onChange={(v) => setAc({ ...ac, scheme_id: v })} options={schemes.filter((s) => s.active).map((s) => ({ value: s.id, label: `${s.name} (${s.profit_rate}%)` }))} /></Field>
             <Field label="কিস্তির টাকা"><Input type="number" min={1} required value={ac.installment_amount} onChange={(e) => setAc({ ...ac, installment_amount: e.target.value })} /></Field>

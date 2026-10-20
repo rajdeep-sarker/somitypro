@@ -20,6 +20,7 @@ const tLabel = { deposit: "জমা", withdraw: "উত্তোলন", profit
 const payout: Record<string, string> = { maturity: "মেয়াদ শেষে", monthly: "মাসিক" };
 
 function Fdr() {
+  const { data: allAccounts = [] } = useRows("fdr_accounts");
   const today = todayISO();
   const { data: schemes = [] } = useCenterRows("fdr_schemes");
   const { data: accounts = [] } = useCenterRows("fdr_accounts");
@@ -42,7 +43,7 @@ function Fdr() {
   function openAcc() {
     const s = sMap.get(ac.scheme_id);
     if (!s || !ac.member_id) return;
-    const account_no = nextNo("FDR-", accounts.map((a) => a.account_no));
+    const account_no = nextNo("FDR-", allAccounts.map((a) => a.account_no));
     insAcc.mutate({ account_no, member_id: ac.member_id, scheme_id: s.id, amount: Number(ac.amount), start_date: ac.start_date, maturity_date: addPeriods(ac.start_date, "monthly", s.duration_months) }, { onSuccess: () => setAc({ ...ac, member_id: "", amount: "" }) });
   }
 
