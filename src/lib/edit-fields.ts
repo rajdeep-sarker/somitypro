@@ -1,0 +1,26 @@
+export type EditField = { key: string; label: string; type?: "number" | "date" | "month" | "time" | "textarea" | "json" | undefined; options?: string[] | undefined };
+const labels: Record<string, string> = { name:"নাম",code:"কোড",address:"ঠিকানা",meeting_day:"মিটিং এর দিন",principal:"লোনের পরিমাণ",interest_rate:"সুদ / লাভের হার (%)",service_charge:"সার্ভিস চার্জ",installment_type:"কিস্তির ধরন",installment_count:"কিস্তির সংখ্যা",disburse_date:"প্রদানের তারিখ",first_due_date:"প্রথম কিস্তির তারিখ",purpose:"লোনের উদ্দেশ্য",guarantor:"জামিনদার",amount:"টাকার পরিমাণ",txn_date:"তারিখ",note:"মন্তব্য",type:"ধরন",late_fee:"বিলম্ব চার্জ",duration_months:"মেয়াদ (মাস)",profit_rate:"লভ্যাংশ (%)",payout_type:"মুনাফা প্রদান",installment_amount:"কিস্তির টাকা",start_date:"শুরুর তারিখ",maturity_date:"মেয়াদপূর্তির তারিখ",status:"অবস্থা",fee_type:"ফি এর ধরন",head_id:"খাত",kind:"ধরন",account_no:"হিসাব নম্বর",bank_name:"ব্যাংকের নাম",branch:"শাখা",unit_price:"শেয়ার মূল্য",opening_balance:"প্রারম্ভিক স্থিতি",budget:"বাজেট",units:"শেয়ার সংখ্যা",reference:"রেফারেন্স",phone:"মোবাইল নম্বর",designation_id:"পদবি",salary:"মাসিক বেতন",join_date:"যোগদানের তারিখ",attendance_date:"হাজিরার তারিখ",check_in:"প্রবেশ",check_out:"প্রস্থান",month:"বেতনের মাস",channel:"মাধ্যম",message:"বার্তা",title:"শিরোনাম",content:"বিবরণ",recipients:"প্রাপক" };
+const keys: Record<string,string[]> = {
+ centers:["name","code","address","meeting_day"], loans:["principal","interest_rate","service_charge","installment_type","installment_count","disburse_date","first_due_date","purpose","guarantor"],
+ savings_transactions:["amount","type","txn_date","note"], loan_repayments:["amount","late_fee","txn_date","note"], dps_schemes:["name","installment_type","duration_months","profit_rate"], fdr_schemes:["name","duration_months","profit_rate","payout_type"],
+ dps_accounts:["installment_amount","start_date","status"], fdr_accounts:["amount","start_date","maturity_date","status"], dps_transactions:["amount","type","txn_date","note"],fdr_transactions:["amount","type","txn_date","note"],member_fees:["fee_type","amount","txn_date","note"],cash_entries:["kind","head_id","amount","txn_date","note"],account_heads:["name","kind"],
+ ledger_accounts:["name","account_no","bank_name","branch","unit_price","opening_balance","budget","start_date","note"],ledger_transactions:["amount","units","txn_date","note","reference"],staff:["name","phone","designation_id","salary","join_date","address"],designations:["name"],attendance:["attendance_date","status","check_in","check_out","note"],salary_payments:["month","amount","txn_date","note"],notification_drafts:["channel","message","recipients"],somiti_rules:["title","content"],
+};
+const numbers = new Set(["principal","interest_rate","service_charge","installment_count","amount","late_fee","duration_months","profit_rate","installment_amount","unit_price","opening_balance","budget","units","salary"]);
+const options: Record<string,Record<string,string[]>> = {
+ loans:{installment_type:["daily","weekly","monthly"]},savings_transactions:{type:["deposit","withdraw","profit"]},dps_schemes:{installment_type:["daily","weekly","monthly"]},fdr_schemes:{payout_type:["maturity","monthly"]},dps_accounts:{status:["active","closed"]},fdr_accounts:{status:["active","closed"]},dps_transactions:{type:["deposit","withdraw","profit","profit_withdraw","service_charge"]},fdr_transactions:{type:["deposit","withdraw","profit","service_charge"]},member_fees:{fee_type:["admission","monthly","late","service","other"]},cash_entries:{kind:["expense","income","opening"]},account_heads:{kind:["expense","income"]},attendance:{status:["present","absent","leave","late"]},notification_drafts:{channel:["sms","email"]},
+};
+export const editOptionLabels: Record<string,string> = { daily:"দৈনিক",weekly:"সাপ্তাহিক",monthly:"মাসিক",maturity:"মেয়াদ শেষে",deposit:"জমা",withdraw:"উত্তোলন",profit:"লভ্যাংশ",profit_withdraw:"লভ্যাংশ উত্তোলন",service_charge:"সার্ভিস চার্জ",admission:"ভর্তি ফি",late:"বিলম্ব",service:"সার্ভিস",other:"অন্যান্য",expense:"খরচ",income:"আয়",opening:"প্রারম্ভিক ক্যাশ",active:"চলমান",closed:"বন্ধ",present:"উপস্থিত",absent:"অনুপস্থিত",leave:"ছুটি",sms:"SMS",email:"ইমেইল" };
+export function entryFields(table:string): EditField[] {
+ return (keys[table] ?? []).map(key => ({key,label:labels[key] ?? key,type:numbers.has(key)?"number":key.endsWith("_date")?"date":key==="month"?"month":key==="check_in"||key==="check_out"?"time":key==="recipients"?"json":key==="message"||key==="content"?"textarea":undefined,options:options[table]?.[key]}));
+}
+export function changedEntryValues(row:Record<string,unknown>, values:Record<string,string>, fields:EditField[]) {
+ const out:Record<string,unknown> = {};
+ for (const field of fields) {
+  const text=values[field.key] ?? "";
+  const value=field.type==="number"?Number(text):field.type==="json"?JSON.parse(text):text || null;
+  if(field.type==="number" && (!text || !Number.isFinite(value))) throw new Error("সঠিক সংখ্যা দিন");
+  if(JSON.stringify(value)!==JSON.stringify(row[field.key] ?? null)) out[field.key]=value;
+ }
+ return out;
+}

@@ -19,7 +19,7 @@ export const supabase = new Proxy({} as ReturnType<typeof createClient<Database>
           return fetch(input, { ...init, headers });
         } },
         auth: { persistSession: true, autoRefreshToken: true,
-          storage: typeof window !== "undefined" && persistent ? createLoginStorage(persistent, window.sessionStorage) : undefined },
+          storage: typeof window !== "undefined" && persistent ? createLoginStorage(persistent, window.sessionStorage, window.localStorage) : undefined },
       });
     }
     return Reflect.get(client, prop, receiver);

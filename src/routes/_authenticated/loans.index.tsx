@@ -1,3 +1,5 @@
+import { useCenterRows } from "@/components/CenterScope";
+import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -18,8 +20,9 @@ export const Route = createFileRoute("/_authenticated/loans/")({
 const typeOpts = (Object.keys(installmentLabels) as InstallmentType[]).map((k) => ({ value: k, label: installmentLabels[k] }));
 
 function Loans() {
-  const { data: loans = [] } = useRows("loans");
-  const { data: rep = [] } = useRows("loan_repayments");
+  const { data: allLoans = [] } = useRows("loans");
+  const { data: loans = [] } = useCenterRows("loans");
+  const { data: rep = [] } = useCenterRows("loan_repayments");
   const mm = useMemberMap();
   const ins = useInsert("loans", "লোন প্রদান সম্পন্ন হয়েছে");
   const upd = useUpdate("loans");
@@ -36,7 +39,7 @@ function Loans() {
   function save() {
     if (!f.member_id || !c.total) return;
     const type = f.installment_type as InstallmentType;
-    const loan_no = nextNo("L-", loans.map((l) => l.loan_no));
+    const loan_no = nextNo("L-", allLoans.map((l) => l.loan_no));
     ins.mutate(
       {
         loan_no, member_id: f.member_id, principal: Number(f.principal), interest_rate: Number(f.interest_rate), service_charge: Number(f.service_charge),
@@ -93,7 +96,7 @@ function Loans() {
                 `${taka(l.installment_amount)} × ${bn(l.installment_count)} (${installmentLabels[l.installment_type as InstallmentType]})`,
                 s.overdueAmount > 0 && l.status === "active" ? <span key="o" className="text-destructive">{taka(s.overdueAmount)}</span> : "—",
                 <Badge key="s" variant={l.status === "active" ? "default" : "secondary"}>{l.status === "active" ? "চলমান" : "বন্ধ"}</Badge>,
-                <div key="a" className="flex gap-1">
+                <div key="a" className="flex gap-1"><EditEntry table="loans" row={l} />
                   <Button size="sm" variant="outline" onClick={() => setSched(l.id)}>কিস্তির তারিখ</Button>
                   {l.status === "active" && <Button size="sm" variant="ghost" onClick={() => confirm("লোন বন্ধ করবেন?") && upd.mutate({ id: l.id, values: { status: "closed" } })}>বন্ধ করুন</Button>}
                 </div>,

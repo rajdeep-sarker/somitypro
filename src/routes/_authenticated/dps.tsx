@@ -1,3 +1,5 @@
+import { useCenterRows } from "@/components/CenterScope";
+import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -18,10 +20,11 @@ const tLabel: Record<string, string> = { deposit: "কিস্তি জমা"
 const typeOpts = (Object.keys(installmentLabels) as InstallmentType[]).map((k) => ({ value: k, label: installmentLabels[k] }));
 
 function Dps() {
+  const { data: allAccounts = [] } = useRows("dps_accounts");
   const today = todayISO();
-  const { data: schemes = [] } = useRows("dps_schemes");
-  const { data: accounts = [] } = useRows("dps_accounts");
-  const { data: tx = [] } = useRows("dps_transactions");
+  const { data: schemes = [] } = useCenterRows("dps_schemes");
+  const { data: accounts = [] } = useCenterRows("dps_accounts");
+  const { data: tx = [] } = useCenterRows("dps_transactions");
   const mm = useMemberMap();
   const insScheme = useInsert("dps_schemes");
   const updScheme = useUpdate("dps_schemes");
@@ -68,10 +71,11 @@ function Dps() {
 
         <TabsContent value="accounts">
           <DataTable
-            head={["একাউন্ট নং", "সদস্য", "স্কিম", "কিস্তি", "শুরু", "মূল জমা", "লভ্যাংশ", "ব্যালেন্স", ""]}
+            head={["একাউন্ট নং", "সদস্য", "স্কিম", "কিস্তি", "শুরু", "মূল জমা", "লভ্যাংশ", "ব্যালেন্স", "", ""]}
             rows={accounts.map((a) => [
               a.account_no, `${mm.get(a.member_id)?.name ?? ""} (${mm.get(a.member_id)?.member_no ?? ""})`, sMap.get(a.scheme_id ?? "")?.name, taka(a.installment_amount), bnDate(a.start_date),
               taka(deposit(a.id)), taka(profit(a.id)), <b key="b">{taka(deposit(a.id) + profit(a.id))}</b>,
+              <EditEntry key="e" table="dps_accounts" row={a} />,
               a.status === "active" ? <Button key="c" size="sm" variant="ghost" onClick={() => confirm("DPS বন্ধ করবেন?") && updAcc.mutate({ id: a.id, values: { status: "closed" } })}>বন্ধ</Button> : "বন্ধ",
             ])}
           />
@@ -95,7 +99,7 @@ function Dps() {
         </TabsContent>
 
         <TabsContent value="open">
-          <FormCard title="নতুন DPS একাউন্ট" onSubmit={() => insAcc.mutate({ ...ac, installment_amount: Number(ac.installment_amount), account_no: nextNo("DPS-", accounts.map((a) => a.account_no)) }, { onSuccess: () => setAc({ ...ac, member_id: "", installment_amount: "" }) })}>
+          <FormCard title="নতুন DPS একাউন্ট" onSubmit={() => insAcc.mutate({ ...ac, installment_amount: Number(ac.installment_amount), account_no: nextNo("DPS-", allAccounts.map((a) => a.account_no)) }, { onSuccess: () => setAc({ ...ac, member_id: "", installment_amount: "" }) })}>
             <Field label="সদস্য"><MemberSelect value={ac.member_id} onChange={(v) => setAc({ ...ac, member_id: v })} /></Field>
             <Field label="স্কিম"><SimpleSelect value={ac.scheme_id} onChange={(v) => setAc({ ...ac, scheme_id: v })} options={schemes.filter((s) => s.active).map((s) => ({ value: s.id, label: `${s.name} (${s.profit_rate}%)` }))} /></Field>
             <Field label="কিস্তির টাকা"><Input type="number" min={1} required value={ac.installment_amount} onChange={(e) => setAc({ ...ac, installment_amount: e.target.value })} /></Field>
@@ -107,8 +111,8 @@ function Dps() {
         <TabsContent value="report" className="space-y-4">
           <Field label="তারিখ" className="max-w-xs"><Input type="date" value={day} onChange={(e) => setDay(e.target.value)} /></Field>
           <DataTable
-            head={["একাউন্ট", "সদস্য", "ধরন", "টাকা", "মন্তব্য"]}
-            rows={dayTx.map((x) => [aMap.get(x.account_id)?.account_no, mm.get(x.member_id)?.name, tLabel[x.type], taka(x.amount), x.note])}
+            head={["একাউন্ট", "সদস্য", "ধরন", "টাকা", "মন্তব্য", ""]}
+            rows={dayTx.map((x) => [aMap.get(x.account_id)?.account_no, mm.get(x.member_id)?.name, tLabel[x.type], taka(x.amount), x.note, <EditEntry key="e" table="dps_transactions" row={x} />])}
             foot={["মোট কালেকশন", "", "", taka(sum(dayTx.filter((x) => x.type === "deposit"), (x) => x.amount)), ""]}
           />
         </TabsContent>
@@ -126,8 +130,8 @@ function Dps() {
             <div className="sm:col-span-2"><Button type="submit">স্কিম তৈরি করুন</Button></div>
           </FormCard>
           <DataTable
-            head={["স্কিমের নাম", "ধরন", "মেয়াদ", "লভ্যাংশ", "অবস্থা"]}
-            rows={schemes.map((s) => [s.name, installmentLabels[s.installment_type as InstallmentType], `${bn(s.duration_months)} মাস`, `${bn(s.profit_rate)}%`, <Button key="t" size="sm" variant="outline" onClick={() => updScheme.mutate({ id: s.id, values: { active: !s.active } })}>{s.active ? "সক্রিয়" : "নিষ্ক্রিয়"}</Button>])}
+            head={["স্কিমের নাম", "ধরন", "মেয়াদ", "লভ্যাংশ", "অবস্থা", ""]}
+            rows={schemes.map((s) => [s.name, installmentLabels[s.installment_type as InstallmentType], `${bn(s.duration_months)} মাস`, `${bn(s.profit_rate)}%`, <Button key="t" size="sm" variant="outline" onClick={() => updScheme.mutate({ id: s.id, values: { active: !s.active } })}>{s.active ? "সক্রিয়" : "নিষ্ক্রিয়"}</Button>, <EditEntry key="e" table="dps_schemes" row={s} />])}
           />
         </TabsContent>
 

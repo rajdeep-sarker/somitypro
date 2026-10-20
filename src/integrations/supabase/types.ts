@@ -318,6 +318,36 @@ export type Database = {
           },
         ]
       }
+      entry_edit_history: {
+        Row: {
+          after_values: Json
+          before_values: Json
+          edited_at: string
+          edited_by: string
+          id: string
+          row_id: string
+          table_name: string
+        }
+        Insert: {
+          after_values: Json
+          before_values: Json
+          edited_at?: string
+          edited_by?: string
+          id?: string
+          row_id: string
+          table_name: string
+        }
+        Update: {
+          after_values?: Json
+          before_values?: Json
+          edited_at?: string
+          edited_by?: string
+          id?: string
+          row_id?: string
+          table_name?: string
+        }
+        Relationships: []
+      }
       fdr_accounts: {
         Row: {
           account_no: string
@@ -505,6 +535,60 @@ export type Database = {
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ledger_revisions: {
+        Row: {
+          amount: number
+          edited_at: string
+          edited_by: string
+          id: string
+          note: string | null
+          reference: string | null
+          revision_no: number
+          transaction_id: string
+          txn_date: string
+          units: number
+        }
+        Insert: {
+          amount: number
+          edited_at?: string
+          edited_by?: string
+          id?: string
+          note?: string | null
+          reference?: string | null
+          revision_no?: never
+          transaction_id: string
+          txn_date: string
+          units: number
+        }
+        Update: {
+          amount?: number
+          edited_at?: string
+          edited_by?: string
+          id?: string
+          note?: string | null
+          reference?: string | null
+          revision_no?: never
+          transaction_id?: string
+          txn_date?: string
+          units?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ledger_revisions_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "effective_ledger_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ledger_revisions_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "ledger_transactions"
             referencedColumns: ["id"]
           },
         ]
@@ -1091,12 +1175,64 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      effective_ledger_transactions: {
+        Row: {
+          account_id: string | null
+          amount: number | null
+          created_at: string | null
+          created_by: string | null
+          id: string | null
+          loan_id: string | null
+          member_id: string | null
+          note: string | null
+          reference: string | null
+          transfer_id: string | null
+          txn_date: string | null
+          type: string | null
+          units: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ledger_transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "ledger_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ledger_transactions_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ledger_transactions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       bulk_collect: {
         Args: { p_batch: string; p_date: string; p_rows: Json }
         Returns: number
+      }
+      correct_ledger_entry: {
+        Args: { p_expected: Json; p_id: string; p_values: Json }
+        Returns: undefined
+      }
+      edit_saved_entry: {
+        Args: {
+          p_expected: Json
+          p_id: string
+          p_table: string
+          p_values: Json
+        }
+        Returns: undefined
       }
       has_access: { Args: { _user_id: string }; Returns: boolean }
       has_module_access: {

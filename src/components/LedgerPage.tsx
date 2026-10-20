@@ -1,3 +1,5 @@
+import { useCenterRows } from "@/components/CenterScope";
+import { EditEntry } from "@/components/EditEntry";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -19,11 +21,11 @@ const config = {
 };
 export function LedgerPage({ module }: { module: Module }) {
  const c = config[module];
- const { data: all = [], isPending, error } = useRows("ledger_accounts");
- const { data: tx = [] } = useRows("ledger_transactions");
- const { data: loans = [] } = useRows("loans");
- const { data: rep = [] } = useRows("loan_repayments");
- const { data: settings = [] } = useRows("somiti_settings",{order:"id"});
+ const { data: all = [], isPending, error } = useCenterRows("ledger_accounts");
+ const { data: tx = [] } = useCenterRows("ledger_transactions");
+ const { data: loans = [] } = useCenterRows("loans");
+ const { data: rep = [] } = useCenterRows("loan_repayments");
+ const { data: settings = [] } = useCenterRows("somiti_settings",{order:"id"});
  const accounts = all.filter(a=>a.module===module);
  const mm = useMemberMap(); const qc = useQueryClient();
  const addAccount = useInsert("ledger_accounts"), addTxn = useInsert("ledger_transactions"), update = useUpdate("ledger_accounts");
@@ -53,7 +55,7 @@ export function LedgerPage({ module }: { module: Module }) {
  {module==="banks"&&<><Field label="হিসাব নম্বর"><Input required value={a.account_no} onChange={e=>setA({...a,account_no:e.target.value})}/></Field><Field label="ব্যাংকের নাম"><Input required value={a.bank_name} onChange={e=>setA({...a,bank_name:e.target.value})}/></Field><Field label="শাখা"><Input value={a.branch} onChange={e=>setA({...a,branch:e.target.value})}/></Field></>}
  {module==="investments"&&<><Field label="বাজেট"><Input type="number" min="0" value={a.budget} onChange={e=>setA({...a,budget:e.target.value})}/></Field><Field label="শুরুর তারিখ"><Input type="date" value={a.start_date} onChange={e=>setA({...a,start_date:e.target.value})}/></Field></>}
  <Field label="বিবরণ"><Input value={a.note} onChange={e=>setA({...a,note:e.target.value})}/></Field><Button type="submit" disabled={addAccount.isPending}>সংরক্ষণ করুন</Button></FormCard>}
- <DataTable head={[c.account,module==="shares"?"শেয়ার মূল্য":"হিসাব / বাজেট","স্থিতি","অবস্থা",""]} empty={isPending?"লোড হচ্ছে…":"কোনো হিসাব নেই"} rows={accounts.map(a=>[<div><p>{a.name}</p><small>{a.bank_name} {a.branch}</small></div>,module==="shares"?taka(a.unit_price):module==="investments"?taka(a.budget):a.account_no||"—",taka(balance(a.id)),a.status==="active"?"সক্রিয়":"বন্ধ",<Button variant="outline" size="sm" disabled={update.isPending} onClick={()=>update.mutate({id:a.id,values:{status:a.status==="active"?"closed":"active"}})}>{a.status==="active"?"বন্ধ করুন":"সক্রিয় করুন"}</Button>])}/>
+ <DataTable head={[c.account,module==="shares"?"শেয়ার মূল্য":"হিসাব / বাজেট","স্থিতি","অবস্থা","",""]} empty={isPending?"লোড হচ্ছে…":"কোনো হিসাব নেই"} rows={accounts.map(a=>[<div><p>{a.name}</p><small>{a.bank_name} {a.branch}</small></div>,module==="shares"?taka(a.unit_price):module==="investments"?taka(a.budget):a.account_no||"—",taka(balance(a.id)),a.status==="active"?"সক্রিয়":"বন্ধ",<EditEntry key="e" table="ledger_accounts" row={a}/>,<Button variant="outline" size="sm" disabled={update.isPending} onClick={()=>update.mutate({id:a.id,values:{status:a.status==="active"?"closed":"active"}})}>{a.status==="active"?"বন্ধ করুন":"সক্রিয় করুন"}</Button>])}/>
  <FormCard title="লেনদেন এন্ট্রি" onSubmit={saveTransaction}>
  <Field label={c.account}><SimpleSelect value={f.account_id} onChange={v=>setF({...f,account_id:v})} options={active.map(a=>({value:a.id,label:a.name}))}/></Field>
  <Field label="লেনদেনের ধরন"><SimpleSelect value={f.type} onChange={v=>setF({...f,type:v})} options={c.types.map(value=>({value,label:labels[value]??value}))}/></Field>
@@ -66,7 +68,7 @@ export function LedgerPage({ module }: { module: Module }) {
  {module==="shares"&&<><h2 className="text-lg font-semibold">শেয়ারধারী তালিকা</h2><DataTable head={["সদস্য",c.account,"শেয়ার সংখ্যা","শেয়ার মূল্য"]} rows={accounts.flatMap(a=>Array.from(mm.values()).filter(m=>holdings(a.id,m.id)>0).map(m=>[`${m.member_no} — ${m.name}`,a.name,bn(holdings(a.id,m.id)),taka(holdings(a.id,m.id)*a.unit_price)]))}/></>}
  {module==="fund"&&<DataTable head={["তহবিল আয়","খরচ ও মওকুফ","উদ্বৃত্ত"]} rows={[[taka(sum(tx.filter(t=>accounts.some(a=>a.id===t.account_id)&&t.type==="deposit"),t=>t.amount)),taka(sum(tx.filter(t=>accounts.some(a=>a.id===t.account_id)&&["expense","waiver"].includes(t.type)),t=>t.amount)),taka(sum(accounts,a=>balance(a.id)))]]}/>}
  <div className="no-print grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><Field label="হিসাব"><SimpleSelect value={filter} onChange={setFilter} options={[{value:"all",label:"সকল হিসাব"},...accounts.map(a=>({value:a.id,label:a.name}))]}/></Field><Field label="শুরু"><Input type="date" value={from} onChange={e=>setFrom(e.target.value)}/></Field><Field label="শেষ"><Input type="date" value={to} onChange={e=>setTo(e.target.value)}/></Field><Field label="সদস্য"><SimpleSelect value={member||"all"} onChange={v=>setMember(v==="all"?"":v)} options={[{value:"all",label:"সকল সদস্য"},...Array.from(mm.values()).map(m=>({value:m.id,label:`${m.member_no} — ${m.name}`}))]}/></Field></div>
- <DataTable head={["তারিখ",c.account,"সদস্য","ধরন","টাকা","মন্তব্য",""]} rows={list.map(t=>[bnDate(t.txn_date),accounts.find(a=>a.id===t.account_id)?.name,mm.get(t.member_id??"")?.name||"—",labels[t.type],taka(t.amount),t.note,<Button size="icon" variant="ghost" aria-label="রসিদ" onClick={()=>setReceipt(t)}><Printer className="size-4"/></Button>])}/>
+ <DataTable head={["তারিখ",c.account,"সদস্য","ধরন","টাকা","মন্তব্য",""]} rows={list.map(t=>[bnDate(t.txn_date),accounts.find(a=>a.id===t.account_id)?.name,mm.get(t.member_id??"")?.name||"—",labels[t.type],taka(t.amount),t.note,<div className="flex gap-1"><EditEntry table="ledger_transactions" row={t}/><Button size="icon" variant="ghost" aria-label="রসিদ" onClick={()=>setReceipt(t)}><Printer className="size-4"/></Button></div>])}/>
  </div>
  {receipt&&<section className="border-y border-border py-8"><div className="no-print mb-4 flex gap-2"><Button onClick={()=>window.print()}><Printer className="size-4"/>রসিদ প্রিন্ট</Button><Button variant="outline" onClick={()=>setReceipt(null)}>বন্ধ করুন</Button></div><h2 className="text-center font-display text-2xl">{settings[0]?.name}</h2><p className="text-center">{settings[0]?.address}</p><h3 className="my-4 text-center text-xl">লেনদেন রসিদ</h3><p>রসিদ নং: {receipt.id}</p><p>তারিখ: {bnDate(receipt.txn_date)}</p><p>সদস্য: {mm.get(receipt.member_id??"")?.name||"—"}</p><p>হিসাব: {accounts.find(a=>a.id===receipt.account_id)?.name}</p><p>ধরন: {labels[receipt.type]}</p><p className="my-4 text-xl font-semibold">টাকা: {taka(receipt.amount)}</p><p>{receipt.note}</p><div className="mt-16 flex justify-between"><span>প্রদানকারীর স্বাক্ষর</span><span>আদায়কারীর স্বাক্ষর</span></div></section>}
  </div>;

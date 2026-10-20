@@ -2,8 +2,8 @@ type Store = { getItem: (key: string) => string | null | Promise<string | null>;
 export const loginModeKey = "somiti-login-mode";
 export const rememberChoiceKey = "somiti-remember-me";
 
-export function createLoginStorage(persistent: Store, temporary: Storage) {
-  const sessionOnly = () => temporary.getItem(loginModeKey) === "session";
+export function createLoginStorage(persistent: Store, temporary: Storage, preferences?: Storage) {
+  const sessionOnly = () => preferences?.getItem(rememberChoiceKey) === "false" || (preferences?.getItem(rememberChoiceKey) == null && temporary.getItem(loginModeKey) === "session");
   return {
     getItem: (key: string) => sessionOnly() ? temporary.getItem(key) : persistent.getItem(key),
     setItem: async (key: string, value: string) => {

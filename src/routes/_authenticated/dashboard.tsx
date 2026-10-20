@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { pageHead } from "@/lib/metadata";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Users, PiggyBank, HandCoins, Wallet, CalendarClock, Landmark, AlertTriangle, Receipt } from "lucide-react";
@@ -14,13 +15,13 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function Dashboard() {
   const today = todayISO();
-  const { data: members = [] } = useRows("members");
-  const { data: sav = [] } = useRows("savings_transactions");
-  const { data: loans = [] } = useRows("loans");
-  const { data: rep = [] } = useRows("loan_repayments");
-  const { data: dps = [] } = useRows("dps_transactions");
-  const { data: fdr = [] } = useRows("fdr_accounts");
-  const { data: fees = [] } = useRows("member_fees");
+  const { data: members = [] } = useCenterRows("members");
+  const { data: sav = [] } = useCenterRows("savings_transactions");
+  const { data: loans = [] } = useCenterRows("loans");
+  const { data: rep = [] } = useCenterRows("loan_repayments");
+  const { data: dps = [] } = useCenterRows("dps_transactions");
+  const { data: fdr = [] } = useCenterRows("fdr_accounts");
+  const { data: fees = [] } = useCenterRows("member_fees");
 
   const savBal = sum(sav, (t) => (t.type === "withdraw" ? -t.amount : t.amount));
   const active = loans.filter((l) => l.status === "active");

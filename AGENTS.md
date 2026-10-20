@@ -22,3 +22,7 @@
 
 - Member photos/ID docs live in Cloudflare R2 bucket somiti-member-docs; server functions in src/lib/r2.functions.ts mint SigV4 presigned PUT/GET URLs (keys R2_ACCOUNT_ID/R2_ACCESS_KEY_ID/R2_SECRET_ACCESS_KEY/R2_BUCKET), members.photo_path/id_doc_path store object keys.
 - List pages filter dates via shared DateFilter/useDateRange/inRange from src/components/kit.tsx.
+- CenterProvider scopes member-related views through useCenterRows while the cached row queries stay unfiltered; changing center remounts entry forms to discard stale member selections.
+- Shared MemberForm handles create/edit document uploads; blank member numbers are allocated atomically by a database trigger to prevent duplicate numbering.
+- Financial corrections use authorized database RPCs and append-only ledger revisions read through an effective view; originals remain unchanged and all financial writes share an advisory lock.
+- Login storage selection reads durable Remember Me preferences to survive installed-app restarts; public entry pages route restored sessions to the dashboard.

@@ -1,3 +1,5 @@
+import { useCenterRows } from "@/components/CenterScope";
+import { MemberForm } from "@/components/MemberForm";
 import { pageHead } from "@/lib/metadata";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Printer } from "lucide-react";
@@ -17,12 +19,12 @@ const typeLabel: Record<string, string> = { deposit: "জমা", withdraw: "উ
 
 function MemberDetail() {
   const { id } = Route.useParams();
-  const { data: members = [] } = useRows("members");
-  const { data: sav = [] } = useRows("savings_transactions");
-  const { data: loans = [] } = useRows("loans");
-  const { data: rep = [] } = useRows("loan_repayments");
-  const { data: dps = [] } = useRows("dps_transactions");
-  const { data: fees = [] } = useRows("member_fees");
+  const { data: members = [] } = useCenterRows("members");
+  const { data: sav = [] } = useCenterRows("savings_transactions");
+  const { data: loans = [] } = useCenterRows("loans");
+  const { data: rep = [] } = useCenterRows("loan_repayments");
+  const { data: dps = [] } = useCenterRows("dps_transactions");
+  const { data: fees = [] } = useCenterRows("member_fees");
   const upd = useUpdate("members");
   const [range, setRange] = useDateRange();
   const m = members.find((x) => x.id === id);
@@ -54,7 +56,7 @@ function MemberDetail() {
       <PageHeader
         title={m.name}
         subtitle={`সদস্য নং ${m.member_no}`}
-        actions={<>
+        actions={<><MemberForm member={m} />
           <Button asChild variant="outline"><Link to="/members"><ArrowLeft className="size-4" /> তালিকা</Link></Button>
           <Button variant="outline" onClick={() => upd.mutate({ id, values: { status: m.status === "active" ? "inactive" : "active" } })}>{m.status === "active" ? "নিষ্ক্রিয় করুন" : "সক্রিয় করুন"}</Button>
           <Button onClick={() => window.print()}><Printer className="size-4" /> প্রিন্ট</Button>

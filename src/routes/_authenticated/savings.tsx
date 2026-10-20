@@ -1,3 +1,5 @@
+import { useCenterRows } from "@/components/CenterScope";
+import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -17,8 +19,8 @@ export const Route = createFileRoute("/_authenticated/savings")({
 const label: Record<string, string> = { deposit: "জমা", withdraw: "উত্তোলন", profit: "লভ্যাংশ" };
 
 function Savings() {
-  const { data: tx = [] } = useRows("savings_transactions");
-  const { data: members = [] } = useRows("members", { order: "member_no", ascending: true });
+  const { data: tx = [] } = useCenterRows("savings_transactions");
+  const { data: members = [] } = useCenterRows("members", { order: "member_no", ascending: true });
   const mm = useMemberMap();
   const ins = useInsert("savings_transactions");
   const [f, setF] = useState({ member_id: "", type: "deposit", amount: "", txn_date: todayISO(), note: "" });
@@ -72,8 +74,8 @@ function Savings() {
             <Field label="শেষ"><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
           </div>
           <DataTable
-            head={["তারিখ", "সদস্য নং", "নাম", "ধরন", "টাকা", "মন্তব্য"]}
-            rows={filtered.map((t) => [bnDate(t.txn_date), mm.get(t.member_id)?.member_no, mm.get(t.member_id)?.name, label[t.type], taka(t.amount), t.note])}
+            head={["তারিখ", "সদস্য নং", "নাম", "ধরন", "টাকা", "মন্তব্য", ""]}
+            rows={filtered.map((t) => [bnDate(t.txn_date), mm.get(t.member_id)?.member_no, mm.get(t.member_id)?.name, label[t.type], taka(t.amount), t.note, <EditEntry key="e" table="savings_transactions" row={t} />])}
             foot={["মোট জমা", "", "", "", taka(sum(filtered.filter((t) => t.type !== "withdraw"), (t) => t.amount)), `উত্তোলন ${taka(sum(filtered.filter((t) => t.type === "withdraw"), (t) => t.amount))}`]}
           />
         </TabsContent>

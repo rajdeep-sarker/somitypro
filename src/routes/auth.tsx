@@ -33,7 +33,14 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [remember, setRemember] = useState(false);
   const [help, setHelp] = useState(false);
-  useEffect(() => { setRemember(localStorage.getItem(rememberChoiceKey) === "true"); }, []);
+  useEffect(() => {
+    setRemember(localStorage.getItem(rememberChoiceKey) === "true");
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (active && data.session) navigate({ to: "/dashboard", replace: true });
+    });
+    return () => { active = false; };
+  }, [navigate]);
 
   async function submit(e: React.FormEvent): Promise<void> {
     e.preventDefault();

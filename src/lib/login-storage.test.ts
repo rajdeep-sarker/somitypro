@@ -24,4 +24,16 @@ describe("Remember Me", () => {
     await createLoginStorage(localStorage, sessionStorage).removeItem("session");
     expect(localStorage.getItem("session")).toBeNull(); expect(sessionStorage.getItem("session")).toBeNull();
   });
+  it("restores remembered login when the installed app starts with a fresh tab store", async () => {
+    chooseLoginPersistence(true, sessionStorage, localStorage);
+    await createLoginStorage(localStorage, sessionStorage, localStorage).setItem("session", "remembered-session");
+    sessionStorage.clear();
+    expect(await createLoginStorage(localStorage, sessionStorage, localStorage).getItem("session")).toBe("remembered-session");
+  });
+  it("does not resurrect an old persistent login when Remember Me was unchecked", async () => {
+    chooseLoginPersistence(false, sessionStorage, localStorage);
+    localStorage.setItem("session", "stale-session");
+    sessionStorage.clear();
+    expect(await createLoginStorage(localStorage, sessionStorage, localStorage).getItem("session")).toBeNull();
+  });
 });

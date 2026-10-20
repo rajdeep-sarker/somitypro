@@ -29,6 +29,20 @@
       "when": 1792391530353,
       "tag": "0003_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792493724032,
+      "tag": "0004_saved_entry_corrections",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792494111304,
+      "tag": "0005_harden_corrections_and_member_numbers",
+      "breakpoints": true
     }
   ]
 }

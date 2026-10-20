@@ -1,3 +1,4 @@
+import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -55,8 +56,8 @@ function Cash() {
             <Field label="শেষ"><Input type="date" value={to} onChange={(ev) => setTo(ev.target.value)} /></Field>
           </div>
           <DataTable
-            head={["তারিখ", "ধরন", "খাত", "বিবরণ", "টাকা", ""]}
-            rows={list.map((x) => [bnDate(x.txn_date), kindLabel[x.kind], hMap.get(x.head_id ?? "") ?? "—", x.note, taka(x.amount), <Button key="d" size="icon" variant="ghost" onClick={() => confirm("মুছবেন?") && del.mutate(x.id)}><Trash2 className="size-4 text-destructive" /></Button>])}
+            head={["তারিখ", "ধরন", "খাত", "বিবরণ", "টাকা", "", ""]}
+            rows={list.map((x) => [bnDate(x.txn_date), kindLabel[x.kind], hMap.get(x.head_id ?? "") ?? "—", x.note, taka(x.amount), <EditEntry key="e" table="cash_entries" row={x} />, <Button key="d" size="icon" variant="ghost" onClick={() => confirm("মুছবেন?") && del.mutate(x.id)}><Trash2 className="size-4 text-destructive" /></Button>])}
             foot={["মোট খরচ", "", "", "", taka(sum(list.filter((x) => x.kind === "expense"), (x) => x.amount)), ""]}
           />
         </TabsContent>
@@ -66,7 +67,7 @@ function Cash() {
             <Field label="ধরন"><SimpleSelect value={h.kind} onChange={(v) => setH({ ...h, kind: v })} options={[{ value: "expense", label: "খরচের খাত" }, { value: "income", label: "আয় / নগদ জমার খাত" }]} /></Field>
             <div className="sm:col-span-2"><Button type="submit">খাত যোগ করুন</Button></div>
           </FormCard>
-          <DataTable head={["খাতের নাম", "ধরন", "মোট"]} rows={heads.map((x) => [x.name, x.kind === "expense" ? "খরচ" : "আয়", taka(sum(entries.filter((en) => en.head_id === x.id), (en) => en.amount))])} />
+          <DataTable head={["খাতের নাম", "ধরন", "মোট", ""]} rows={heads.map((x) => [x.name, x.kind === "expense" ? "খরচ" : "আয়", taka(sum(entries.filter((en) => en.head_id === x.id), (en) => en.amount)), <EditEntry key="e" table="account_heads" row={x} />])} />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,4 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/lib/app-client";
 import { PiggyBank, HandCoins, CalendarClock, Landmark, FileBarChart, Users, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -26,6 +28,14 @@ const features = [
 ];
 
 function Index() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (active && data.session) navigate({ to: "/dashboard", replace: true });
+    });
+    return () => { active = false; };
+  }, [navigate]);
   return (
     <div className="min-h-screen bg-background">
       <section className="bg-hero text-primary-foreground">

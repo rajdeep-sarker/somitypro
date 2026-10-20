@@ -1,3 +1,5 @@
+import { useCenterRows } from "@/components/CenterScope";
+import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -18,10 +20,11 @@ const tLabel = { deposit: "জমা", withdraw: "উত্তোলন", profit
 const payout: Record<string, string> = { maturity: "মেয়াদ শেষে", monthly: "মাসিক" };
 
 function Fdr() {
+  const { data: allAccounts = [] } = useRows("fdr_accounts");
   const today = todayISO();
-  const { data: schemes = [] } = useRows("fdr_schemes");
-  const { data: accounts = [] } = useRows("fdr_accounts");
-  const { data: tx = [] } = useRows("fdr_transactions");
+  const { data: schemes = [] } = useCenterRows("fdr_schemes");
+  const { data: accounts = [] } = useCenterRows("fdr_accounts");
+  const { data: tx = [] } = useCenterRows("fdr_transactions");
   const mm = useMemberMap();
   const insScheme = useInsert("fdr_schemes");
   const insAcc = useInsert("fdr_accounts", "FDR খোলা হয়েছে");
@@ -40,7 +43,7 @@ function Fdr() {
   function openAcc() {
     const s = sMap.get(ac.scheme_id);
     if (!s || !ac.member_id) return;
-    const account_no = nextNo("FDR-", accounts.map((a) => a.account_no));
+    const account_no = nextNo("FDR-", allAccounts.map((a) => a.account_no));
     insAcc.mutate({ account_no, member_id: ac.member_id, scheme_id: s.id, amount: Number(ac.amount), start_date: ac.start_date, maturity_date: addPeriods(ac.start_date, "monthly", s.duration_months) }, { onSuccess: () => setAc({ ...ac, member_id: "", amount: "" }) });
   }
 
@@ -61,12 +64,13 @@ function Fdr() {
         </TabsList>
         <TabsContent value="accounts">
           <DataTable
-            head={["একাউন্ট নং", "সদস্য", "স্কিম", "আমানত", "শুরু", "মেয়াদপূর্তি", "প্রত্যাশিত মুনাফা", "প্রদত্ত মুনাফা", ""]}
+            head={["একাউন্ট নং", "সদস্য", "স্কিম", "আমানত", "শুরু", "মেয়াদপূর্তি", "প্রত্যাশিত মুনাফা", "প্রদত্ত মুনাফা", "", ""]}
             rows={accounts.map((a) => {
               const s = sMap.get(a.scheme_id ?? "");
               return [
                 a.account_no, mm.get(a.member_id)?.name, s?.name, taka(a.amount), bnDate(a.start_date), bnDate(a.maturity_date),
                 taka(s ? simpleProfit(a.amount, s.profit_rate, s.duration_months) : 0), taka(paidProfit(a.id)),
+                <EditEntry key="e" table="fdr_accounts" row={a} />,
                 a.status === "active" ? <Button key="c" size="sm" variant="ghost" onClick={() => {
                   if (!confirm("FDR নগদায়ন (উত্তোলন) করবেন?")) return;
                   insTx.mutate({ account_id: a.id, member_id: a.member_id, type: "withdraw", amount: a.amount, txn_date: today, note: "FDR নগদায়ন" });
@@ -104,10 +108,10 @@ function Fdr() {
             <Field label="শেষ"><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
           </div>
           <DataTable
-            head={["তারিখ", "একাউন্ট", "সদস্য", "ধরন", "টাকা"]}
+            head={["তারিখ", "একাউন্ট", "সদস্য", "ধরন", "টাকা", ""]}
             rows={[
-              ...accounts.filter((a) => a.start_date >= from && a.start_date <= to).map((a) => [bnDate(a.start_date), a.account_no, mm.get(a.member_id)?.name, "নতুন জমা", taka(a.amount)]),
-              ...rng.map((x) => [bnDate(x.txn_date), aMap.get(x.account_id)?.account_no, mm.get(x.member_id)?.name, tLabel[x.type], taka(x.amount)]),
+              ...accounts.filter((a) => a.start_date >= from && a.start_date <= to).map((a) => [bnDate(a.start_date), a.account_no, mm.get(a.member_id)?.name, "নতুন জমা", taka(a.amount), <EditEntry key="e" table="fdr_accounts" row={a} />]),
+              ...rng.map((x) => [bnDate(x.txn_date), aMap.get(x.account_id)?.account_no, mm.get(x.member_id)?.name, tLabel[x.type], taka(x.amount), <EditEntry key="e" table="fdr_transactions" row={x} />]),
             ]}
           />
         </TabsContent>
@@ -119,7 +123,7 @@ function Fdr() {
             <Field label="মুনাফা (%)"><Input type="number" step="0.01" value={sc.profit_rate} onChange={(e) => setSc({ ...sc, profit_rate: e.target.value })} /></Field>
             <div className="sm:col-span-2"><Button type="submit">স্কিম তৈরি করুন</Button></div>
           </FormCard>
-          <DataTable head={["স্কিমের নাম", "ধরন", "সময়কাল", "লভ্যাংশ (%)"]} rows={schemes.map((s) => [s.name, payout[s.payout_type], `${bn(s.duration_months)} মাস`, `${bn(s.profit_rate)}%`])} />
+          <DataTable head={["স্কিমের নাম", "ধরন", "সময়কাল", "লভ্যাংশ (%)", ""]} rows={schemes.map((s) => [s.name, payout[s.payout_type], `${bn(s.duration_months)} মাস`, `${bn(s.profit_rate)}%`, <EditEntry key="e" table="fdr_schemes" row={s} />])} />
         </TabsContent>
         <TabsContent value="calc">
           <FormCard title="FDR ক্যালকুলেটর" onSubmit={() => {}}>
