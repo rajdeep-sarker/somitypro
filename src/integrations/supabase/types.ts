@@ -547,6 +547,7 @@ export type Database = {
           id: string
           note: string | null
           reference: string | null
+          revision_no: number
           transaction_id: string
           txn_date: string
           units: number
@@ -558,6 +559,7 @@ export type Database = {
           id?: string
           note?: string | null
           reference?: string | null
+          revision_no?: never
           transaction_id: string
           txn_date: string
           units: number
@@ -569,6 +571,7 @@ export type Database = {
           id?: string
           note?: string | null
           reference?: string | null
+          revision_no?: never
           transaction_id?: string
           txn_date?: string
           units?: number

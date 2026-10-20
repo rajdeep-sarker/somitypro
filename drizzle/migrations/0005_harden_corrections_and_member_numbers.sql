@@ -1,0 +1,22 @@
+create or replace function public.assign_member_number() returns trigger language plpgsql security definer set search_path=public as $$ declare n bigint; begin perform pg_advisory_xact_lock(741301); if new.member_no is null or new.member_no='' then select coalesce(max(case when member_no ~ '^M-[0-9]+$' then substring(member_no from 3)::bigint else 0 end),0)+1 into n from public.members; new.member_no:='M-'||lpad(n::text,greatest(4,length(n::text)),'0'); end if; return new; end $$;
+create trigger member_number_before_insert before insert on public.members for each row execute function public.assign_member_number();
+alter table public.ledger_revisions add column revision_no bigint generated always as identity;
+create or replace view public.effective_ledger_transactions with (security_invoker=true) as select t.id,t.account_id,t.member_id,t.loan_id,t.type,coalesce(r.amount,t.amount) amount,coalesce(r.units,t.units) units,coalesce(r.txn_date,t.txn_date) txn_date,case when r.id is null then t.note else r.note end note,case when r.id is null then t.reference else r.reference end reference,t.transfer_id,t.created_by,t.created_at from public.ledger_transactions t left join lateral (select * from public.ledger_revisions r where r.transaction_id=t.id order by r.revision_no desc limit 1) r on true;
+revoke insert on public.entry_edit_history from authenticated;
+create or replace function public.serialize_financial_write() returns trigger language plpgsql set search_path=public as $$ begin perform pg_advisory_xact_lock(741302); return null; end $$;
+do $$ declare t text; begin foreach t in array array['loans','loan_repayments','ledger_transactions','ledger_revisions','ledger_accounts','savings_transactions','dps_accounts','dps_transactions','fdr_accounts','fdr_transactions','member_fees','cash_entries'] loop execute format('create trigger serialize_financial_write before insert or update or delete on public.%I for each statement execute function public.serialize_financial_write()',t); end loop; end $$;
+do $$ declare def text; begin
+ select pg_get_functiondef('public.edit_saved_entry(text,uuid,jsonb,jsonb)'::regprocedure) into def;
+ def:=replace(def,'SECURITY INVOKER','SECURITY DEFINER');
+ def:=replace(def,'if auth.uid() is null then raise exception ''লগইন করুন''; end if;','if auth.uid() is null or not public.has_role(auth.uid(),''admin'') then raise exception ''শুধু অ্যাডমিন সংরক্ষিত এন্ট্রি সংশোধন করতে পারবেন''; end if;');
+ def:=replace(def,'if not(p_values ? ''first_due_date'') or ((p_values->>''first_due_date'')=b->>''first_due_date'' and (due<>(b->>''disburse_date'')::date or itype<>b->>''installment_type'')) then','if not(p_values ? ''first_due_date'') and (due<>(b->>''disburse_date'')::date or itype<>b->>''installment_type'') then');
+ def:=replace(def,'insert into public.entry_edit_history(table_name,row_id,before_values,after_values) values(p_table,p_id,b,a);','execute format(''select to_jsonb(t) from public.%I t where id=$1'',p_table) into a using p_id; insert into public.entry_edit_history(table_name,row_id,before_values,after_values) values(p_table,p_id,b,a);');
+ execute def;
+ alter function public.edit_saved_entry(text,uuid,jsonb,jsonb) security definer;
+ select pg_get_functiondef('public.correct_ledger_entry(uuid,jsonb,jsonb)'::regprocedure) into def;
+ def:=replace(def,'if a.module=''shares'' and t.type in (''purchase'',''withdraw'') then amt:=u*a.unit_price;','if a.module=''shares'' and t.type in (''purchase'',''withdraw'') and (u<>t.units or amt<>t.amount) then if u<>t.units and not(p_values ? ''amount'') then amt:=u*(t.amount/nullif(t.units,0)); end if;');
+ def:=replace(def,'if (select count(*) from public.ledger_transactions where transfer_id=t.transfer_id)<>2 then','if (select count(*) from public.ledger_transactions where transfer_id=t.transfer_id)<>2 or t.type not in (''transfer_in'',''transfer_out'') then');
+ def:=replace(def,'select e.* into other from public.effective_ledger_transactions e where transfer_id=t.transfer_id and id<>t.id; perform id','select e.* into other from public.effective_ledger_transactions e where transfer_id=t.transfer_id and id<>t.id; if other.account_id=t.account_id or other.type=t.type or other.type not in (''transfer_in'',''transfer_out'') then raise exception ''স্থানান্তরের হিসাব সঠিক নয়''; end if; perform id');
+ execute def;
+end $$;
+revoke all on function public.edit_saved_entry(text,uuid,jsonb,jsonb) from public,anon; grant execute on function public.edit_saved_entry(text,uuid,jsonb,jsonb) to authenticated;
