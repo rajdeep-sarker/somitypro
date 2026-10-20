@@ -26,5 +26,5 @@
 - [x] Rules & policy page, printable receipts
 
 ## Open tasks
-- [ ] Date filters on all list pages (in progress)
-- [ ] Member photo/ID upload to Cloudflare R2 (any format jpg/png/pdf) — needs Cloudflare connection
+- [x] Date filters on all list pages
+- [x] Member photo/ID upload to Cloudflare R2 (any format)
