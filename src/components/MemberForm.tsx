@@ -65,7 +65,7 @@ export function MemberForm({ member }: { member?: Row<"members"> }) {
         <form className="grid gap-4 sm:grid-cols-2" onSubmit={e => { e.preventDefault(); void save(); }}>
           {Object.entries(labels).map(([key, label]) => {
             const k = key as keyof typeof empty;
-            return <Field key={key} label={label ?? key} className={k === "address" ? "sm:col-span-2" : undefined}><Input aria-label={label} required={k === "name"} type={k === "dob" || k === "admission_date" ? "date" : "text"} value={f[k]} onChange={e => setF({ ...f, [k]: e.target.value })} /></Field>;
+            return <Field key={key} label={label ?? key} className={k === "address" ? "sm:col-span-2" : ""}><Input aria-label={label} required={k === "name"} type={k === "dob" || k === "admission_date" ? "date" : "text"} value={f[k]} onChange={e => setF({ ...f, [k]: e.target.value })} /></Field>;
           })}
           <Field label="লিঙ্গ"><SimpleSelect value={f.gender} onChange={v => setF({ ...f, gender: v })} options={[{ value: "পুরুষ", label: "পুরুষ" }, { value: "মহিলা", label: "মহিলা" }]} /></Field>
           <Field label="কেন্দ্র"><SimpleSelect value={f.center_id} onChange={v => setF({ ...f, center_id: v })} options={centers.map(c => ({ value: c.id, label: c.name }))} /></Field>

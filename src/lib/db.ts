@@ -12,8 +12,8 @@ export function rowQueryOptions<T extends TableName>(table: T, opts?: { order?: 
   return {
     queryKey: ["t", table],
     queryFn: async ({ signal }: { signal: AbortSignal }) => {
-      const { data, error } = await supabase
-        .from(table === "ledger_transactions" ? "effective_ledger_transactions" : table)
+      const source = table === "ledger_transactions" ? supabase.from("effective_ledger_transactions") : supabase.from(table);
+      const { data, error } = await source
         .select("*")
         .order(opts?.order ?? (table === "user_roles" || table === "somiti_settings" ? "id" : "created_at"), { ascending: opts?.ascending ?? false })
         .limit(5000)
