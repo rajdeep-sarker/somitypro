@@ -26,5 +26,8 @@
 - [x] Rules & policy page, printable receipts
 
 ## Open tasks
+- [ ] Remember Me survives installed-app restarts and skips the login page
+- [ ] Photo/NID selection inside member creation and editing
+- [ ] Pencil editing on saved entries, including safe financial corrections
 - [x] Date filters on all list pages
 - [x] Member photo/ID upload to Cloudflare R2 (any format)
