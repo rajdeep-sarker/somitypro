@@ -19,3 +19,6 @@
 - Desktop and mobile navigation share one sectioned menu definition, flattened for preloading, so grouping cannot drop or duplicate preload destinations.
 - App browser reads and bearer middleware use the app-owned client with a session/persistent storage adapter; generated integrations remain untouched, and only persistent logins use the preview broker.
 - Password resets for other accounts run through an authenticated server function that verifies the caller's database admin role before loading the privileged client; self-changes still require the current password.
+
+- Member photos/ID docs live in Cloudflare R2 bucket somiti-member-docs; server functions in src/lib/r2.functions.ts mint SigV4 presigned PUT/GET URLs (keys R2_ACCOUNT_ID/R2_ACCESS_KEY_ID/R2_SECRET_ACCESS_KEY/R2_BUCKET), members.photo_path/id_doc_path store object keys.
+- List pages filter dates via shared DateFilter/useDateRange/inRange from src/components/kit.tsx.
