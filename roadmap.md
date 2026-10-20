@@ -31,3 +31,7 @@
 - [ ] Pencil editing on saved entries, including safe financial corrections
 - [x] Date filters on all list pages
 - [x] Member photo/ID upload to Cloudflare R2 (any format)
+- [ ] Collapsible menu sections on desktop and phone
+- [ ] Center-based member selection and list filtering across entry pages
+- [ ] Replace Lovable favicon with somiti icon
+- [ ] Explain Firebase free-tier and Lovable Free database hosting options without migrating
