@@ -43,6 +43,20 @@
       "when": 1792494111304,
       "tag": "0005_harden_corrections_and_member_numbers",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792494722155,
+      "tag": "0006_correction_validation_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792494745665,
+      "tag": "0007_allow_atomic_waiver_updates",
+      "breakpoints": true
     }
   ]
 }
