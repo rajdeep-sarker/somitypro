@@ -1,3 +1,4 @@
+import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -40,8 +41,8 @@ function Fees() {
         <DateFilter range={range} onChange={setRange} />
       </div>
       <DataTable
-        head={["তারিখ", "সদস্য নং", "নাম", "ধরন", "টাকা", "মন্তব্য"]}
-        rows={list.map((x) => [bnDate(x.txn_date), mm.get(x.member_id)?.member_no, mm.get(x.member_id)?.name, feeLabel[x.fee_type], taka(x.amount), x.note])}
+        head={["তারিখ", "সদস্য নং", "নাম", "ধরন", "টাকা", "মন্তব্য", ""]}
+        rows={list.map((x) => [bnDate(x.txn_date), mm.get(x.member_id)?.member_no, mm.get(x.member_id)?.name, feeLabel[x.fee_type], taka(x.amount), x.note, <EditEntry key="e" table="member_fees" row={x} />])}
         foot={["মোট", "", "", "", taka(sum(list, (x) => x.amount)), ""]}
       />
     </div>

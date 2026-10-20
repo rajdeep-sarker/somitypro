@@ -1,3 +1,4 @@
+import { MemberForm } from "@/components/MemberForm";
 import { pageHead } from "@/lib/metadata";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Printer } from "lucide-react";
@@ -54,7 +55,7 @@ function MemberDetail() {
       <PageHeader
         title={m.name}
         subtitle={`সদস্য নং ${m.member_no}`}
-        actions={<>
+        actions={<><MemberForm member={m} />
           <Button asChild variant="outline"><Link to="/members"><ArrowLeft className="size-4" /> তালিকা</Link></Button>
           <Button variant="outline" onClick={() => upd.mutate({ id, values: { status: m.status === "active" ? "inactive" : "active" } })}>{m.status === "active" ? "নিষ্ক্রিয় করুন" : "সক্রিয় করুন"}</Button>
           <Button onClick={() => window.print()}><Printer className="size-4" /> প্রিন্ট</Button>

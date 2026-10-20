@@ -1,3 +1,4 @@
+import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -76,8 +77,8 @@ function Collect() {
         <Field label="তারিখ অনুযায়ী কালেকশন"><Input type="date" value={day} onChange={(e) => setDay(e.target.value)} /></Field>
       </div>
       <DataTable
-        head={["তারিখ", "লোন নং", "সদস্য", "কিস্তি", "বিলম্ব চার্জ", "মন্তব্য"]}
-        rows={list.map((r) => [bnDate(r.txn_date), loanNo.get(r.loan_id), mm.get(r.member_id)?.name, taka(r.amount), taka(r.late_fee), r.note])}
+        head={["তারিখ", "লোন নং", "সদস্য", "কিস্তি", "বিলম্ব চার্জ", "মন্তব্য", ""]}
+        rows={list.map((r) => [bnDate(r.txn_date), loanNo.get(r.loan_id), mm.get(r.member_id)?.name, taka(r.amount), taka(r.late_fee), r.note, <EditEntry key="e" table="loan_repayments" row={r} />])}
         foot={["মোট", "", "", taka(sum(list, (r) => r.amount)), taka(sum(list, (r) => r.late_fee)), ""]}
       />
     </div>

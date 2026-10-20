@@ -1,3 +1,4 @@
+import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -93,7 +94,7 @@ function Loans() {
                 `${taka(l.installment_amount)} × ${bn(l.installment_count)} (${installmentLabels[l.installment_type as InstallmentType]})`,
                 s.overdueAmount > 0 && l.status === "active" ? <span key="o" className="text-destructive">{taka(s.overdueAmount)}</span> : "—",
                 <Badge key="s" variant={l.status === "active" ? "default" : "secondary"}>{l.status === "active" ? "চলমান" : "বন্ধ"}</Badge>,
-                <div key="a" className="flex gap-1">
+                <div key="a" className="flex gap-1"><EditEntry table="loans" row={l} />
                   <Button size="sm" variant="outline" onClick={() => setSched(l.id)}>কিস্তির তারিখ</Button>
                   {l.status === "active" && <Button size="sm" variant="ghost" onClick={() => confirm("লোন বন্ধ করবেন?") && upd.mutate({ id: l.id, values: { status: "closed" } })}>বন্ধ করুন</Button>}
                 </div>,

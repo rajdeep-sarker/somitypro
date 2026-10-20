@@ -1,3 +1,4 @@
+import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -72,8 +73,8 @@ function Savings() {
             <Field label="শেষ"><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
           </div>
           <DataTable
-            head={["তারিখ", "সদস্য নং", "নাম", "ধরন", "টাকা", "মন্তব্য"]}
-            rows={filtered.map((t) => [bnDate(t.txn_date), mm.get(t.member_id)?.member_no, mm.get(t.member_id)?.name, label[t.type], taka(t.amount), t.note])}
+            head={["তারিখ", "সদস্য নং", "নাম", "ধরন", "টাকা", "মন্তব্য", ""]}
+            rows={filtered.map((t) => [bnDate(t.txn_date), mm.get(t.member_id)?.member_no, mm.get(t.member_id)?.name, label[t.type], taka(t.amount), t.note, <EditEntry key="e" table="savings_transactions" row={t} />])}
             foot={["মোট জমা", "", "", "", taka(sum(filtered.filter((t) => t.type !== "withdraw"), (t) => t.amount)), `উত্তোলন ${taka(sum(filtered.filter((t) => t.type === "withdraw"), (t) => t.amount))}`]}
           />
         </TabsContent>
