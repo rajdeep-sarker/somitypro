@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRows } from "@/lib/db";
 import { cn } from "@/lib/utils";
+import { useCenterRows } from "@/components/CenterScope";
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
   return (
@@ -48,7 +49,7 @@ export function Field({ label, children, className }: { label: string; children:
 }
 
 export function MemberSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const { data: members = [] } = useRows("members", { order: "member_no", ascending: true });
+  const { data: members = [] } = useCenterRows("members", { order: "member_no", ascending: true });
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger>
@@ -182,6 +183,6 @@ export function DateFilter({ range, onChange }: { range: DateRange; onChange: (r
 }
 
 export function useMemberMap() {
-  const { data = [] } = useRows("members");
+  const { data = [] } = useCenterRows("members");
   return new Map(data.map((m) => [m.id, m]));
 }

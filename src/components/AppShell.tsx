@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  LayoutDashboard, MapPin, Users, PiggyBank, HandCoins, CalendarClock, Landmark, Receipt, Wallet, FileBarChart, Settings, LogOut, Menu, Calculator, AlertTriangle, Briefcase, Shield, Coins, Upload, ClipboardList, MessageSquare, BookOpen, LoaderCircle,
+  LayoutDashboard, MapPin, Users, PiggyBank, HandCoins, CalendarClock, Landmark, Receipt, Wallet, FileBarChart, Settings, LogOut, Menu, Calculator, AlertTriangle, Briefcase, Shield, Coins, Upload, ClipboardList, MessageSquare, BookOpen, LoaderCircle, ChevronDown,
 } from "lucide-react";
 import { supabase } from "@/lib/app-client";
 import { rowQueryOptions, useRows } from "@/lib/db";
@@ -10,6 +10,7 @@ import { preloadTables, runPreloadQueue } from "@/lib/preload";
 import { bnDate, todayISO } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { CenterProvider, CenterSelector } from "@/components/CenterScope";
 
 const menuSections = [
   { label: "সারসংক্ষেপ", items: [
@@ -54,10 +55,19 @@ const menuSections = [
 const menu = menuSections.flatMap((section) => [...section.items]);
 
 export function AppShell({ children }: { children: ReactNode }) {
+  return <CenterProvider><ShellContent>{children}</ShellContent></CenterProvider>;
+}
+
+function ShellContent({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const loading = useRouterState({ select: (state) => state.isLoading });
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const [expanded,setExpanded]=useState<Record<string,boolean>>({});
+  useEffect(()=>{
+    const section=menuSections.find(s=>s.items.some(item=>pathname===item.to||pathname.startsWith(item.to+"/")));
+    if(section)setExpanded(previous=>({...previous,[section.label]:true}));
+  },[pathname]);
   const qc = useQueryClient();
   const router = useRouter();
   const preloadController = useRef<AbortController | null>(null);
@@ -97,8 +107,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-3">
         {menuSections.map((section) => (
           <section key={section.label} aria-label={section.label} className="border-t border-sidebar-border pt-3 first:border-t-0 first:pt-0">
-            <h2 className="mb-1 px-3 text-xs font-semibold text-sidebar-primary">{section.label}</h2>
-            <div className="space-y-0.5">
+            <h2><Button variant="ghost" aria-expanded={expanded[section.label]===true} onClick={()=>setExpanded({...expanded,[section.label]:!expanded[section.label]})} className="mb-1 h-11 w-full justify-between px-3 text-sm font-semibold text-sidebar-primary hover:bg-sidebar-accent hover:text-sidebar-primary">{section.label}<ChevronDown className={expanded[section.label]?"size-4 rotate-180 transition-transform":"size-4 transition-transform"}/></Button></h2>
+            {expanded[section.label]&&<div className="space-y-0.5">
         {section.items.map((m) => (
           <Link
             key={m.to}
@@ -112,7 +122,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {m.label}
           </Link>
         ))}
-            </div>
+            </div>}
           </section>
         ))}
       </div>
@@ -138,6 +148,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <p className="text-sm font-semibold">{bnDate(todayISO())}</p>
           </div>
           {loading && <LoaderCircle aria-label="পৃষ্ঠা লোড হচ্ছে" className="size-5 shrink-0 animate-spin text-primary" />}
+          <div className="col-span-full flex min-w-0 items-center gap-3"><span className="shrink-0 text-sm text-muted-foreground">কেন্দ্র</span><CenterSelector /></div>
         </header>
         <main key={pathname} className="page-transition min-w-0 p-4 md:p-6">{children}</main>
       </div>
