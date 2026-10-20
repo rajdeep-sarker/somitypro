@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { EditEntry } from "@/components/EditEntry";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -14,7 +15,7 @@ import { csvDownload } from "@/lib/import";
 import { pageHead } from "@/lib/metadata";
 export const Route=createFileRoute("/_authenticated/collection")({head:()=>pageHead("দৈনিক ও বাল্ক কালেকশন"),component:Collection});
 type Entry={key:string;kind:string;member_id:string;account_id:string;amount:string};
-function Collection(){const {data:members=[]}=useRows("members"),{data:centers=[]}=useRows("centers"),{data:loans=[]}=useRows("loans"),{data:dps=[]}=useRows("dps_accounts"),{data:sav=[]}=useRows("savings_transactions"),{data:rep=[]}=useRows("loan_repayments"),{data:dtx=[]}=useRows("dps_transactions"),{data:settings=[]}=useRows("somiti_settings",{order:"id"});
+function Collection(){const {data:members=[]}=useCenterRows("members"),{data:centers=[]}=useRows("centers"),{data:loans=[]}=useCenterRows("loans"),{data:dps=[]}=useCenterRows("dps_accounts"),{data:sav=[]}=useCenterRows("savings_transactions"),{data:rep=[]}=useCenterRows("loan_repayments"),{data:dtx=[]}=useCenterRows("dps_transactions"),{data:settings=[]}=useCenterRows("somiti_settings",{order:"id"});
  const [date,setDate]=useState(todayISO()),[center,setCenter]=useState("all"),[entries,setEntries]=useState<Entry[]>([]),[busy,setBusy]=useState(false),[batch,setBatch]=useState("");const qc=useQueryClient();
  const list=members.filter(m=>m.status==="active"&&(center==="all"||m.center_id===center));
  const change=(key:string,values:Partial<Entry>)=>setEntries(entries.map(e=>e.key===key?{...e,...values}:e));

@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { MemberForm } from "@/components/MemberForm";
 import { pageHead } from "@/lib/metadata";
 import { useMemo, useState } from "react";
@@ -19,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/members/")({
 const empty = { name: "", father_name: "", mother_name: "", spouse_name: "", phone: "", nid: "", dob: "", gender: "", occupation: "", address: "", center_id: "", nominee_name: "", nominee_relation: "", nominee_phone: "", admission_date: "" };
 
 function Members() {
-  const { data: members = [] } = useRows("members", { order: "member_no", ascending: true });
+  const { data: members = [] } = useCenterRows("members", { order: "member_no", ascending: true });
   const { data: centers = [] } = useRows("centers");
 
   const [open, setOpen] = useState(false);

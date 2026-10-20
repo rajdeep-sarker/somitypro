@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
@@ -15,8 +16,8 @@ export const Route = createFileRoute("/_authenticated/loans/collect")({
 });
 
 function Collect() {
-  const { data: loans = [] } = useRows("loans");
-  const { data: rep = [] } = useRows("loan_repayments");
+  const { data: loans = [] } = useCenterRows("loans");
+  const { data: rep = [] } = useCenterRows("loan_repayments");
   const mm = useMemberMap();
   const ins = useInsert("loan_repayments", "কিস্তি আদায় হয়েছে");
   const upd = useUpdate("loans");

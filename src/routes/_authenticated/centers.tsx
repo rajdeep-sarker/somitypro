@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/centers")({
 
 function Centers() {
   const { data: centers = [] } = useRows("centers");
-  const { data: members = [] } = useRows("members");
+  const { data: members = [] } = useCenterRows("members");
   const ins = useInsert("centers");
   const del = useDelete("centers");
   const [f, setF] = useState({ name: "", code: "", address: "", meeting_day: "" });

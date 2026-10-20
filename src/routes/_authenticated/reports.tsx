@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -18,20 +19,20 @@ function Reports() {
   const today = todayISO();
   const [from, setFrom] = useState(today);
   const [to, setTo] = useState(today);
-  const { data: settings = [] } = useRows("somiti_settings", { order: "id" });
-  const { data: members = [] } = useRows("members", { order: "member_no", ascending: true });
-  const { data: sav = [] } = useRows("savings_transactions");
-  const { data: loans = [] } = useRows("loans");
-  const { data: rep = [] } = useRows("loan_repayments");
-  const { data: dps = [] } = useRows("dps_transactions");
-  const { data: fdrA = [] } = useRows("fdr_accounts");
-  const { data: fdrT = [] } = useRows("fdr_transactions");
-  const { data: fees = [] } = useRows("member_fees");
-  const { data: cash = [] } = useRows("cash_entries");
+  const { data: settings = [] } = useCenterRows("somiti_settings", { order: "id" });
+  const { data: members = [] } = useCenterRows("members", { order: "member_no", ascending: true });
+  const { data: sav = [] } = useCenterRows("savings_transactions");
+  const { data: loans = [] } = useCenterRows("loans");
+  const { data: rep = [] } = useCenterRows("loan_repayments");
+  const { data: dps = [] } = useCenterRows("dps_transactions");
+  const { data: fdrA = [] } = useCenterRows("fdr_accounts");
+  const { data: fdrT = [] } = useCenterRows("fdr_transactions");
+  const { data: fees = [] } = useCenterRows("member_fees");
+  const { data: cash = [] } = useCenterRows("cash_entries");
 
-  const { data: ledgerAccounts = [] } = useRows("ledger_accounts");
-  const { data: ledgerTx = [] } = useRows("ledger_transactions");
-  const { data: salaries = [] } = useRows("salary_payments");
+  const { data: ledgerAccounts = [] } = useCenterRows("ledger_accounts");
+  const { data: ledgerTx = [] } = useCenterRows("ledger_transactions");
+  const { data: salaries = [] } = useCenterRows("salary_payments");
   const accountMap = new Map(ledgerAccounts.map(a => [a.id, a]));
   const inR = <T extends { txn_date: string }>(r: T[]) => r.filter((x) => x.txn_date >= from && x.txn_date <= to);
   const upto = <T extends { txn_date: string }>(r: T[]) => r.filter((x) => x.txn_date <= to);

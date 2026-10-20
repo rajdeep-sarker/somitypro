@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
@@ -20,9 +21,9 @@ const typeOpts = (Object.keys(installmentLabels) as InstallmentType[]).map((k) =
 
 function Dps() {
   const today = todayISO();
-  const { data: schemes = [] } = useRows("dps_schemes");
-  const { data: accounts = [] } = useRows("dps_accounts");
-  const { data: tx = [] } = useRows("dps_transactions");
+  const { data: schemes = [] } = useCenterRows("dps_schemes");
+  const { data: accounts = [] } = useCenterRows("dps_accounts");
+  const { data: tx = [] } = useCenterRows("dps_transactions");
   const mm = useMemberMap();
   const insScheme = useInsert("dps_schemes");
   const updScheme = useUpdate("dps_schemes");

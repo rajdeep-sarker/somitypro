@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/fees")({
 const feeLabel: Record<string, string> = { admission: "ভর্তি ফি", monthly: "মাসিক সমিতি ফি", late: "বিলম্ব চার্জ", service: "সার্ভিস চার্জ", other: "অন্যান্য" };
 
 function Fees() {
-  const { data: fees = [] } = useRows("member_fees");
+  const { data: fees = [] } = useCenterRows("member_fees");
   const mm = useMemberMap();
   const ins = useInsert("member_fees");
   const today = todayISO();

@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
@@ -19,8 +20,8 @@ export const Route = createFileRoute("/_authenticated/loans/")({
 const typeOpts = (Object.keys(installmentLabels) as InstallmentType[]).map((k) => ({ value: k, label: installmentLabels[k] }));
 
 function Loans() {
-  const { data: loans = [] } = useRows("loans");
-  const { data: rep = [] } = useRows("loan_repayments");
+  const { data: loans = [] } = useCenterRows("loans");
+  const { data: rep = [] } = useCenterRows("loan_repayments");
   const mm = useMemberMap();
   const ins = useInsert("loans", "লোন প্রদান সম্পন্ন হয়েছে");
   const upd = useUpdate("loans");

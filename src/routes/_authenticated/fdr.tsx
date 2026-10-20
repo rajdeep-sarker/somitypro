@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
@@ -20,9 +21,9 @@ const payout: Record<string, string> = { maturity: "মেয়াদ শেষ
 
 function Fdr() {
   const today = todayISO();
-  const { data: schemes = [] } = useRows("fdr_schemes");
-  const { data: accounts = [] } = useRows("fdr_accounts");
-  const { data: tx = [] } = useRows("fdr_transactions");
+  const { data: schemes = [] } = useCenterRows("fdr_schemes");
+  const { data: accounts = [] } = useCenterRows("fdr_accounts");
+  const { data: tx = [] } = useCenterRows("fdr_transactions");
   const mm = useMemberMap();
   const insScheme = useInsert("fdr_schemes");
   const insAcc = useInsert("fdr_accounts", "FDR খোলা হয়েছে");

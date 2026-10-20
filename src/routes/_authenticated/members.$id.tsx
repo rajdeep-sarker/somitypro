@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { MemberForm } from "@/components/MemberForm";
 import { pageHead } from "@/lib/metadata";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -18,12 +19,12 @@ const typeLabel: Record<string, string> = { deposit: "জমা", withdraw: "উ
 
 function MemberDetail() {
   const { id } = Route.useParams();
-  const { data: members = [] } = useRows("members");
-  const { data: sav = [] } = useRows("savings_transactions");
-  const { data: loans = [] } = useRows("loans");
-  const { data: rep = [] } = useRows("loan_repayments");
-  const { data: dps = [] } = useRows("dps_transactions");
-  const { data: fees = [] } = useRows("member_fees");
+  const { data: members = [] } = useCenterRows("members");
+  const { data: sav = [] } = useCenterRows("savings_transactions");
+  const { data: loans = [] } = useCenterRows("loans");
+  const { data: rep = [] } = useCenterRows("loan_repayments");
+  const { data: dps = [] } = useCenterRows("dps_transactions");
+  const { data: fees = [] } = useCenterRows("member_fees");
   const upd = useUpdate("members");
   const [range, setRange] = useDateRange();
   const m = members.find((x) => x.id === id);

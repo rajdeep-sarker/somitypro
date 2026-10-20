@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field, SimpleSelect } from "@/components/kit";
-import { nextNo, useRows, type Row } from "@/lib/db";
+import { useRows, type Row } from "@/lib/db";
 import { supabase } from "@/lib/app-client";
 import { todayISO } from "@/lib/format";
 import { getMemberDocUploadUrl } from "@/lib/r2.functions";
@@ -48,7 +48,7 @@ export function MemberForm({ member }: { member?: Row<"members"> }) {
       const values = { ...f, ...paths, center_id: f.center_id || null, dob: f.dob || null, admission_date: f.admission_date || todayISO() };
       const result = member
         ? await supabase.from("members").update(values).eq("id", id).select("id").single()
-        : await supabase.from("members").insert({ ...values, id, member_no: nextNo("M-", members.map(m => m.member_no)) }).select("id").single();
+        : await supabase.from("members").insert({ ...values, id, member_no: "" }).select("id").single();
       if (result.error) throw result.error;
       await qc.invalidateQueries({ queryKey: ["t", "members"] });
       toast.success(member ? "সদস্যের তথ্য সংশোধন হয়েছে" : "সদস্য তৈরি হয়েছে"); setOpen(false);

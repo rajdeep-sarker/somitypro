@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { EditEntry } from "@/components/EditEntry";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -20,11 +21,11 @@ const config = {
 };
 export function LedgerPage({ module }: { module: Module }) {
  const c = config[module];
- const { data: all = [], isPending, error } = useRows("ledger_accounts");
- const { data: tx = [] } = useRows("ledger_transactions");
- const { data: loans = [] } = useRows("loans");
- const { data: rep = [] } = useRows("loan_repayments");
- const { data: settings = [] } = useRows("somiti_settings",{order:"id"});
+ const { data: all = [], isPending, error } = useCenterRows("ledger_accounts");
+ const { data: tx = [] } = useCenterRows("ledger_transactions");
+ const { data: loans = [] } = useCenterRows("loans");
+ const { data: rep = [] } = useCenterRows("loan_repayments");
+ const { data: settings = [] } = useCenterRows("somiti_settings",{order:"id"});
  const accounts = all.filter(a=>a.module===module);
  const mm = useMemberMap(); const qc = useQueryClient();
  const addAccount = useInsert("ledger_accounts"), addTxn = useInsert("ledger_transactions"), update = useUpdate("ledger_accounts");

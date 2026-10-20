@@ -1,3 +1,4 @@
+import { useCenterRows } from "@/components/CenterScope";
 import { pageHead } from "@/lib/metadata";
 import { createFileRoute } from "@tanstack/react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,8 +13,8 @@ export const Route = createFileRoute("/_authenticated/loans/due")({
 });
 
 function Due() {
-  const { data: loans = [] } = useRows("loans");
-  const { data: rep = [] } = useRows("loan_repayments");
+  const { data: loans = [] } = useCenterRows("loans");
+  const { data: rep = [] } = useCenterRows("loan_repayments");
   const mm = useMemberMap();
   const today = todayISO();
   const active = loans.filter((l) => l.status === "active");
