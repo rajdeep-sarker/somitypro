@@ -26,12 +26,12 @@
 - [x] Rules & policy page, printable receipts
 
 ## Open tasks
-- [ ] Remember Me survives installed-app restarts and skips the login page
-- [ ] Photo/NID selection inside member creation and editing
-- [ ] Pencil editing on saved entries, including safe financial corrections
+- [x] Remember Me survives installed-app restarts and skips the login page
+- [x] Photo/NID selection inside member creation and editing
+- [x] Pencil editing on saved entries, including safe financial corrections
 - [x] Date filters on all list pages
 - [x] Member photo/ID upload to Cloudflare R2 (any format)
-- [ ] Collapsible menu sections on desktop and phone
-- [ ] Center-based member selection and list filtering across entry pages
-- [ ] Replace Lovable favicon with somiti icon
-- [ ] Explain Firebase free-tier and Lovable Free database hosting options without migrating
+- [x] Collapsible menu sections on desktop and phone
+- [x] Center-based member selection and list filtering across entry pages
+- [x] Replace Lovable favicon with somiti icon
+- [x] Explain Firebase free-tier and Lovable Free database hosting options without migrating
