@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { FormCard } from "@/components/kit";
 import { compareWithFirebase, syncAllToFirebase } from "@/lib/firebase.functions";
 
 type Cmp = Awaited<ReturnType<typeof compareWithFirebase>>;
@@ -20,7 +19,7 @@ export function FirebaseCheck() {
     } catch (e) { toast.error(e instanceof Error ? e.message : "ব্যর্থ"); } finally { setBusy(false); }
   }
   const same = (r: Cmp[number]) => r.dbCount === r.fbCount && JSON.stringify(r.dbMoney) === JSON.stringify(r.fbMoney);
-  return <FormCard title="Firebase স্থানান্তর ও যাচাই">
+  return <section className="rounded-xl border bg-card p-5 shadow-sm"><h2 className="mb-4 text-lg font-semibold">Firebase স্থানান্তর ও যাচাই</h2>
     <div className="flex flex-wrap gap-2">
       <Button disabled={busy} onClick={() => run(true)}>সব তথ্য Firebase-এ কপি করুন</Button>
       <Button disabled={busy} variant="outline" onClick={() => run(false)}>দুই জায়গা মিলিয়ে দেখুন</Button>
@@ -32,5 +31,5 @@ export function FirebaseCheck() {
         <td className="p-2">{Object.keys(r.dbMoney).map(k => `${k}: ${r.dbMoney[k]} / ${r.fbMoney[k] ?? 0}`).join(", ") || "—"}</td>
         <td className="p-2">{same(r) ? "মিলেছে" : "মেলেনি"}</td></tr>)}</tbody>
     </table></div>}
-  </FormCard>;
+  </section>;
 }
