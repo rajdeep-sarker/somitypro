@@ -15,7 +15,8 @@ const MODULE_TABLES: Record<string, string> = {
   notification_drafts: "notifications",
 };
 
-type Row = Record<string, unknown>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Row = Record<string, any>;
 
 const tableSchema = z.object({ table: z.string().refine((t) => TABLES.has(t), "অজানা তালিকা") });
 

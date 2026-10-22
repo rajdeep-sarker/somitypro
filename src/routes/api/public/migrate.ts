@@ -1,5 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { createFileRoute } from "@tanstack/react-start";
+import { createFileRoute } from "@tanstack/react-router";
 import { scrypt } from "scrypt-js";
 
 // One-time move of every table and every login from the old database into
