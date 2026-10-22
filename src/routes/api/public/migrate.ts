@@ -39,10 +39,8 @@ export const Route = createFileRoute("/api/public/migrate")({
         for (const table of FIREBASE_TABLES) {
           const rows: Record<string, unknown>[] = [];
           for (let from = 0; ; from += 1000) {
-            const { data, error } = await (supabaseAdmin as never as { from: (t: string) => { select: (s: string) => { range: (a: number, b: number) => Promise<{ data: Record<string, unknown>[] | null; error: { message: string } | null }> } } })
-              .from(table)
-              .select("*")
-              .range(from, from + 999);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { data, error } = await (supabaseAdmin as any).from(table).select("*").range(from, from + 999);
             if (error) throw new Error(`${table}: ${error.message}`);
             rows.push(...(data ?? []));
             if (!data || data.length < 1000) break;
