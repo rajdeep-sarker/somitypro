@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTable, Field, FormCard, MemberSelect, PageHeader, SimpleSelect, StatCard, useMemberMap } from "@/components/kit";
 import { useInsert, useRows, useUpdate } from "@/lib/db";
-import { supabase } from "@/lib/app-client";
+import { transferBank } from "@/lib/finance.functions";
 import { bn, bnDate, sum, taka, todayISO } from "@/lib/format";
 
 type Module = "shares" | "investments" | "fund" | "banks";
@@ -43,7 +43,7 @@ export function LedgerPage({ module }: { module: Module }) {
   const share=module==="shares"&&f.type!=="dividend";
   addTxn.mutate({...f,member_id:f.member_id||null,loan_id:f.type==="waiver"?f.loan_id||null:null,amount:share?Number(f.units)*Number(selected?.unit_price??0):Number(f.amount),units:share?Number(f.units):0},{onSuccess:()=>{setF({...f,amount:"",note:"",reference:""});qc.invalidateQueries({queryKey:["t","loans"]});}});
  }
- async function doTransfer(){setBusy(true); const {error}=await supabase.rpc("transfer_bank",{p_from:transfer.from,p_to:transfer.to,p_amount:Number(transfer.amount),p_date:f.txn_date,p_note:f.note});setBusy(false);if(error)toast.error(error.message);else {toast.success("স্থানান্তর সম্পন্ন হয়েছে");setTransfer({...transfer,amount:""});qc.invalidateQueries({queryKey:["t","ledger_transactions"]});}}
+ async function doTransfer(){setBusy(true);try{await transferBank({data:{from:transfer.from,to:transfer.to,amount:Number(transfer.amount),date:f.txn_date,note:f.note||null}});toast.success("স্থানান্তর সম্পন্ন হয়েছে");setTransfer({...transfer,amount:""});qc.invalidateQueries({queryKey:["t","ledger_transactions"]});}catch(e){toast.error(e instanceof Error?e.message:"স্থানান্তর হয়নি");}finally{setBusy(false);}}
  return <div className="min-w-0 space-y-6">
  <div className={receipt?"no-print space-y-6":"space-y-6"}>
  <PageHeader title={c.title} actions={<><Button variant="outline" onClick={()=>{setReceipt(null);window.print();}}><Printer className="size-4"/>প্রিন্ট</Button><Button onClick={()=>setShow(!show)}>{show?"বন্ধ করুন":`নতুন ${c.account}`}</Button></>}/>

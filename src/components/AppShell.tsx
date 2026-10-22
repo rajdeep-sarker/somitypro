@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   LayoutDashboard, MapPin, Users, PiggyBank, HandCoins, CalendarClock, Landmark, Receipt, Wallet, FileBarChart, Settings, LogOut, Menu, Calculator, AlertTriangle, Briefcase, Shield, Coins, Upload, ClipboardList, MessageSquare, BookOpen, LoaderCircle, ChevronDown,
 } from "lucide-react";
-import { supabase } from "@/lib/app-client";
+import { auth } from "@/lib/app-client";
 import { rowQueryOptions, useRows } from "@/lib/db";
 import { preloadTables, runPreloadQueue } from "@/lib/preload";
 import { bnDate, todayISO } from "@/lib/format";
@@ -93,7 +93,7 @@ function ShellContent({ children }: { children: ReactNode }) {
     preloadController.current?.abort();
     await qc.cancelQueries();
     qc.clear();
-    await supabase.auth.signOut();
+    await auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
 

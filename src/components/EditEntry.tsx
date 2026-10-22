@@ -7,10 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field, SimpleSelect } from "@/components/kit";
-import { supabase } from "@/lib/app-client";
+import { correctLedgerEntry, editSavedEntry } from "@/lib/finance.functions";
 import { useRows, type TableName } from "@/lib/db";
 import { entryFields, editOptionLabels, changedEntryValues } from "@/lib/edit-fields";
-import type { Json } from "@/integrations/supabase/types";
 
 export function EditEntry({ table, row }: { table: TableName; row: { id: string } }) {
  const record = row as unknown as Record<string,unknown>;
@@ -22,10 +21,8 @@ export function EditEntry({ table, row }: { table: TableName; row: { id: string 
  async function save(){setBusy(true);try{
   const changed=changedEntryValues(record,values,fields);
   if(!Object.keys(changed).length){setOpen(false);return;}
-  const result=table==="ledger_transactions"
-   ? await supabase.rpc("correct_ledger_entry",{p_id:row.id,p_values:changed as Json,p_expected:record as Json})
-   : await supabase.rpc("edit_saved_entry",{p_table:table,p_id:row.id,p_values:changed as Json,p_expected:record as Json});
-  if(result.error)throw result.error;
+  if(table==="ledger_transactions") await correctLedgerEntry({data:{id:row.id,values:changed,expected:record}});
+  else await editSavedEntry({data:{table,id:row.id,values:changed,expected:record}});
   await qc.invalidateQueries({queryKey:["t"]});toast.success("তথ্য সংশোধন হয়েছে");setOpen(false);
  }catch(error){toast.error(error instanceof Error?error.message:(error as {message?:string})?.message ?? "সংশোধন হয়নি");}finally{setBusy(false);}}
  return <><Button type="button" variant="ghost" size="icon" aria-label="সম্পাদনা" title="এন্ট্রি সম্পাদনা" onClick={start}><Pencil className="size-4"/></Button>

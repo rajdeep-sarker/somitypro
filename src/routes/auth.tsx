@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Landmark } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/app-client";
+import { auth } from "@/lib/app-client";
 import { chooseLoginPersistence, rememberChoiceKey } from "@/lib/login-storage";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ function AuthPage() {
   useEffect(() => {
     setRemember(localStorage.getItem(rememberChoiceKey) === "true");
     let active = true;
-    supabase.auth.getSession().then(({ data }) => {
+    auth.getSession().then(({ data }) => {
       if (active && data.session) navigate({ to: "/dashboard", replace: true });
     });
     return () => { active = false; };
@@ -50,8 +50,8 @@ function AuthPage() {
     chooseLoginPersistence(remember, sessionStorage, localStorage);
     const res =
       mode === "login"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password, options: { data: { full_name: name, phone }, emailRedirectTo: window.location.origin } });
+        ? await auth.signInWithPassword({ email, password })
+        : await auth.signUp({ email, password, options: { data: { full_name: name, phone } } });
     setBusy(false);
     if (res.error) { toast.error(mode === "login" ? "মোবাইল নম্বর বা পাসওয়ার্ড ভুল" : res.error.message); return; }
     if (!res.data.session) { toast.success("অ্যাকাউন্ট তৈরি হয়েছে, এখন লগইন করুন"); return; }

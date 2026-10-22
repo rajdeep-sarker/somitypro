@@ -6,9 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FormCard, PageHeader } from "@/components/kit";
 import { useRows, useUpdate } from "@/lib/db";
-import { supabase } from "@/lib/app-client";
+import { auth } from "@/lib/app-client";
 import { AdminPasswordReset } from "@/components/AdminPasswordReset";
-import { FirebaseCheck } from "@/components/FirebaseCheck";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => pageHead("সেটিং"),
@@ -28,7 +27,7 @@ function Settings() {
   }, [data]);
 
   async function changePw() {
-    const { error } = await supabase.auth.updateUser({ password: pw.next, current_password: pw.current } as never);
+    const { error } = await auth.updateUser({ password: pw.next, current_password: pw.current });
     if (error) toast.error(error.message);
     else { toast.success("পাসওয়ার্ড পরিবর্তন হয়েছে"); setPw({ current: "", next: "" }); }
   }
@@ -50,7 +49,6 @@ function Settings() {
         <div className="sm:col-span-2"><Button type="submit">পরিবর্তন করুন</Button></div>
       </FormCard>
       <AdminPasswordReset currentUserId={user.id} />
-      <FirebaseCheck />
     </div>
   );
 }
