@@ -35,3 +35,5 @@
 - [x] Center-based member selection and list filtering across entry pages
 - [x] Replace Lovable favicon with somiti icon
 - [x] Explain Firebase free-tier and Lovable Free database hosting options without migrating
+- [x] Firebase: copy + compare page in Settings, members mirrored on save
+- [ ] Firebase: move logins and switch every page to read/save in Firebase (section by section)

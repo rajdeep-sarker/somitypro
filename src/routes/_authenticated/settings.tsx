@@ -8,6 +8,7 @@ import { Field, FormCard, PageHeader } from "@/components/kit";
 import { useRows, useUpdate } from "@/lib/db";
 import { supabase } from "@/lib/app-client";
 import { AdminPasswordReset } from "@/components/AdminPasswordReset";
+import { FirebaseCheck } from "@/components/FirebaseCheck";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => pageHead("সেটিং"),
@@ -49,6 +50,7 @@ function Settings() {
         <div className="sm:col-span-2"><Button type="submit">পরিবর্তন করুন</Button></div>
       </FormCard>
       <AdminPasswordReset currentUserId={user.id} />
+      <FirebaseCheck />
     </div>
   );
 }
