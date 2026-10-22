@@ -57,6 +57,13 @@
       "when": 1792494745665,
       "tag": "0007_allow_atomic_waiver_updates",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792676544343,
+      "tag": "0008_restrict_member_docs_storage",
+      "breakpoints": true
     }
   ]
 }
