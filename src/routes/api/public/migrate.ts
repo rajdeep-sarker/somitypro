@@ -29,7 +29,7 @@ export const Route = createFileRoute("/api/public/migrate")({
         if (request.headers.get("x-migration-token") !== process.env["MIGRATION_TOKEN"]) {
           return Response.json({ error: "forbidden" }, { status: 403 });
         }
-        const body = (await request.json().catch(() => ({}))) as { testPhone?: string; testPassword?: string };
+        const body = (await request.json().catch(() => ({}))) as { testPhone?: string; testPassword?: string; hashes?: { id: string; password_hash: string }[] };
         const admin = await import("@/lib/firebase-admin.server");
         const { FIREBASE_TABLES } = await import("@/lib/firebase-format");
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -70,6 +70,16 @@ export const Route = createFileRoute("/api/public/migrate")({
           if (batch.length < 1000) break;
         }
 
+        // Password hashes supplied directly (the admin API omits them).
+        let hashesApplied = 0;
+        if (Array.isArray(body.hashes)) {
+          const writes = body.hashes
+            .filter((h) => h.id && h.password_hash)
+            .map((h) => admin.wUpdate(fsDb, "auth_users", h.id, { password_hash: h.password_hash }));
+          await admin.commitWrites(writes);
+          hashesApplied = writes.length;
+        }
+
         let testLogin: boolean | null = null;
         if (body.testPhone && body.testPassword) {
           const authUsers = await admin.listCollection("auth_users");
@@ -77,7 +87,7 @@ export const Route = createFileRoute("/api/public/migrate")({
           testLogin = found ? await verifyPassword(body.testPassword, String(found["password_hash"] ?? "")) : false;
         }
 
-        return Response.json({ tables: counts, users, hashCaptured: hashSample.length > 0, testLogin });
+        return Response.json({ tables: counts, users, hashCaptured: hashSample.length > 0, hashesApplied, testLogin });
       },
     },
   },
