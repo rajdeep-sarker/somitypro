@@ -10,6 +10,7 @@ const enc = new TextEncoder();
 
 async function verifyPassword(password: string, stored: string): Promise<boolean> {
   try {
+    if (stored.startsWith("$2")) return bcrypt.compareSync(password, stored);
     const raw = Uint8Array.from(atob(stored), (c) => c.charCodeAt(0));
     if (raw.length !== 48) return false;
     const key = raw.slice(0, 32);
