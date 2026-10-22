@@ -25,6 +25,6 @@ export function toFirestoreFields(r: Record<string, unknown>) {
 export function moneyTotals(rows: Record<string, unknown>[], fields: string[]) {
   const out: Record<string, number> = {};
   for (const r of rows) for (const f of fields) if (f in r) out[f] = (out[f] ?? 0) + (Number(r[f]) || 0);
-  for (const f in out) out[f] = Math.round(out[f] * 100) / 100;
+  for (const f in out) out[f] = Math.round((out[f] ?? 0) * 100) / 100;
   return out;
 }
