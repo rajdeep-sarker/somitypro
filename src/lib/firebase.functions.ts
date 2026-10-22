@@ -38,7 +38,7 @@ async function firestore() {
 }
 
 type Row = Record<string, unknown>;
-const docId = (r: Row) => String(r.id ?? r.user_id);
+const docId = (r: Row) => String(r["id"] ?? r["user_id"]);
 
 async function writeRows(table: string, rows: Row[]) {
   const { db, call } = await firestore();
@@ -54,12 +54,12 @@ async function readAll(table: string) {
   let pageToken = "";
   do {
     const j = await call(`${db}/${table}?pageSize=1000${pageToken ? `&pageToken=${pageToken}` : ""}`);
-    for (const d of (j.documents as { fields: Record<string, Record<string, unknown>> }[] | undefined) ?? []) {
+    for (const d of (j["documents"] as { fields: Record<string, Record<string, unknown>> }[] | undefined) ?? []) {
       const r: Row = {};
-      for (const [k, v] of Object.entries(d.fields)) r[k] = v.integerValue !== undefined ? Number(v.integerValue) : (v.doubleValue ?? v.stringValue ?? v.booleanValue ?? null);
+      for (const [k, v] of Object.entries(d.fields)) r[k] = v["integerValue"] !== undefined ? Number(v["integerValue"]) : (v["doubleValue"] ?? v["stringValue"] ?? v["booleanValue"] ?? null);
       out.push(r);
     }
-    pageToken = (j.nextPageToken as string) ?? "";
+    pageToken = (j["nextPageToken"] as string) ?? "";
   } while (pageToken);
   return out;
 }
