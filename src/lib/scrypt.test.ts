@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { scrypt } from "scrypt-js";
+import scryptJs from "scrypt-js";
+const { scrypt } = scryptJs;
 
 const hex = (buf: Uint8Array) => [...buf].map((b) => b.toString(16).padStart(2, "0")).join("");
 const enc = new TextEncoder();

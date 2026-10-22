@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { scrypt } from "scrypt-js";
+import scryptJs from "scrypt-js";
+const { scrypt } = scryptJs;
 
 // One-time move of every table and every login from the old database into
 // Firebase. Protected by a server-only token; safe to re-run (idempotent).

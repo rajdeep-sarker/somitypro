@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { scrypt } from "scrypt-js";
+import scryptJs from "scrypt-js";
+const { scrypt } = scryptJs;
 import { requireAppAuth } from "./auth-middleware";
 import { phoneToEmail } from "./format";
 
