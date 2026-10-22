@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAppAuth } from "./auth-middleware";
 
 // Cloudflare R2 is S3-compatible. We generate SigV4 presigned URLs server-side
 // so the browser can upload/download directly without exposing credentials.
@@ -67,7 +67,7 @@ function safeKey(memberId: string, kind: string, fileName: string): string {
 }
 
 export const getMemberDocUploadUrl = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAppAuth])
   .inputValidator((input: { memberId: string; kind: "photo" | "id_doc"; fileName: string }) => input)
   .handler(async ({ data, context }) => {
     if (!data.memberId || !data.fileName) throw new Error("সদস্য ও ফাইল নির্বাচন করুন");
@@ -77,7 +77,7 @@ export const getMemberDocUploadUrl = createServerFn({ method: "POST" })
   });
 
 export const getMemberDocViewUrl = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAppAuth])
   .inputValidator((input: { key: string }) => input)
   .handler(async ({ data }) => {
     if (!data.key.startsWith("members/")) throw new Error("অবৈধ ফাইল");

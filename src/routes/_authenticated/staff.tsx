@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable, Field, FormCard, PageHeader, SimpleSelect } from "@/components/kit";
 import { useInsert, useRows, useUpdate } from "@/lib/db";
-import { supabase } from "@/lib/app-client";
-import { createStaffLogin } from "@/lib/staff.functions";
+import { deleteRow, upsertRow } from "@/lib/data.functions";
+import { createStaffLogin } from "@/lib/auth.functions";
 import { bnDate, sum, taka, todayISO } from "@/lib/format";
 import { pageHead } from "@/lib/metadata";
 export const Route = createFileRoute("/_authenticated/staff")({head:()=>pageHead("কর্মী ও বেতন"),component:Staff});
@@ -26,9 +26,9 @@ function Staff(){
  const [attDate,setAttDate]=useState(todayISO()),[month,setMonth]=useState(todayISO().slice(0,7));
  const admin=roles.some(r=>r.role==="admin");const chosen=staff.find(s=>s.id===selected);const person=staff.find(s=>s.id===card);
  const options=staff.filter(s=>s.status==="active").map(s=>({value:s.id,label:s.name}));
- async function attendance(){setBusy(true);const {error}=await supabase.from("attendance").upsert({...a,check_in:a.check_in||null,check_out:a.check_out||null},{onConflict:"staff_id,attendance_date"});setBusy(false);if(error)toast.error(error.message);else {toast.success("হাজিরা সংরক্ষিত");qc.invalidateQueries({queryKey:["t","attendance"]});}}
+ async function attendance(){setBusy(true);try{await upsertRow({data:{table:"attendance",keys:["staff_id","attendance_date"],values:{...a,check_in:a.check_in||null,check_out:a.check_out||null}}});toast.success("হাজিরা সংরক্ষিত");qc.invalidateQueries({queryKey:["t","attendance"]});}catch(e){toast.error(e instanceof Error?e.message:"হাজিরা সংরক্ষণ হয়নি");}finally{setBusy(false);}}
  async function provision(){setBusy(true);try{await login({data:{staffId:selected,phone,password:pw}});setPw("");toast.success("কর্মীর লগইন তৈরি হয়েছে");qc.invalidateQueries({queryKey:["t","staff"]});}catch(e){toast.error(e instanceof Error?e.message:"লগইন তৈরি হয়নি");}finally{setBusy(false);}}
- async function permission(module:string,enabled:boolean,write=false){if(!chosen?.user_id)return;setBusy(true);const result=enabled?await supabase.from("staff_permissions").upsert({user_id:chosen.user_id,module,can_write:write},{onConflict:"user_id,module"}):await supabase.from("staff_permissions").delete().eq("user_id",chosen.user_id).eq("module",module);setBusy(false);if(result.error)toast.error(result.error.message);else qc.invalidateQueries({queryKey:["t","staff_permissions"]});}
+ async function permission(module:string,enabled:boolean,write=false){if(!chosen?.user_id)return;setBusy(true);try{if(enabled)await upsertRow({data:{table:"staff_permissions",keys:["user_id","module"],values:{user_id:chosen.user_id,module,can_write:write}}});else{const existing=permissions.find(p=>p.user_id===chosen.user_id&&p.module===module);if(existing)await deleteRow({data:{table:"staff_permissions",id:existing.id}});}qc.invalidateQueries({queryKey:["t","staff_permissions"]});}catch(e){toast.error(e instanceof Error?e.message:"অনুমতি বদলায়নি");}finally{setBusy(false);}}
  return <div className="space-y-6"><div className={card?"no-print space-y-6":"space-y-6"}><PageHeader title="কর্মী, হাজিরা ও বেতন"/>
  {!admin?<DataTable head={["নাম","মোবাইল","অবস্থা"]} rows={staff.map(s=>[s.name,s.phone,s.status==="active"?"সক্রিয়":"বন্ধ"])}/>:<>
  <div className="grid gap-6 xl:grid-cols-2"><FormCard title="নতুন কর্মী" onSubmit={()=>add.mutate({...f,salary:Number(f.salary),designation_id:f.designation_id||null},{onSuccess:()=>setF({...f,name:"",phone:"",address:""})})}>

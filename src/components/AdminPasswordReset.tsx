@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { KeyRound } from "lucide-react";
 import { useRows } from "@/lib/db";
-import { resetAccountPassword } from "@/lib/password-reset.functions";
+import { resetAccountPassword } from "@/lib/auth.functions";
 import { FormCard, Field, SimpleSelect } from "./kit";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";

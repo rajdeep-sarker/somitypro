@@ -8,10 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field, SimpleSelect } from "@/components/kit";
 import { useRows, type Row } from "@/lib/db";
-import { supabase } from "@/lib/app-client";
+import { insertRow, updateRow } from "@/lib/data.functions";
 import { todayISO } from "@/lib/format";
 import { getMemberDocUploadUrl } from "@/lib/r2.functions";
-import { mirrorMember } from "@/lib/firebase.functions";
 import { validateMemberFile, type MemberFiles } from "@/lib/member-files";
 import { useCenterScope } from "@/components/CenterScope";
 
@@ -27,7 +26,6 @@ export function MemberForm({ member }: { member?: Row<"members"> }) {
   const { data: centers = [] } = useRows("centers");
   const qc = useQueryClient();
   const uploadUrl = useServerFn(getMemberDocUploadUrl);
-  const mirror = useServerFn(mirrorMember);
 
   function start() {
     const values = { ...empty, center_id: center === "all" ? "" : center };
@@ -49,11 +47,8 @@ export function MemberForm({ member }: { member?: Row<"members"> }) {
         paths[kind === "photo" ? "photo_path" : "id_doc_path"] = key;
       }
       const values = { ...f, ...paths, center_id: f.center_id || null, dob: f.dob || null, admission_date: f.admission_date || todayISO() };
-      const result = member
-        ? await supabase.from("members").update(values).eq("id", id).select("id").single()
-        : await supabase.from("members").insert({ ...values, id, member_no: "" }).select("id").single();
-      if (result.error) throw result.error;
-      void mirror({ data: { id } }).catch(() => toast.warning("Firebase-এ কপি হয়নি; সেটিংস থেকে আবার কপি করুন"));
+      if (member) await updateRow({ data: { table: "members", id, values } });
+      else await insertRow({ data: { table: "members", values: { ...values, id, member_no: "" } } });
       await qc.invalidateQueries({ queryKey: ["t", "members"] });
       toast.success(member ? "সদস্যের তথ্য সংশোধন হয়েছে" : "সদস্য তৈরি হয়েছে"); setOpen(false);
     } catch (error) { toast.error(error instanceof Error ? error.message : (error as { message?: string })?.message ?? "সংরক্ষণ হয়নি"); }
