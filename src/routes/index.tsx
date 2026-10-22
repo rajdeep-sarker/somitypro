@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { supabase } from "@/lib/app-client";
+import { auth } from "@/lib/app-client";
 import { PiggyBank, HandCoins, CalendarClock, Landmark, FileBarChart, Users, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -31,7 +31,7 @@ function Index() {
   const navigate = useNavigate();
   useEffect(() => {
     let active = true;
-    supabase.auth.getSession().then(({ data }) => {
+    auth.getSession().then(({ data }) => {
       if (active && data.session) navigate({ to: "/dashboard", replace: true });
     });
     return () => { active = false; };

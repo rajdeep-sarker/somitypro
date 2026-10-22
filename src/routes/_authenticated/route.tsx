@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { supabase } from "@/lib/app-client";
+import { auth } from "@/lib/app-client";
 import { AppShell } from "@/components/AppShell";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_authenticated")({
     const user = await context.queryClient.fetchQuery({
       queryKey: ["auth", "verified-user"],
       queryFn: async () => {
-        const { data, error } = await supabase.auth.getUser();
+        const { data, error } = await auth.getUser();
         if (error) throw redirect({ to: "/auth" });
         return data.user;
       },

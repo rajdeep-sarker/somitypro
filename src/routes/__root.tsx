@@ -12,7 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { supabase } from "@/lib/app-client";
+import { auth } from "@/lib/app-client";
 import { Toaster } from "@/components/ui/sonner";
 import sutonnyFont from "@/assets/sutonny-regular.ttf.asset.json";
 
@@ -121,7 +121,7 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
+    const { data } = auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       // Mark identity stale before the router re-runs the protected layout.
       void queryClient.invalidateQueries({ queryKey: ["auth", "verified-user"] });
