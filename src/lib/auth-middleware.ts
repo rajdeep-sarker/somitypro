@@ -1,0 +1,11 @@
+import { createMiddleware } from "@tanstack/react-start";
+
+// Verifies the app-issued session token (Firebase-backed auth) on server functions.
+export const requireAppAuth = createMiddleware({ type: "function" }).server(async ({ next, request }) => {
+  const header = request.headers.get("authorization") ?? "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  const { verifySession } = await import("./session.server");
+  const payload = token ? await verifySession(token, process.env["SESSION_SECRET"] ?? "") : null;
+  if (!payload) throw new Error("সেশন শেষ হয়েছে — আবার লগইন করুন");
+  return next({ context: { userId: payload.uid, userEmail: payload.email, userName: payload.name } });
+});
