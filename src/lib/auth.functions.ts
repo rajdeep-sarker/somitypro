@@ -24,6 +24,8 @@ async function hashPassword(password: string, salt?: Uint8Array): Promise<string
 
 async function verifyPassword(password: string, stored: string): Promise<boolean> {
   try {
+    // Legacy logins were hashed with bcrypt; new ones use scrypt.
+    if (stored.startsWith("$2")) return bcrypt.compareSync(password, stored);
     const raw = Uint8Array.from(atob(stored), (c) => c.charCodeAt(0));
     if (raw.length !== SCRYPT.dkLen + 16) return false;
     const key = raw.slice(0, SCRYPT.dkLen);
