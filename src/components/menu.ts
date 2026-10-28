@@ -9,10 +9,10 @@ import {
   BarChart3, Radio, MessageSquare, Mail, Settings, BookMarked, UsersRound, KeyRound, CheckCircle2, Contact, UserCheck,
 } from "lucide-react";
 
-export type MenuItem = { to: NonNullable<LinkProps["to"]>; label: string; icon: LucideIcon };
-export type MenuSection = { label: string; icon: LucideIcon; items: MenuItem[] };
+export type MenuItem = { to: NonNullable<LinkProps["to"]>; label: string; en: string; icon: LucideIcon };
+export type MenuSection = { key: string; label: string; en: string; icon: LucideIcon; items: MenuItem[]; adminOnly?: boolean };
 
-const i = (label: string, to: MenuItem["to"], icon: LucideIcon): MenuItem => ({ label, to, icon });
+const i = (label: string, en: string, to: MenuItem["to"], icon: LucideIcon): MenuItem => ({ label, en, to, icon });
 
 export const homeItem = i("হোম", "Home", "/dashboard", Home);
 
@@ -152,11 +152,11 @@ export const menuSections: MenuSection[] = [
   { key: "staff", label: "স্টাফ ব্যবস্থাপনা", en: "Staff Management", icon: UsersRound, items: [
     i("স্টাফ পদবী তৈরি", "Staff Designations", "/staff", PlusCircle),
     i("স্টাফ নাম এন্ট্রি", "Add Staff", "/staff", UserPlus),
-    i("স্টাফ লগইন ও পাসওয়ার্ড", "Staff Login & Password", "/staff", KeyRound),
-    i("স্টাফের পারমিশন", "Staff Permissions", "/staff", CheckCircle2),
+    i("স্টাফ লগইন ও পাসওয়ার্ড", "Staff Login & Password", "/users", KeyRound),
+    i("স্টাফের পারমিশন", "Staff Permissions", "/users", CheckCircle2),
     i("স্টাফের তালিকা", "Staff List", "/staff", Contact),
     i("আইডি কার্ড তৈরি করুন", "ID Card", "/staff", IdCard),
-    i("স্টাফের উপস্থিতি", "Staff Attendance", "/staff", UserCheck),
+    i("হাজিরা দিন", "Take Attendance", "/attendance", UserCheck),
     i("স্টাফের উপস্থিতি রিপোর্ট", "Attendance Report", "/staff", CalendarCheck),
   ] },
   { key: "notifications", label: "নোটিফিকেশন গেট ওয়ে", en: "Notification Gateway", icon: Radio, items: [
@@ -167,9 +167,30 @@ export const menuSections: MenuSection[] = [
   { key: "settings", label: "সেটিং", en: "Settings", icon: Settings, items: [
     i("সমিতি সেটিংস", "Somiti Settings", "/settings", Settings2),
     i("সমিতির নীতিমালা", "Somiti Rules", "/rules", BookMarked),
-    i("ইউজার ও পারমিশন", "Users & Permissions", "/staff", Users),
+    i("ইউজার ম্যানেজমেন্ট", "User Management", "/users", Users),
   ] },
 ];
+
+/** Routes only the administrator may open, whatever permissions a user has. */
+export const ADMIN_ROUTES = new Set<string>(["/users", "/settings", "/import"]);
+
+/** Which permission modules unlock a route (a route can appear in several sections). */
+export function modulesForRoute(path: string): string[] {
+  return menuSections.filter((s) => s.items.some((m) => path === m.to || path.startsWith(m.to + "/"))).map((s) => s.key);
+}
+
+export type Access = { admin: boolean; view: Set<string> };
+export function canOpen(access: Access, to: string): boolean {
+  if (access.admin || to === homeItem.to) return true;
+  if (ADMIN_ROUTES.has(to)) return false;
+  return modulesForRoute(to).some((k) => access.view.has(k));
+}
+/** Menu trimmed to what this user may open; empty sections disappear. */
+export function visibleSections(access: Access): MenuSection[] {
+  return menuSections
+    .map((s) => ({ ...s, items: access.admin ? s.items : access.view.has(s.key) ? s.items.filter((m) => !ADMIN_ROUTES.has(m.to)) : [] }))
+    .filter((s) => s.items.length > 0);
+}
 
 // Unique destinations for background preloading.
 export const menuDestinations = Array.from(new Set([homeItem.to, ...menuSections.flatMap((s) => s.items.map((m) => m.to))]));
