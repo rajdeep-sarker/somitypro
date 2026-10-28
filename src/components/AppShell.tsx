@@ -1,3 +1,4 @@
+import { SomitiLogo } from "@/components/Branding";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -82,7 +83,7 @@ function ShellContent({ children }: { children: ReactNode }) {
       <div className="p-3">
         <div className="nav-brand rounded-2xl border border-sidebar-border px-4 py-5 text-center shadow-card">
           <div className="nav-teal mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl">
-            <Landmark className="size-7" />
+            <SomitiLogo className="size-10" />
           </div>
           <p className="font-display text-base font-semibold leading-snug">{t(name, "Sonali Savings & Credit Co-operative Society Ltd.")}</p>
         </div>
