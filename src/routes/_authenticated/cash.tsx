@@ -1,3 +1,5 @@
+import { useLang } from "@/lib/i18n";
+import { uiText } from "@/lib/ui-translation";
 import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
@@ -18,6 +20,8 @@ export const Route = createFileRoute("/_authenticated/cash")({
 const kindLabel: Record<string, string> = { expense: "খরচ", income: "অন্যান্য আয় / নগদ জমা", opening: "প্রারম্ভিক ক্যাশ" };
 
 function Cash() {
+  useLang();
+
   const today = todayISO();
   const { data: heads = [] } = useRows("account_heads");
   const { data: entries = [] } = useRows("cash_entries");
@@ -33,41 +37,41 @@ function Cash() {
 
   return (
     <div>
-      <PageHeader title="জমা খরচ ব্যবস্থাপনা" />
+      <PageHeader title={uiText("জমা খরচ ব্যবস্থাপনা")} />
       <Tabs defaultValue="entry">
         <TabsList className="mb-4 flex-wrap">
-          <TabsTrigger value="entry">খরচ / আয় এন্ট্রি</TabsTrigger>
-          <TabsTrigger value="report">খরচের রিপোর্ট</TabsTrigger>
-          <TabsTrigger value="heads">খাত ব্যবস্থাপনা</TabsTrigger>
+          <TabsTrigger value="entry">{uiText("খরচ / আয় এন্ট্রি")}</TabsTrigger>
+          <TabsTrigger value="report">{uiText("খরচের রিপোর্ট")}</TabsTrigger>
+          <TabsTrigger value="heads">{uiText("খাত ব্যবস্থাপনা")}</TabsTrigger>
         </TabsList>
         <TabsContent value="entry">
-          <FormCard title="টাকা প্রদান / খরচ / নগদ জমা এন্ট্রি" onSubmit={() => ins.mutate({ ...e, head_id: e.head_id || null, amount: Number(e.amount) }, { onSuccess: () => setE({ ...e, amount: "", note: "" }) })}>
-            <Field label="ধরন"><SimpleSelect value={e.kind} onChange={(v) => setE({ ...e, kind: v, head_id: "" })} options={Object.entries(kindLabel).map(([value, label]) => ({ value, label }))} /></Field>
-            {e.kind !== "opening" && <Field label="খাত"><SimpleSelect value={e.head_id} onChange={(v) => setE({ ...e, head_id: v })} options={heads.filter((x) => x.kind === e.kind).map((x) => ({ value: x.id, label: x.name }))} /></Field>}
-            <Field label="টাকা"><Input type="number" min={1} required value={e.amount} onChange={(ev) => setE({ ...e, amount: ev.target.value })} /></Field>
-            <Field label="তারিখ"><Input type="date" value={e.txn_date} onChange={(ev) => setE({ ...e, txn_date: ev.target.value })} /></Field>
-            <Field label="বিবরণ" className="sm:col-span-2"><Input value={e.note} onChange={(ev) => setE({ ...e, note: ev.target.value })} /></Field>
-            <div className="sm:col-span-2"><Button type="submit">সংরক্ষণ করুন</Button></div>
+          <FormCard title={uiText("টাকা প্রদান / খরচ / নগদ জমা এন্ট্রি")} onSubmit={() => ins.mutate({ ...e, head_id: e.head_id || null, amount: Number(e.amount) }, { onSuccess: () => setE({ ...e, amount: "", note: "" }) })}>
+            <Field label={uiText("ধরন")}><SimpleSelect value={e.kind} onChange={(v) => setE({ ...e, kind: v, head_id: "" })} options={Object.entries(kindLabel).map(([value, label]) => ({ value, label }))} /></Field>
+            {e.kind !== "opening" && <Field label={uiText("খাত")}><SimpleSelect value={e.head_id} onChange={(v) => setE({ ...e, head_id: v })} options={heads.filter((x) => x.kind === e.kind).map((x) => ({ value: x.id, label: x.name }))} /></Field>}
+            <Field label={uiText("টাকা")}><Input type="number" min={1} required value={e.amount} onChange={(ev) => setE({ ...e, amount: ev.target.value })} /></Field>
+            <Field label={uiText("তারিখ")}><Input type="date" value={e.txn_date} onChange={(ev) => setE({ ...e, txn_date: ev.target.value })} /></Field>
+            <Field label={uiText("বিবরণ")} className="sm:col-span-2"><Input value={e.note} onChange={(ev) => setE({ ...e, note: ev.target.value })} /></Field>
+            <div className="sm:col-span-2"><Button type="submit">{uiText("সংরক্ষণ করুন")}</Button></div>
           </FormCard>
         </TabsContent>
         <TabsContent value="report" className="space-y-4">
           <div className="flex flex-wrap gap-3">
-            <Field label="শুরু"><Input type="date" value={from} onChange={(ev) => setFrom(ev.target.value)} /></Field>
-            <Field label="শেষ"><Input type="date" value={to} onChange={(ev) => setTo(ev.target.value)} /></Field>
+            <Field label={uiText("শুরু")}><Input type="date" value={from} onChange={(ev) => setFrom(ev.target.value)} /></Field>
+            <Field label={uiText("শেষ")}><Input type="date" value={to} onChange={(ev) => setTo(ev.target.value)} /></Field>
           </div>
           <DataTable
-            head={["তারিখ", "ধরন", "খাত", "বিবরণ", "টাকা", "", ""]}
-            rows={list.map((x) => [bnDate(x.txn_date), kindLabel[x.kind], hMap.get(x.head_id ?? "") ?? "—", x.note, taka(x.amount), <EditEntry key="e" table="cash_entries" row={x} />, <Button key="d" size="icon" variant="ghost" onClick={() => confirm("মুছবেন?") && del.mutate(x.id)}><Trash2 className="size-4 text-destructive" /></Button>])}
-            foot={["মোট খরচ", "", "", "", taka(sum(list.filter((x) => x.kind === "expense"), (x) => x.amount)), ""]}
+            head={[uiText("তারিখ"), uiText("ধরন"), uiText("খাত"), uiText("বিবরণ"), uiText("টাকা"), "", ""]}
+            rows={list.map((x) => [bnDate(x.txn_date), kindLabel[x.kind], hMap.get(x.head_id ?? "") ?? "—", x.note, taka(x.amount), <EditEntry key="e" table="cash_entries" row={x} />, <Button key="d" size="icon" variant="ghost" onClick={() => confirm(uiText("মুছবেন?")) && del.mutate(x.id)}><Trash2 className="size-4 text-destructive" /></Button>])}
+            foot={[uiText("মোট খরচ"), "", "", "", taka(sum(list.filter((x) => x.kind === "expense"), (x) => x.amount)), ""]}
           />
         </TabsContent>
         <TabsContent value="heads" className="space-y-4">
-          <FormCard title="নতুন খাত" onSubmit={() => insHead.mutate(h, { onSuccess: () => setH({ ...h, name: "" }) })}>
-            <Field label="খাতের নাম"><Input required value={h.name} onChange={(ev) => setH({ ...h, name: ev.target.value })} /></Field>
-            <Field label="ধরন"><SimpleSelect value={h.kind} onChange={(v) => setH({ ...h, kind: v })} options={[{ value: "expense", label: "খরচের খাত" }, { value: "income", label: "আয় / নগদ জমার খাত" }]} /></Field>
-            <div className="sm:col-span-2"><Button type="submit">খাত যোগ করুন</Button></div>
+          <FormCard title={uiText("নতুন খাত")} onSubmit={() => insHead.mutate(h, { onSuccess: () => setH({ ...h, name: "" }) })}>
+            <Field label={uiText("খাতের নাম")}><Input required value={h.name} onChange={(ev) => setH({ ...h, name: ev.target.value })} /></Field>
+            <Field label={uiText("ধরন")}><SimpleSelect value={h.kind} onChange={(v) => setH({ ...h, kind: v })} options={[{ value: "expense", label: "খরচের খাত" }, { value: "income", label: "আয় / নগদ জমার খাত" }]} /></Field>
+            <div className="sm:col-span-2"><Button type="submit">{uiText("খাত যোগ করুন")}</Button></div>
           </FormCard>
-          <DataTable head={["খাতের নাম", "ধরন", "মোট", ""]} rows={heads.map((x) => [x.name, x.kind === "expense" ? "খরচ" : "আয়", taka(sum(entries.filter((en) => en.head_id === x.id), (en) => en.amount)), <EditEntry key="e" table="account_heads" row={x} />])} />
+          <DataTable head={[uiText("খাতের নাম"), uiText("ধরন"), uiText("মোট"), ""]} rows={heads.map((x) => [x.name, x.kind === "expense" ? uiText("খরচ") : uiText("আয়"), taka(sum(entries.filter((en) => en.head_id === x.id), (en) => en.amount)), <EditEntry key="e" table="account_heads" row={x} />])} />
         </TabsContent>
       </Tabs>
     </div>

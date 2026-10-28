@@ -1,3 +1,5 @@
+import { useLang } from "@/lib/i18n";
+import { uiText } from "@/lib/ui-translation";
 import { useCenterRows } from "@/components/CenterScope";
 import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
@@ -20,6 +22,8 @@ const tLabel = { deposit: "জমা", withdraw: "উত্তোলন", profit
 const payout: Record<string, string> = { maturity: "মেয়াদ শেষে", monthly: "মাসিক" };
 
 function Fdr() {
+  useLang();
+
   const { data: allAccounts = [] } = useRows("fdr_accounts");
   const today = todayISO();
   const { data: schemes = [] } = useCenterRows("fdr_schemes");
@@ -27,7 +31,7 @@ function Fdr() {
   const { data: tx = [] } = useCenterRows("fdr_transactions");
   const mm = useMemberMap();
   const insScheme = useInsert("fdr_schemes");
-  const insAcc = useInsert("fdr_accounts", "FDR খোলা হয়েছে");
+  const insAcc = useInsert("fdr_accounts", uiText("FDR খোলা হয়েছে"));
   const updAcc = useUpdate("fdr_accounts");
   const insTx = useInsert("fdr_transactions");
   const sMap = new Map(schemes.map((s) => [s.id, s]));
@@ -52,19 +56,19 @@ function Fdr() {
 
   return (
     <div>
-      <PageHeader title="FDR ব্যবস্থাপনা" subtitle={`মোট আমানত ${taka(sum(accounts.filter((a) => a.status === "active"), (a) => a.amount))}`} />
+      <PageHeader title={uiText("FDR ব্যবস্থাপনা")} subtitle={`মোট আমানত ${taka(sum(accounts.filter((a) => a.status === "active"), (a) => a.amount))}`} />
       <Tabs defaultValue="accounts">
         <TabsList className="mb-4 flex-wrap">
-          <TabsTrigger value="accounts">সকল FDR</TabsTrigger>
-          <TabsTrigger value="open">FDR সেটিং ও কালেকশন</TabsTrigger>
-          <TabsTrigger value="profit">মুনাফা প্রদান / উত্তোলন</TabsTrigger>
-          <TabsTrigger value="report">জমা-উত্তোলন রিপোর্ট</TabsTrigger>
-          <TabsTrigger value="schemes">স্কিম তৈরি</TabsTrigger>
-          <TabsTrigger value="calc">ক্যালকুলেটর</TabsTrigger>
+          <TabsTrigger value="accounts">{uiText("সকল FDR")}</TabsTrigger>
+          <TabsTrigger value="open">{uiText("FDR সেটিং ও কালেকশন")}</TabsTrigger>
+          <TabsTrigger value="profit">{uiText("মুনাফা প্রদান / উত্তোলন")}</TabsTrigger>
+          <TabsTrigger value="report">{uiText("জমা-উত্তোলন রিপোর্ট")}</TabsTrigger>
+          <TabsTrigger value="schemes">{uiText("স্কিম তৈরি")}</TabsTrigger>
+          <TabsTrigger value="calc">{uiText("ক্যালকুলেটর")}</TabsTrigger>
         </TabsList>
         <TabsContent value="accounts">
           <DataTable
-            head={["একাউন্ট নং", "সদস্য", "স্কিম", "আমানত", "শুরু", "মেয়াদপূর্তি", "প্রত্যাশিত মুনাফা", "প্রদত্ত মুনাফা", "", ""]}
+            head={[uiText("একাউন্ট নং"), uiText("সদস্য"), uiText("স্কিম"), uiText("আমানত"), uiText("শুরু"), uiText("মেয়াদপূর্তি"), uiText("প্রত্যাশিত মুনাফা"), uiText("প্রদত্ত মুনাফা"), "", ""]}
             rows={accounts.map((a) => {
               const s = sMap.get(a.scheme_id ?? "");
               return [
@@ -72,67 +76,69 @@ function Fdr() {
                 taka(s ? simpleProfit(a.amount, s.profit_rate, s.duration_months) : 0), taka(paidProfit(a.id)),
                 <EditEntry key="e" table="fdr_accounts" row={a} />,
                 a.status === "active" ? <Button key="c" size="sm" variant="ghost" onClick={() => {
-                  if (!confirm("FDR নগদায়ন (উত্তোলন) করবেন?")) return;
+                  if (!confirm(uiText("FDR নগদায়ন (উত্তোলন) করবেন?"))) return;
                   insTx.mutate({ account_id: a.id, member_id: a.member_id, type: "withdraw", amount: a.amount, txn_date: today, note: "FDR নগদায়ন" });
                   updAcc.mutate({ id: a.id, values: { status: "closed" } });
-                }}>নগদায়ন</Button> : "বন্ধ",
+                }}>{uiText("নগদায়ন")}</Button> : uiText("বন্ধ"),
               ];
             })}
           />
         </TabsContent>
         <TabsContent value="open">
-          <FormCard title="নতুন FDR জমা" onSubmit={openAcc}>
-            <Field label="সদস্য"><MemberSelect value={ac.member_id} onChange={(v) => setAc({ ...ac, member_id: v })} /></Field>
-            <Field label="স্কিম"><SimpleSelect value={ac.scheme_id} onChange={(v) => setAc({ ...ac, scheme_id: v })} options={schemes.filter((s) => s.active).map((s) => ({ value: s.id, label: `${s.name} (${s.profit_rate}%, ${s.duration_months} মাস)` }))} /></Field>
-            <Field label="আমানতের পরিমাণ"><Input type="number" min={1} required value={ac.amount} onChange={(e) => setAc({ ...ac, amount: e.target.value })} /></Field>
-            <Field label="তারিখ"><Input type="date" value={ac.start_date} onChange={(e) => setAc({ ...ac, start_date: e.target.value })} /></Field>
-            <div className="sm:col-span-2"><Button type="submit" disabled={!ac.member_id || !ac.scheme_id}>FDR খুলুন</Button></div>
+          <FormCard title={uiText("নতুন FDR জমা")} onSubmit={openAcc}>
+            <Field label={uiText("সদস্য")}><MemberSelect value={ac.member_id} onChange={(v) => setAc({ ...ac, member_id: v })} /></Field>
+            <Field label={uiText("স্কিম")}><SimpleSelect value={ac.scheme_id} onChange={(v) => setAc({ ...ac, scheme_id: v })} options={schemes.filter((s) => s.active).map((s) => ({ value: s.id, label: `${s.name} (${s.profit_rate}%, ${s.duration_months} মাস)` }))} /></Field>
+            <Field label={uiText("আমানতের পরিমাণ")}><Input type="number" min={1} required value={ac.amount} onChange={(e) => setAc({ ...ac, amount: e.target.value })} /></Field>
+            <Field label={uiText("তারিখ")}><Input type="date" value={ac.start_date} onChange={(e) => setAc({ ...ac, start_date: e.target.value })} /></Field>
+            <div className="sm:col-span-2"><Button type="submit" disabled={!ac.member_id || !ac.scheme_id}>{uiText("FDR খুলুন")}</Button></div>
           </FormCard>
         </TabsContent>
         <TabsContent value="profit">
-          <FormCard title="FDR মুনাফা প্রদান / সার্ভিস চার্জ" onSubmit={() => {
+          <FormCard title={uiText("FDR মুনাফা প্রদান / সার্ভিস চার্জ")} onSubmit={() => {
             const a = aMap.get(t.account_id);
             if (!a) return;
             insTx.mutate({ account_id: a.id, member_id: a.member_id, type: t.type, amount: Number(t.amount), txn_date: t.txn_date, note: t.note }, { onSuccess: () => setT({ ...t, amount: "", note: "" }) });
           }}>
-            <Field label="FDR একাউন্ট"><SimpleSelect value={t.account_id} onChange={(v) => setT({ ...t, account_id: v })} options={accounts.filter((a) => a.status === "active").map((a) => ({ value: a.id, label: `${a.account_no} — ${mm.get(a.member_id)?.name ?? ""}` }))} /></Field>
-            <Field label="ধরন"><SimpleSelect value={t.type} onChange={(v) => setT({ ...t, type: v })} options={[{ value: "profit", label: tLabel.profit }, { value: "service_charge", label: tLabel.service_charge }]} /></Field>
-            <Field label="টাকা"><Input type="number" min={1} required value={t.amount} onChange={(e) => setT({ ...t, amount: e.target.value })} /></Field>
-            <Field label="তারিখ"><Input type="date" value={t.txn_date} onChange={(e) => setT({ ...t, txn_date: e.target.value })} /></Field>
-            <div className="sm:col-span-2"><Button type="submit" disabled={!t.account_id}>সংরক্ষণ করুন</Button></div>
+            <Field label={uiText("FDR একাউন্ট")}><SimpleSelect value={t.account_id} onChange={(v) => setT({ ...t, account_id: v })} options={accounts.filter((a) => a.status === "active").map((a) => ({ value: a.id, label: `${a.account_no} — ${mm.get(a.member_id)?.name ?? ""}` }))} /></Field>
+            <Field label={uiText("ধরন")}><SimpleSelect value={t.type} onChange={(v) => setT({ ...t, type: v })} options={[{ value: "profit", label: tLabel.profit }, { value: "service_charge", label: tLabel.service_charge }]} /></Field>
+            <Field label={uiText("টাকা")}><Input type="number" min={1} required value={t.amount} onChange={(e) => setT({ ...t, amount: e.target.value })} /></Field>
+            <Field label={uiText("তারিখ")}><Input type="date" value={t.txn_date} onChange={(e) => setT({ ...t, txn_date: e.target.value })} /></Field>
+            <div className="sm:col-span-2"><Button type="submit" disabled={!t.account_id}>{uiText("সংরক্ষণ করুন")}</Button></div>
           </FormCard>
         </TabsContent>
         <TabsContent value="report" className="space-y-4">
           <div className="flex flex-wrap gap-3">
-            <Field label="শুরু"><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
-            <Field label="শেষ"><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
+            <Field label={uiText("শুরু")}><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
+            <Field label={uiText("শেষ")}><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
           </div>
           <DataTable
-            head={["তারিখ", "একাউন্ট", "সদস্য", "ধরন", "টাকা", ""]}
+            head={[uiText("তারিখ"), uiText("একাউন্ট"), uiText("সদস্য"), uiText("ধরন"), uiText("টাকা"), ""]}
             rows={[
-              ...accounts.filter((a) => a.start_date >= from && a.start_date <= to).map((a) => [bnDate(a.start_date), a.account_no, mm.get(a.member_id)?.name, "নতুন জমা", taka(a.amount), <EditEntry key="e" table="fdr_accounts" row={a} />]),
+              ...accounts.filter((a) => a.start_date >= from && a.start_date <= to).map((a) => [bnDate(a.start_date), a.account_no, mm.get(a.member_id)?.name, uiText("নতুন জমা"), taka(a.amount), <EditEntry key="e" table="fdr_accounts" row={a} />]),
               ...rng.map((x) => [bnDate(x.txn_date), aMap.get(x.account_id)?.account_no, mm.get(x.member_id)?.name, tLabel[x.type], taka(x.amount), <EditEntry key="e" table="fdr_transactions" row={x} />]),
             ]}
           />
         </TabsContent>
         <TabsContent value="schemes" className="space-y-4">
-          <FormCard title="FDR স্কিম তৈরি" onSubmit={() => insScheme.mutate({ ...sc, duration_months: Number(sc.duration_months), profit_rate: Number(sc.profit_rate) }, { onSuccess: () => setSc({ ...sc, name: "" }) })}>
-            <Field label="স্কিমের নাম"><Input required value={sc.name} onChange={(e) => setSc({ ...sc, name: e.target.value })} /></Field>
-            <Field label="মুনাফা প্রদানের ধরন"><SimpleSelect value={sc.payout_type} onChange={(v) => setSc({ ...sc, payout_type: v })} options={Object.entries(payout).map(([value, label]) => ({ value, label }))} /></Field>
-            <Field label="মেয়াদ (মাস)"><Input type="number" value={sc.duration_months} onChange={(e) => setSc({ ...sc, duration_months: e.target.value })} /></Field>
-            <Field label="মুনাফা (%)"><Input type="number" step="0.01" value={sc.profit_rate} onChange={(e) => setSc({ ...sc, profit_rate: e.target.value })} /></Field>
-            <div className="sm:col-span-2"><Button type="submit">স্কিম তৈরি করুন</Button></div>
+          <FormCard title={uiText("FDR স্কিম তৈরি")} onSubmit={() => insScheme.mutate({ ...sc, duration_months: Number(sc.duration_months), profit_rate: Number(sc.profit_rate) }, { onSuccess: () => setSc({ ...sc, name: "" }) })}>
+            <Field label={uiText("স্কিমের নাম")}><Input required value={sc.name} onChange={(e) => setSc({ ...sc, name: e.target.value })} /></Field>
+            <Field label={uiText("মুনাফা প্রদানের ধরন")}><SimpleSelect value={sc.payout_type} onChange={(v) => setSc({ ...sc, payout_type: v })} options={Object.entries(payout).map(([value, label]) => ({ value, label }))} /></Field>
+            <Field label={uiText("মেয়াদ (মাস)")}><Input type="number" value={sc.duration_months} onChange={(e) => setSc({ ...sc, duration_months: e.target.value })} /></Field>
+            <Field label={uiText("মুনাফা (%)")}><Input type="number" step="0.01" value={sc.profit_rate} onChange={(e) => setSc({ ...sc, profit_rate: e.target.value })} /></Field>
+            <div className="sm:col-span-2"><Button type="submit">{uiText("স্কিম তৈরি করুন")}</Button></div>
           </FormCard>
-          <DataTable head={["স্কিমের নাম", "ধরন", "সময়কাল", "লভ্যাংশ (%)", ""]} rows={schemes.map((s) => [s.name, payout[s.payout_type], `${bn(s.duration_months)} মাস`, `${bn(s.profit_rate)}%`, <EditEntry key="e" table="fdr_schemes" row={s} />])} />
+          <DataTable head={[uiText("স্কিমের নাম"), uiText("ধরন"), uiText("সময়কাল"), uiText("লভ্যাংশ (%)"), ""]} rows={schemes.map((s) => [s.name, payout[s.payout_type], `${bn(s.duration_months)} মাস`, `${bn(s.profit_rate)}%`, <EditEntry key="e" table="fdr_schemes" row={s} />])} />
         </TabsContent>
         <TabsContent value="calc">
-          <FormCard title="FDR ক্যালকুলেটর" onSubmit={() => {}}>
-            <Field label="আমানত"><Input type="number" value={calc.a} onChange={(e) => setCalc({ ...calc, a: e.target.value })} /></Field>
-            <Field label="বার্ষিক হার (%)"><Input type="number" value={calc.r} onChange={(e) => setCalc({ ...calc, r: e.target.value })} /></Field>
-            <Field label="মেয়াদ (মাস)"><Input type="number" value={calc.m} onChange={(e) => setCalc({ ...calc, m: e.target.value })} /></Field>
+          <FormCard title={uiText("FDR ক্যালকুলেটর")} onSubmit={() => {}}>
+            <Field label={uiText("আমানত")}><Input type="number" value={calc.a} onChange={(e) => setCalc({ ...calc, a: e.target.value })} /></Field>
+            <Field label={uiText("বার্ষিক হার (%)")}><Input type="number" value={calc.r} onChange={(e) => setCalc({ ...calc, r: e.target.value })} /></Field>
+            <Field label={uiText("মেয়াদ (মাস)")}><Input type="number" value={calc.m} onChange={(e) => setCalc({ ...calc, m: e.target.value })} /></Field>
             <div className="rounded-lg bg-secondary p-4 text-sm">
-              মোট মুনাফা: <b>{taka(simpleProfit(Number(calc.a), Number(calc.r), Number(calc.m)))}</b><br />
-              মাসিক মুনাফা: <b>{taka(simpleProfit(Number(calc.a), Number(calc.r), 1))}</b>
+              
+              {uiText("মোট মুনাফা:")} <b>{taka(simpleProfit(Number(calc.a), Number(calc.r), Number(calc.m)))}</b><br />
+              
+              {uiText("মাসিক মুনাফা:")} <b>{taka(simpleProfit(Number(calc.a), Number(calc.r), 1))}</b>
             </div>
           </FormCard>
         </TabsContent>

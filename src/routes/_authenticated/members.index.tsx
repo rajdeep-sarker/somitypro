@@ -1,3 +1,5 @@
+import { useLang } from "@/lib/i18n";
+import { uiText } from "@/lib/ui-translation";
 import { useCenterRows } from "@/components/CenterScope";
 import { MemberForm } from "@/components/MemberForm";
 import { pageHead } from "@/lib/metadata";
@@ -20,6 +22,8 @@ export const Route = createFileRoute("/_authenticated/members/")({
 const empty = { name: "", father_name: "", mother_name: "", spouse_name: "", phone: "", nid: "", dob: "", gender: "", occupation: "", address: "", center_id: "", nominee_name: "", nominee_relation: "", nominee_phone: "", admission_date: "" };
 
 function Members() {
+  useLang();
+
   const { data: members = [] } = useCenterRows("members", { order: "member_no", ascending: true });
   const { data: centers = [] } = useRows("centers");
 
@@ -33,17 +37,17 @@ function Members() {
 
   return (
     <div>
-      <PageHeader title="সদস্য ব্যবস্থাপনা" subtitle={`মোট ${members.length} জন সদস্য`} actions={<MemberForm />} />
+      <PageHeader title={uiText("সদস্য ব্যবস্থাপনা")} subtitle={`মোট ${members.length} জন সদস্য`} actions={<MemberForm />} />
       <div className="relative mb-4 max-w-sm">
         <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
-        <Input className="pl-9" placeholder="নাম, মোবাইল বা সদস্য নং দিয়ে খুঁজুন" value={q} onChange={(e) => setQ(e.target.value)} />
+        <Input className="pl-9" placeholder={uiText("নাম, মোবাইল বা সদস্য নং দিয়ে খুঁজুন")} value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
       <DataTable
-        head={["সদস্য নং", "নাম", "মোবাইল", "কেন্দ্র", "ভর্তির তারিখ", "অবস্থা", ""]}
+        head={[uiText("সদস্য নং"), uiText("নাম"), uiText("মোবাইল"), uiText("কেন্দ্র"), uiText("ভর্তির তারিখ"), uiText("অবস্থা"), ""]}
         rows={list.map((m) => [
           m.member_no, <span key="n" className="font-medium">{m.name}</span>, m.phone, centerName.get(m.center_id ?? "") ?? "—", bnDate(m.admission_date),
-          <Badge key="s" variant={m.status === "active" ? "default" : "secondary"}>{m.status === "active" ? "সক্রিয়" : "নিষ্ক্রিয়"}</Badge>,
-          <div key="v" className="flex gap-1"><MemberForm member={m} /><Button asChild size="sm" variant="outline"><Link to="/members/$id" params={{ id: m.id }}>বিস্তারিত</Link></Button></div>,
+          <Badge key="s" variant={m.status === "active" ? "default" : "secondary"}>{m.status === "active" ? uiText("সক্রিয়") : uiText("নিষ্ক্রিয়")}</Badge>,
+          <div key="v" className="flex gap-1"><MemberForm member={m} /><Button asChild size="sm" variant="outline"><Link to="/members/$id" params={{ id: m.id }}>{uiText("বিস্তারিত")}</Link></Button></div>,
         ])}
       />
 

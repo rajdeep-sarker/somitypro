@@ -1,3 +1,4 @@
+import { uiText } from "@/lib/ui-translation";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -89,7 +90,7 @@ export function SimpleSelect({ value, onChange, options, placeholder }: { value:
   );
 }
 
-export function DataTable({ head, rows, empty = "কোনো তথ্য পাওয়া যায়নি", foot }: { head: ReactNode[]; rows: ReactNode[][]; empty?: string; foot?: ReactNode[] }) {
+export function DataTable({ head, rows, empty = uiText("কোনো তথ্য পাওয়া যায়নি"), foot }: { head: ReactNode[]; rows: ReactNode[][]; empty?: string; foot?: ReactNode[] }) {
   const { ui } = useLang();
   return (
     <Card className="min-w-0 max-w-full overflow-hidden shadow-card">
@@ -171,19 +172,22 @@ export function useDateRange(): [DateRange, (r: DateRange) => void] {
 }
 
 export function DateFilter({ range, onChange }: { range: DateRange; onChange: (r: DateRange) => void }) {
+  useLang();
+
   return (
     <div className="no-print flex flex-wrap items-end gap-2">
       <div className="space-y-1">
-        <Label className="text-xs text-muted-foreground">শুরু তারিখ</Label>
+        <Label className="text-xs text-muted-foreground">{uiText("শুরু তারিখ")}</Label>
         <Input type="date" value={range.from} onChange={(e) => onChange({ ...range, from: e.target.value })} className="w-40" />
       </div>
       <div className="space-y-1">
-        <Label className="text-xs text-muted-foreground">শেষ তারিখ</Label>
+        <Label className="text-xs text-muted-foreground">{uiText("শেষ তারিখ")}</Label>
         <Input type="date" value={range.to} onChange={(e) => onChange({ ...range, to: e.target.value })} className="w-40" />
       </div>
       {(range.from || range.to) && (
         <Button type="button" variant="outline" onClick={() => onChange({ from: "", to: "" })}>
-          সব দেখুন
+          
+          {uiText("সব দেখুন")}
         </Button>
       )}
     </div>

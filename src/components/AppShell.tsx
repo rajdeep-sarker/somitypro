@@ -1,3 +1,4 @@
+import { uiText } from "@/lib/ui-translation";
 import { SomitiLogo } from "@/components/Branding";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
@@ -24,6 +25,8 @@ import { toast } from "sonner";
 
 
 export function AppShell({ children }: { children: ReactNode }) {
+  useLang();
+
   return <CenterProvider><ShellContent>{children}</ShellContent></CenterProvider>;
 }
 
@@ -54,12 +57,12 @@ function ShellContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const preloadController = useRef<AbortController | null>(null);
   const { data: settings = [] } = useRows("somiti_settings", { order: "id" });
-  const name = settings[0]?.name ?? "সমিতি";
+  const name = settings[0]?.name ?? uiText("সমিতি");
   const [user, setUser] = useState<{ full_name?: string; phone?: string; email: string } | null>(null);
   useEffect(() => { void auth.getUser().then(({ data }) => setUser(data.user)); }, []);
   const userName = user?.full_name || (access.admin ? t("অ্যাডমিন", "Admin") : t("ব্যবহারকারী", "User"));
   const roleLabel = access.cto ? "CTO" : access.admin ? "Admin" : "Staff";
-  const initial = userName.trim().charAt(0) || "অ";
+  const initial = userName.trim().charAt(0) || uiText("অ");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -159,7 +162,7 @@ function ShellContent({ children }: { children: ReactNode }) {
   const profile = (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" type="button" className="h-auto shrink-0 gap-2 rounded-full p-1 text-left hover:bg-muted" aria-label="প্রোফাইল">
+        <Button variant="ghost" type="button" className="h-auto shrink-0 gap-2 rounded-full p-1 text-left hover:bg-muted" aria-label={uiText("প্রোফাইল")}>
           <span className="nav-teal flex size-10 items-center justify-center rounded-full border-2 border-secondary font-semibold">{initial}</span>
           <span className="hidden leading-tight sm:block"><span className="block text-sm font-semibold">{userName}</span><span className="flex items-center gap-1 text-xs text-muted-foreground">{roleLabel} <ChevronDown className="size-3" /></span></span>
         </Button>
@@ -200,9 +203,9 @@ function ShellContent({ children }: { children: ReactNode }) {
       <div className={"shell-content min-w-0 " + (collapsed ? "lg:pl-16" : "lg:pl-72")}>
         <header className="no-print sticky top-0 z-30 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card px-4 py-3 lg:grid-cols-[minmax(0,1fr)_auto]">
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild><Button variant="outline" size="icon" className="shrink-0 lg:hidden" aria-label="মেনু"><Menu className="size-5" /></Button></SheetTrigger>
+            <SheetTrigger asChild><Button variant="outline" size="icon" className="shrink-0 lg:hidden" aria-label={uiText("মেনু")}><Menu className="size-5" /></Button></SheetTrigger>
             <SheetContent side="left" aria-describedby={undefined} className="no-print w-80 max-w-[88vw] border-sidebar-border bg-sidebar p-0 text-sidebar-foreground data-[state=open]:duration-150 data-[state=closed]:duration-100 motion-reduce:animate-none lg:hidden">
-              <SheetTitle className="sr-only">সমিতির মেনু</SheetTitle>{nav}
+              <SheetTitle className="sr-only">{uiText("সমিতির মেনু")}</SheetTitle>{nav}
             </SheetContent>
           </Sheet>
           <div className="min-w-0">
@@ -211,7 +214,7 @@ function ShellContent({ children }: { children: ReactNode }) {
             <p className="text-sm font-semibold">{bnDate(todayISO())}</p>
           </div>
           <div className="flex items-center gap-2">
-            {loading && <LoaderCircle aria-label="পৃষ্ঠা লোড হচ্ছে" className="size-5 shrink-0 animate-spin text-primary" />}
+            {loading && <LoaderCircle aria-label={uiText("পৃষ্ঠা লোড হচ্ছে")} className="size-5 shrink-0 animate-spin text-primary" />}
             <span className="hidden max-w-xs truncate rounded-full border border-success/40 bg-success/10 px-3 py-1.5 text-sm text-success xl:inline">{t(name, "Sonali Co-operative Society")}</span>
             <LangToggle />
             {profile}

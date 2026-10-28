@@ -1,3 +1,5 @@
+import { useLang } from "@/lib/i18n";
+import { uiText } from "@/lib/ui-translation";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, Tooltip, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import { Card } from "@/components/ui/card";
 import { bn, taka } from "@/lib/format";
@@ -20,6 +22,8 @@ const tip = (v: number) => taka(v);
 const axis = (v: number) => (v >= 1000 ? `${bn(Math.round(v / 1000))}k` : bn(v));
 
 function ChartCard({ title, children }: { title: string; children: React.ReactElement }) {
+  useLang();
+
   return (
     <Card className="p-4 shadow-card">
       <h3 className="mb-3 font-semibold">{title}</h3>
@@ -34,6 +38,8 @@ export function DashboardCharts(p: {
   loanCounts: { active: number; overdue: number; closed: number };
   mix: { savings: number; dps: number; fdr: number; loanOut: number };
 }) {
+  useLang();
+
   const ms = lastMonths(6);
   const collection = ms.map((m) => ({
     name: m.label,
@@ -68,34 +74,34 @@ export function DashboardCharts(p: {
     { name: "FDR", value: p.mix.fdr, fill: C[4] },
     { name: "বাকি ঋণ", value: p.mix.loanOut, fill: C[3] },
   ].filter((x) => x.value > 0);
-  const empty = <p className="flex h-full items-center justify-center text-muted-foreground">এখনো তথ্য নেই</p>;
+  const empty = <p className="flex h-full items-center justify-center text-muted-foreground">{uiText("এখনো তথ্য নেই")}</p>;
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <ChartCard title="মাসিক কালেকশন (শেষ ৬ মাস)">
+      <ChartCard title={uiText("মাসিক কালেকশন (শেষ ৬ মাস)")}>
         <BarChart data={collection}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="name" /><YAxis tickFormatter={axis} width={40} /><Tooltip formatter={tip} /><Legend />
-          {["সঞ্চয়", "লোন", "DPS", "ফি"].map((k, i) => <Bar key={k} dataKey={k} stackId="a" fill={C[i]} radius={i === 3 ? [4, 4, 0, 0] : 0} />)}
+          {[uiText("সঞ্চয়"), uiText("লোন"), "DPS", uiText("ফি")].map((k, i) => <Bar key={k} dataKey={k} stackId="a" fill={C[i]} radius={i === 3 ? [4, 4, 0, 0] : 0} />)}
         </BarChart>
       </ChartCard>
-      <ChartCard title="তহবিলের বণ্টন">
+      <ChartCard title={uiText("তহবিলের বণ্টন")}>
         {mixPie.length ? <PieChart><Pie data={mixPie} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={2}>{mixPie.map((x) => <Cell key={x.name} fill={x.fill} />)}</Pie><Tooltip formatter={tip} /><Legend /></PieChart> : empty}
       </ChartCard>
-      <ChartCard title="সঞ্চয় জমা বনাম উত্তোলন">
+      <ChartCard title={uiText("সঞ্চয় জমা বনাম উত্তোলন")}>
         <AreaChart data={flow}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="name" /><YAxis tickFormatter={axis} width={40} /><Tooltip formatter={tip} /><Legend />
-          <Area type="monotone" dataKey="জমা" stroke={C[2]} fill={C[2]} fillOpacity={0.25} /><Area type="monotone" dataKey="উত্তোলন" stroke={C[3]} fill={C[3]} fillOpacity={0.2} />
+          <Area type="monotone" dataKey={uiText("জমা")} stroke={C[2]} fill={C[2]} fillOpacity={0.25} /><Area type="monotone" dataKey={uiText("উত্তোলন")} stroke={C[3]} fill={C[3]} fillOpacity={0.2} />
         </AreaChart>
       </ChartCard>
-      <ChartCard title="লোনের অবস্থা">
+      <ChartCard title={uiText("লোনের অবস্থা")}>
         {loanPie.length ? <PieChart><Pie data={loanPie} dataKey="value" nameKey="name" outerRadius={90} label={(e) => bn(e.value)}>{loanPie.map((x) => <Cell key={x.name} fill={x.fill} />)}</Pie><Tooltip formatter={(v: number) => `${bn(v)} টি`} /><Legend /></PieChart> : empty}
       </ChartCard>
-      <ChartCard title="সদস্য বৃদ্ধি">
+      <ChartCard title={uiText("সদস্য বৃদ্ধি")}>
         <AreaChart data={growth}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="name" /><YAxis allowDecimals={false} tickFormatter={(v) => bn(v)} width={40} /><Tooltip formatter={(v: number) => `${bn(v)} জন`} />
-          <Area type="monotone" dataKey="সদস্য" stroke={C[0]} fill={C[0]} fillOpacity={0.25} />
+          <Area type="monotone" dataKey={uiText("সদস্য")} stroke={C[0]} fill={C[0]} fillOpacity={0.25} />
         </AreaChart>
       </ChartCard>
-      <ChartCard title="আয় বনাম ব্যয় (জমা খরচ)">
+      <ChartCard title={uiText("আয় বনাম ব্যয় (জমা খরচ)")}>
         <BarChart data={income}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="name" /><YAxis tickFormatter={axis} width={40} /><Tooltip formatter={tip} /><Legend />
-          <Bar dataKey="আয়" fill={C[2]} radius={[4, 4, 0, 0]} /><Bar dataKey="ব্যয়" fill={C[3]} radius={[4, 4, 0, 0]} />
+          <Bar dataKey={uiText("আয়")} fill={C[2]} radius={[4, 4, 0, 0]} /><Bar dataKey={uiText("ব্যয়")} fill={C[3]} radius={[4, 4, 0, 0]} />
         </BarChart>
       </ChartCard>
     </div>

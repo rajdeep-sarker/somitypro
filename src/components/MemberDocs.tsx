@@ -1,3 +1,5 @@
+import { useLang } from "@/lib/i18n";
+import { uiText } from "@/lib/ui-translation";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Camera, FileText, LoaderCircle, Upload } from "lucide-react";
@@ -10,6 +12,8 @@ import { getMemberDocUploadUrl, getMemberDocViewUrl } from "@/lib/r2.functions";
 type Kind = "photo" | "id_doc";
 
 function DocSlot({ memberId, kind, path, label, icon }: { memberId: string; kind: Kind; path: string | null; label: string; icon: React.ReactNode }) {
+  useLang();
+
   const [busy, setBusy] = useState(false);
   const upd = useUpdate("members");
   const getUploadUrl = useServerFn(getMemberDocUploadUrl);
@@ -17,7 +21,7 @@ function DocSlot({ memberId, kind, path, label, icon }: { memberId: string; kind
 
   async function upload(file: File) {
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("ফাইল সর্বোচ্চ ১০ মেগাবাইট হতে পারে");
+      toast.error(uiText("ফাইল সর্বোচ্চ ১০ মেগাবাইট হতে পারে"));
       return;
     }
     setBusy(true);
@@ -28,7 +32,7 @@ function DocSlot({ memberId, kind, path, label, icon }: { memberId: string; kind
       upd.mutate({ id: memberId, values: kind === "photo" ? { photo_path: key } : { id_doc_path: key } });
       toast.success(`${label} সংরক্ষণ হয়েছে`);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "আপলোড ব্যর্থ হয়েছে");
+      toast.error(e instanceof Error ? e.message : uiText("আপলোড ব্যর্থ হয়েছে"));
     } finally {
       setBusy(false);
     }
@@ -40,7 +44,7 @@ function DocSlot({ memberId, kind, path, label, icon }: { memberId: string; kind
       const { url } = await getViewUrl({ data: { key: path } });
       window.open(url, "_blank", "noopener");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "ফাইল খোলা যায়নি");
+      toast.error(e instanceof Error ? e.message : uiText("ফাইল খোলা যায়নি"));
     }
   }
 
@@ -50,15 +54,15 @@ function DocSlot({ memberId, kind, path, label, icon }: { memberId: string; kind
         {icon}
         <div className="min-w-0">
           <p className="text-sm font-medium">{label}</p>
-          <p className="truncate text-xs text-muted-foreground">{path ? "আপলোড করা আছে" : "jpg, png, pdf — যেকোনো ফরম্যাট"}</p>
+          <p className="truncate text-xs text-muted-foreground">{path ? uiText("আপলোড করা আছে") : uiText("jpg, png, pdf — যেকোনো ফরম্যাট")}</p>
         </div>
       </div>
       <div className="flex shrink-0 gap-2">
-        {path && <Button type="button" size="sm" variant="outline" onClick={view}>দেখুন</Button>}
+        {path && <Button type="button" size="sm" variant="outline" onClick={view}>{uiText("দেখুন")}</Button>}
         <Button type="button" size="sm" variant={path ? "ghost" : "default"} disabled={busy} asChild>
           <label className="cursor-pointer">
             {busy ? <LoaderCircle className="size-4 animate-spin" /> : <Upload className="size-4" />}
-            {path ? "বদলান" : "আপলোড"}
+            {path ? uiText("বদলান") : uiText("আপলোড")}
             <input type="file" accept="image/*,.pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ""; }} />
           </label>
         </Button>
@@ -68,11 +72,13 @@ function DocSlot({ memberId, kind, path, label, icon }: { memberId: string; kind
 }
 
 export function MemberDocs({ memberId, photoPath, idDocPath }: { memberId: string; photoPath: string | null; idDocPath: string | null }) {
+  useLang();
+
   return (
     <Card className="space-y-3 p-5 shadow-card">
-      <h2 className="text-lg font-semibold">ছবি ও পরিচয়পত্র</h2>
-      <DocSlot memberId={memberId} kind="photo" path={photoPath} label="সদস্যের ছবি" icon={<Camera className="size-5 text-muted-foreground" />} />
-      <DocSlot memberId={memberId} kind="id_doc" path={idDocPath} label="আইডি কার্ড / NID" icon={<FileText className="size-5 text-muted-foreground" />} />
+      <h2 className="text-lg font-semibold">{uiText("ছবি ও পরিচয়পত্র")}</h2>
+      <DocSlot memberId={memberId} kind="photo" path={photoPath} label={uiText("সদস্যের ছবি")} icon={<Camera className="size-5 text-muted-foreground" />} />
+      <DocSlot memberId={memberId} kind="id_doc" path={idDocPath} label={uiText("আইডি কার্ড / NID")} icon={<FileText className="size-5 text-muted-foreground" />} />
     </Card>
   );
 }
