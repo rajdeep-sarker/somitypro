@@ -1,6 +1,6 @@
 import { brokeredPreviewStorage } from "@/integrations/supabase/previewAuthStorage";
 import { createLoginStorage } from "./login-storage";
-import { changeOwnPassword, loginWithPhone, signUpAccount } from "./auth.functions";
+import { changeOwnPassword, loginWithPhone, renewSession, signUpAccount } from "./auth.functions";
 
 // App session storage (Firebase-backed auth). The session token is kept in
 // the Remember-Me aware storage adapter, exactly like before.
@@ -34,11 +34,23 @@ function decode(token: string): { uid: string; email: string; name: string; exp:
   }
 }
 
+// Renew a remembered login once per app open when it is older than a day,
+// so active devices never hit the expiry date.
+let renewing = false;
+function maybeRenew(exp: number) {
+  if (renewing || exp * 1000 - Date.now() > 364 * 24 * 3600 * 1000) return;
+  renewing = true;
+  void renewSession()
+    .then(async (r) => { if (await store().getItem(KEY)) await store().setItem(KEY, r.token); })
+    .catch(() => { renewing = false; });
+}
+
 export const auth = {
   async getSession(): Promise<Result<{ session: Session | null }>> {
     const token = await store().getItem(KEY);
     const payload = token ? decode(token) : null;
     if (!token || !payload) return { data: { session: null }, error: null };
+    maybeRenew(payload.exp);
     return { data: { session: { access_token: token, user: { id: payload.uid, email: payload.email, full_name: payload.name } } }, error: null };
   },
   async getUser(): Promise<Result<{ user: User | null }>> {

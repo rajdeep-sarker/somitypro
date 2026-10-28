@@ -68,6 +68,14 @@ async function issueToken(user: Record<string, unknown>) {
   };
 }
 
+export const renewSession = createServerFn({ method: "POST" })
+  .middleware([requireAppAuth])
+  .handler(async ({ context }) => {
+    const { signSession } = await import("./session.server");
+    const token = await signSession({ uid: context.userId, email: context.userEmail, name: context.userName }, process.env["SESSION_SECRET"] ?? "");
+    return { token };
+  });
+
 export const loginWithPhone = createServerFn({ method: "POST" })
   .inputValidator(z.object({ phone: z.string().min(11), password: z.string().min(1) }))
   .handler(async ({ data }) => {
