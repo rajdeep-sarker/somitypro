@@ -5,15 +5,19 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { takeAnnouncement } from "@/lib/announcements.functions";
 
 const KEY = "somiti-announcement-checked";
+const PENDING = "somiti-announcement-pending";
 
 /** CTO banner popup; checked once per app visit and closable only with the × button. */
 export function AnnouncementPopup() {
   const take = useServerFn(takeAnnouncement);
   const [a, setA] = useState<{ title: string; message: string } | null>(null);
   useEffect(() => {
+    // The fetched banner is kept in sessionStorage until ×, so a remount cannot lose it.
+    const pending = sessionStorage.getItem(PENDING);
+    if (pending) { setA(JSON.parse(pending)); return; }
     if (sessionStorage.getItem(KEY)) return;
     sessionStorage.setItem(KEY, "1");
-    void take().then(setA).catch(() => {});
+    void take().then((r) => { if (r) { sessionStorage.setItem(PENDING, JSON.stringify(r)); setA(r); } }).catch(() => {});
   }, [take]);
   if (!a) return null;
   return (
@@ -26,7 +30,7 @@ export function AnnouncementPopup() {
             <DialogTitle className="text-lg">{a.title}</DialogTitle>
             <DialogDescription className="mt-2 whitespace-pre-wrap text-base text-foreground">{a.message}</DialogDescription>
           </div>
-          <button type="button" aria-label="বন্ধ করুন" onClick={() => setA(null)} className="flex size-9 shrink-0 items-center justify-center rounded-full bg-card shadow-card hover:bg-muted">
+          <button type="button" aria-label="বন্ধ করুন" onClick={() => { sessionStorage.removeItem(PENDING); setA(null); }} className="flex size-9 shrink-0 items-center justify-center rounded-full bg-card shadow-card hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
