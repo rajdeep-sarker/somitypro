@@ -34,6 +34,11 @@ function ShellContent({ children }: { children: ReactNode }) {
   const loading = useRouterState({ select: (state) => state.isLoading });
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [signingOut, setSigningOut] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => { setCollapsed(localStorage.getItem("somiti-sidebar-collapsed") === "true"); }, []);
+  function toggleSidebar() {
+    setCollapsed(previous => { localStorage.setItem("somiti-sidebar-collapsed", String(!previous)); return !previous; });
+  }
   const logoutStarted = useRef(false);
   const [expanded,setExpanded]=useState<Record<string,boolean>>({});
   const access = useAccess();
@@ -93,15 +98,15 @@ function ShellContent({ children }: { children: ReactNode }) {
   }
 
   const nav = (
-    <nav className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
+    <nav aria-label={t("প্রধান মেনু", "Main navigation")} className="app-nav flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="p-3">
-        <div className="nav-brand rounded-2xl border border-sidebar-border px-4 py-5 text-center shadow-card">
+        <div className="nav-brand rounded-lg border border-sidebar-border px-4 py-4 text-center">
           <div className="nav-teal mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl">
             <SomitiLogo className="size-10" />
           </div>
           <p className="font-display text-base font-semibold leading-snug">{t(name, "Sonali Savings & Credit Co-operative Society Ltd.")}</p>
         </div>
-        <div className="mt-3 flex items-center gap-2 rounded-lg border-l-4 border-sidebar-ring bg-sidebar-accent px-3 py-2.5 font-semibold">
+        <div className="mt-3 flex items-center gap-2 px-3 py-2 text-xs font-semibold text-sidebar-foreground/65">
           <Menu className="size-4" /> {t("প্রধান মেনু তালিকা", "Main Menu")}
         </div>
       </div>
@@ -114,9 +119,9 @@ function ShellContent({ children }: { children: ReactNode }) {
           return (
           <section key={section.key} aria-label={t(section.label, section.en)}>
             <h2><Button variant="ghost" type="button" aria-expanded={isOpen} aria-controls={`menu-${section.key}`} onClick={()=>setExpanded(previous=>({...previous,[section.key]:!isOpen}))} className="nav-pill h-auto min-h-12 w-full justify-start gap-3 whitespace-normal rounded-lg px-3 py-2 text-left font-semibold">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-foreground/20"><section.icon className="size-4" /></span>
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-foreground/10"><section.icon className="size-4" /></span>
               <span className="flex-1">{t(section.label, section.en)}</span>
-              <span className="flex size-7 items-center justify-center rounded-full bg-sidebar-foreground/20"><ChevronDown className={isOpen?"size-4 transition-transform":"size-4 -rotate-90 transition-transform"}/></span>
+              <ChevronDown className={isOpen?"size-4 shrink-0 transition-transform":"size-4 shrink-0 -rotate-90 transition-transform"}/>
             </Button></h2>
             <div id={`menu-${section.key}`} className="nav-submenu" data-open={isOpen} inert={!isOpen} aria-hidden={!isOpen}>
             <div className="min-h-0 overflow-hidden"><div className="ml-2 mt-1.5 space-y-1.5 rounded-b-lg border-l-2 border-nav-rail pb-1 pl-2">
@@ -183,8 +188,16 @@ function ShellContent({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <aside className="no-print fixed inset-y-0 left-0 hidden w-72 lg:block">{nav}</aside>
-      <div className="min-w-0 lg:pl-72">
+      <aside className={"desktop-sidebar no-print fixed inset-y-0 left-0 z-40 hidden border-r border-sidebar-border lg:block " + (collapsed ? "w-16" : "w-72")}>
+        {collapsed ? <nav aria-label={t("সংক্ষিপ্ত মেনু", "Compact navigation")} className="flex h-full flex-col items-center gap-2 overflow-y-auto bg-sidebar py-4 text-sidebar-foreground">
+          <SomitiLogo className="mb-3 size-8" />
+          {!access.cto && <Button asChild variant="ghost" size="icon" className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"><Link to={homeItem.to} title={t(homeItem.label, homeItem.en)} aria-label={t(homeItem.label, homeItem.en)}><homeItem.icon /></Link></Button>}
+          {menuSections.map(section => <Button key={section.key} variant="ghost" size="icon" className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground" title={t(section.label, section.en)} aria-label={t(section.label, section.en)} onClick={() => { toggleSidebar(); setExpanded(previous => ({ ...previous, [section.key]: true })); }}><section.icon /></Button>)}
+          <Button asChild variant="ghost" size="icon" className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"><Link to="/requests" title={t("পরিবর্তনের অনুরোধ", "Change Requests")} aria-label={t("পরিবর্তনের অনুরোধ", "Change Requests")}><MessageSquare /></Link></Button>
+          <Button variant="ghost" size="icon" disabled={signingOut} onClick={signOut} title={t("লগ আউট", "Log out")} aria-label={t("লগ আউট", "Log out")} className="mt-auto text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"><LogOut /></Button>
+        </nav> : nav}
+      </aside>
+      <div className={"shell-content min-w-0 " + (collapsed ? "lg:pl-16" : "lg:pl-72")}>
         <header className="no-print sticky top-0 z-30 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card px-4 py-3 lg:grid-cols-[minmax(0,1fr)_auto]">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild><Button variant="outline" size="icon" className="shrink-0 lg:hidden" aria-label="মেনু"><Menu className="size-5" /></Button></SheetTrigger>
@@ -193,12 +206,13 @@ function ShellContent({ children }: { children: ReactNode }) {
             </SheetContent>
           </Sheet>
           <div className="min-w-0">
+            <Button variant="ghost" size="icon" className="float-left mr-3 hidden lg:inline-flex" onClick={toggleSidebar} aria-label={collapsed ? t("মেনু খুলুন", "Expand sidebar") : t("মেনু ছোট করুন", "Minimize sidebar")} title={collapsed ? t("মেনু খুলুন", "Expand sidebar") : t("মেনু ছোট করুন", "Minimize sidebar")} aria-expanded={!collapsed}><Menu className="size-5" /></Button>
             <p className="text-xs text-muted-foreground">{t("আজকের তারিখ", "Today")}</p>
             <p className="text-sm font-semibold">{bnDate(todayISO())}</p>
           </div>
           <div className="flex items-center gap-2">
             {loading && <LoaderCircle aria-label="পৃষ্ঠা লোড হচ্ছে" className="size-5 shrink-0 animate-spin text-primary" />}
-            <span className="hidden max-w-xs truncate rounded-full border border-success/40 bg-success/10 px-3 py-1.5 text-sm text-success md:inline">{name}</span>
+            <span className="hidden max-w-xs truncate rounded-full border border-success/40 bg-success/10 px-3 py-1.5 text-sm text-success xl:inline">{t(name, "Sonali Co-operative Society")}</span>
             <LangToggle />
             {profile}
           </div>

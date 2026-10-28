@@ -114,10 +114,10 @@
   --sidebar-accent-foreground: oklch(0.98 0.01 250);
   --sidebar-border: oklch(0.3 0.04 245);
   --sidebar-ring: oklch(0.62 0.18 265);
-  --nav-pill: linear-gradient(180deg, oklch(0.6 0.2 268), oklch(0.5 0.21 268));
+  --nav-pill: linear-gradient(180deg, var(--sidebar-accent), var(--sidebar-accent));
   --nav-rail: oklch(0.75 0.13 225);
   --nav-pill-foreground: oklch(0.99 0 0);
-  --nav-pill-shadow: 0 3px 0 oklch(0.38 0.17 268), 0 6px 14px -6px oklch(0.4 0.2 268 / 60%);
+  --nav-pill-shadow: none;
   --nav-brand: linear-gradient(180deg, oklch(0.27 0.03 240), oklch(0.17 0.03 240));
   --nav-teal: linear-gradient(180deg, oklch(0.58 0.11 185), oklch(0.47 0.1 185));
   --profile-card: linear-gradient(160deg, oklch(0.5 0.1 172), oklch(0.32 0.07 172));
@@ -207,6 +207,10 @@
 
 .nav-submenu { display: grid; grid-template-rows: 0fr; opacity: 0; }
 .nav-submenu[data-open="true"] { grid-template-rows: 1fr; opacity: 1; }
+.nav-pill { border: 1px solid var(--sidebar-border); }
+.nav-pill:hover, .nav-pill[aria-expanded="true"] { background: var(--sidebar-border); color: var(--sidebar-foreground); }
+.app-nav .nav-item { box-shadow: none; }
+.app-nav .nav-item[aria-current="page"] { background: var(--secondary); color: var(--primary); }
 @keyframes logout-arrive {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -225,6 +229,8 @@
     animation: page-arrive 220ms ease-out both;
   }
   .nav-submenu { transition: grid-template-rows 180ms ease-out, opacity 180ms ease-out; }
+  .desktop-sidebar { transition: width 180ms ease-out; }
+  .shell-content { transition: padding-left 180ms ease-out; }
   .nav-item { transition: background-color 140ms ease-out, box-shadow 140ms ease-out, transform 140ms ease-out; }
   .logout-overlay { animation: logout-arrive 140ms ease-out both; }
   .logout-icon { animation: logout-icon-arrive 220ms ease-out both; }
