@@ -40,8 +40,8 @@
 - [x] Dashboard quick search, favorites, insight charts
 
 ## Current batch
-- [ ] Quick Actions "Add" picker on dashboard
-- [ ] Bangla/English language switch
-- [ ] Staff page UI cleanup; separate attendance page
-- [ ] User Management (admin-only) with per-section permissions; users see only allowed menus
-- [ ] Admin-only "Changes needed" request box that emails the owner (needs email domain)
+- [x] Quick Actions "Add" picker on dashboard
+- [x] Bangla/English (menus, dashboard, staff, attendance, users; other pages still Bangla) language switch
+- [x] Staff page UI cleanup; separate attendance page
+- [x] User Management (admin-only) with per-section permissions; users see only allowed menus
+- [ ] "Changes needed" box built and saving; email delivery waits on a sender email domain
