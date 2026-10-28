@@ -1,3 +1,4 @@
+import type { LinkProps } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 import {
   Home, MapPinned, GitBranch, Map, MapPin, UserCog, UserPlus, FileSpreadsheet, IdCard, Users, Banknote, ReceiptText, History, HandCoins,
@@ -8,10 +9,10 @@ import {
   BarChart3, Radio, MessageSquare, Mail, Settings, BookMarked, UsersRound, KeyRound, CheckCircle2, Contact, UserCheck,
 } from "lucide-react";
 
-export type MenuItem = { to: string; label: string; icon: LucideIcon };
+export type MenuItem = { to: NonNullable<LinkProps["to"]>; label: string; icon: LucideIcon };
 export type MenuSection = { label: string; icon: LucideIcon; items: MenuItem[] };
 
-const i = (label: string, to: string, icon: LucideIcon): MenuItem => ({ label, to, icon });
+const i = (label: string, to: MenuItem["to"], icon: LucideIcon): MenuItem => ({ label, to, icon });
 
 export const homeItem = i("হোম", "/dashboard", Home);
 
