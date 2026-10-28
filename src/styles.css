@@ -56,6 +56,7 @@
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-gold: var(--gold);
+  --color-nav-rail: var(--nav-rail);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -114,6 +115,7 @@
   --sidebar-border: oklch(0.3 0.04 245);
   --sidebar-ring: oklch(0.62 0.18 265);
   --nav-pill: linear-gradient(180deg, oklch(0.6 0.2 268), oklch(0.5 0.21 268));
+  --nav-rail: oklch(0.75 0.13 225);
   --nav-pill-foreground: oklch(0.99 0 0);
   --nav-pill-shadow: 0 3px 0 oklch(0.38 0.17 268), 0 6px 14px -6px oklch(0.4 0.2 268 / 60%);
   --nav-brand: linear-gradient(180deg, oklch(0.27 0.03 240), oklch(0.17 0.03 240));

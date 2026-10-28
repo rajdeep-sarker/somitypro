@@ -37,3 +37,4 @@
 - [x] Explain Firebase free-tier and Lovable Free database hosting options without migrating
 - [x] Firebase: copy + compare page in Settings, members mirrored on save
 - [ ] Firebase: move logins and switch every page to read/save in Firebase (section by section)
+- [x] Dashboard quick search, favorites, insight charts
