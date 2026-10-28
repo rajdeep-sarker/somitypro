@@ -172,7 +172,7 @@ export const menuSections: MenuSection[] = [
 ];
 
 /** Routes only the administrator may open, whatever permissions a user has. */
-export const ADMIN_ROUTES = new Set<string>(["/users", "/settings", "/import"]);
+export const ADMIN_ROUTES = new Set<string>(["/users", "/settings", "/import", "/requests"]);
 
 /** Which permission modules unlock a route (a route can appear in several sections). */
 export function modulesForRoute(path: string): string[] {

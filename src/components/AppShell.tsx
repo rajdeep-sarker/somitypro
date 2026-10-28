@@ -116,6 +116,9 @@ function ShellContent({ children }: { children: ReactNode }) {
           </section>
           );
         })}
+        {access.admin && <Link to="/requests" onClick={() => setOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card hover:bg-secondary">
+          <MessageSquare className="size-5 text-gold" />{t("পরিবর্তনের অনুরোধ (Changes needed)", "Changes needed")}
+        </Link>}
         <Button variant="ghost" onClick={signOut} className="min-h-12 w-full justify-start gap-3 rounded-xl bg-card px-3 font-semibold text-card-foreground shadow-card hover:bg-secondary">
           <LogOut className="size-5 text-destructive" /> {t("লগ আউট", "Log out")}
         </Button>
