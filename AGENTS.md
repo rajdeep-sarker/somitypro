@@ -27,3 +27,4 @@
 - Financial corrections use authorized database RPCs and append-only ledger revisions read through an effective view; originals remain unchanged and all financial writes share an advisory lock.
 - Login storage selection reads durable Remember Me preferences to survive installed-app restarts; public entry pages route restored sessions to the dashboard.
 - Firebase migration: data mirrored to Firestore (src/lib/firebase.functions.ts, admin-only full copy/compare in Settings, members mirrored on save); app still reads the primary database until cutover.
+- App session tokens last one year and are renewed on each app open via renewSession, so remembered devices stay signed in until explicit logout.
