@@ -78,7 +78,7 @@ function MemberDetail() {
       <h2 className="text-lg font-semibold">লেনদেন খতিয়ান</h2>
       <DateFilter range={range} onChange={setRange} />
       <DataTable head={["তারিখ", "বিবরণ", "টাকা"]} rows={ledger.filter((l) => inRange(l.date, range)).map((l) => [bnDate(l.date), l.desc, taka(l.amt)])} />
-      <div className="hidden print:block"><SignatureRow /></div>
+      <div className="print-only"><SignatureRow /></div>
     </div>
   );
 }
