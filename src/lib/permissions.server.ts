@@ -93,12 +93,15 @@ export async function validateAccountTxn(table: string, values: Row) {
   if (!account) throw new Error("হিসাব পাওয়া যায়নি");
   if (String(account["member_id"]) !== String(values["member_id"])) throw new Error("হিসাবটি এই সদস্যের নয়");
   const type = String(values["type"] ?? "");
-  if (["withdraw", "withdrawal", "payout", "close", "charge"].includes(type)) {
+  const isFdr = accountTable === "fdr_accounts";
+  const debits = isFdr ? ["withdraw"] : ["withdraw", "profit_withdraw", "service_charge"];
+  if (debits.includes(type)) {
     const txns = (await admin.listCollection(table)).filter((t) => t["account_id"] === account["id"]);
-    let bal = accountTable === "fdr_accounts" ? Number(account["amount"]) || 0 : 0;
+    let bal = isFdr ? Number(account["amount"]) || 0 : 0;
     for (const t of txns) {
-      const a = Number(t["amount"]) || 0;
-      bal += ["deposit", "profit"].includes(String(t["type"])) ? a : -a;
+      const a = Number(t["amount"]) || 0, tt = String(t["type"]);
+      if (tt === "deposit" || (!isFdr && tt === "profit")) bal += a;
+      else if (debits.includes(tt)) bal -= a;
     }
     if (amount > bal + 0.001) throw new Error("হিসাবের ব্যালেন্সের চেয়ে বেশি উত্তোলন করা যায় না");
   }
