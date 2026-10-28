@@ -30,3 +30,4 @@
 - App session tokens last one year and are renewed on each app open via renewSession, so remembered devices stay signed in until explicit logout.
 - Menu sections carry a permission key; visibleSections/canOpen drive menu, dashboard and the route guard, and data.functions maps every table to a section so the server rejects writes outside granted sections. /users, /settings, /import are admin-only; /requests is a staff→admin→CTO workflow (requests.functions.ts); the hidden "cto" role only opens /requests, reads no somiti data and is filtered out of user_roles listings.
 - Language is a client-side bn/en toggle (src/lib/i18n.tsx, `t(bn,en)`); menu items carry their own English label.
+- All static interface copy uses the shared UI glossary or explicit bilingual text; language-aware formatters cover numbers/dates. User-entered names, notes and stored values remain unchanged when switching language.

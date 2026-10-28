@@ -1,7 +1,8 @@
-const nf = new Intl.NumberFormat("bn-BD", { maximumFractionDigits: 2 });
+import { interfaceLanguage } from "./ui-translation";
+const nf = () => new Intl.NumberFormat(interfaceLanguage() === "en" ? "en-GB" : "bn-BD", { maximumFractionDigits: 2 });
 
-export const bn = (n: number | string | null | undefined) => nf.format(Number(n ?? 0));
-export const taka = (n: number | string | null | undefined) => `৳ ${nf.format(Number(n ?? 0))}`;
+export const bn = (n: number | string | null | undefined) => nf().format(Number(n ?? 0));
+export const taka = (n: number | string | null | undefined) => `৳ ${nf().format(Number(n ?? 0))}`;
 
 export const todayISO = () => {
   const d = new Date();
@@ -10,7 +11,7 @@ export const todayISO = () => {
 };
 
 export const bnDate = (s?: string | null) =>
-  s ? new Intl.DateTimeFormat("bn-BD", { day: "numeric", month: "long", year: "numeric" }).format(new Date(s)) : "—";
+  s ? new Intl.DateTimeFormat(interfaceLanguage() === "en" ? "en-GB" : "bn-BD", { day: "numeric", month: "long", year: "numeric" }).format(new Date(s)) : "—";
 
 export const phoneToEmail = (phone: string) => `${phone.replace(/\D/g, "")}@somiti.app`;
 
