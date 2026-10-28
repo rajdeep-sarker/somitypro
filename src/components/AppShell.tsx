@@ -11,6 +11,7 @@ import { bnDate, todayISO } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { CenterProvider, CenterSelector, useCenterScope } from "@/components/CenterScope";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const menuSections = [
   { label: "সারসংক্ষেপ", items: [
@@ -74,6 +75,10 @@ function ShellContent({ children }: { children: ReactNode }) {
   const preloadController = useRef<AbortController | null>(null);
   const { data: settings = [] } = useRows("somiti_settings", { order: "id" });
   const name = settings[0]?.name ?? "সমিতি";
+  const [user, setUser] = useState<{ full_name?: string; phone?: string; email: string } | null>(null);
+  useEffect(() => { void auth.getUser().then(({ data }) => setUser(data.user)); }, []);
+  const userName = user?.full_name || "অ্যাডমিন";
+  const initial = userName.trim().charAt(0) || "অ";
 
   useEffect(() => {
     const controller = new AbortController();
@@ -99,25 +104,44 @@ function ShellContent({ children }: { children: ReactNode }) {
 
   const nav = (
     <nav className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className="border-b border-sidebar-border px-5 py-5">
-        <div className="mb-2 flex size-11 items-center justify-center rounded-xl bg-gold text-sidebar-primary-foreground">
-          <Landmark className="size-6" />
+      <div className="p-3">
+        <div className="nav-brand rounded-2xl border border-sidebar-border px-4 py-5 text-center shadow-card">
+          <div className="nav-teal mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl">
+            <Landmark className="size-7" />
+          </div>
+          <p className="font-display text-base font-semibold leading-snug">{name}</p>
         </div>
-        <p className="font-display text-base leading-snug">{name}</p>
+        <div className="mt-3 flex items-center gap-2 rounded-lg border-l-4 border-sidebar-ring bg-sidebar-accent px-3 py-2.5 font-semibold">
+          <Menu className="size-4" /> প্রধান মেনু তালিকা
+        </div>
       </div>
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-3">
-        {menuSections.map((section) => (
-          <section key={section.label} aria-label={section.label} className="border-t border-sidebar-border pt-3 first:border-t-0 first:pt-0">
-            <h2><Button variant="ghost" aria-expanded={expanded[section.label]===true} onClick={()=>setExpanded({...expanded,[section.label]:!expanded[section.label]})} className="mb-1 h-11 w-full justify-between px-3 text-sm font-semibold text-sidebar-primary hover:bg-sidebar-accent hover:text-sidebar-primary">{section.label}<ChevronDown className={expanded[section.label]?"size-4 rotate-180 transition-transform":"size-4 transition-transform"}/></Button></h2>
-            {expanded[section.label]&&<div className="space-y-0.5">
+      <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain px-3 pb-3">
+        {menuSections.map((section) => {
+          const isOpen = expanded[section.label] === true;
+          const single = section.items.length === 1 ? section.items[0] : null;
+          const SectionIcon = section.items[0].icon;
+          if (single) return (
+            <Link key={section.label} to={single.to} onClick={() => setOpen(false)}
+              className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card">
+              <span className="nav-teal flex size-8 items-center justify-center rounded-lg"><single.icon className="size-4" /></span>{single.label}
+            </Link>
+          );
+          return (
+          <section key={section.label} aria-label={section.label}>
+            <h2><button type="button" aria-expanded={isOpen} onClick={()=>setExpanded({...expanded,[section.label]:!isOpen})} className="nav-pill flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2 text-left font-semibold">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-foreground/20"><SectionIcon className="size-4" /></span>
+              <span className="flex-1">{section.label}</span>
+              <span className="flex size-7 items-center justify-center rounded-full bg-sidebar-foreground/20"><ChevronDown className={isOpen?"size-4 transition-transform":"size-4 -rotate-90 transition-transform"}/></span>
+            </button></h2>
+            {isOpen&&<div className="mt-1.5 space-y-1 border-l-2 border-sidebar-border pl-3 ml-4">
         {section.items.map((m) => (
           <Link
             key={m.to}
             to={m.to}
             onClick={() => setOpen(false)}
             activeOptions={{ exact: m.to === "/loans" }}
-            className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-sidebar-accent"
-            activeProps={{ className: "bg-sidebar-primary text-sidebar-primary-foreground font-semibold hover:bg-sidebar-primary" }}
+            className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent"
+            activeProps={{ className: "bg-card text-card-foreground font-semibold hover:bg-card" }}
           >
             <m.icon className="size-4 shrink-0" />
             {m.label}
@@ -125,30 +149,62 @@ function ShellContent({ children }: { children: ReactNode }) {
         ))}
             </div>}
           </section>
-        ))}
+          );
+        })}
       </div>
-      <Button variant="ghost" onClick={signOut} className="m-3 justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground">
-        <LogOut className="size-4" /> লগ আউট
-      </Button>
     </nav>
+  );
+
+  const profile = (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button type="button" className="flex shrink-0 items-center gap-2 rounded-full p-1 text-left hover:bg-muted" aria-label="প্রোফাইল">
+          <span className="nav-teal flex size-10 items-center justify-center rounded-full border-2 border-secondary font-semibold">{initial}</span>
+          <span className="hidden leading-tight sm:block"><span className="block text-sm font-semibold">{userName}</span><span className="flex items-center gap-1 text-xs text-muted-foreground">Admin <ChevronDown className="size-3" /></span></span>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-80 overflow-hidden p-0">
+        <div className="profile-card space-y-3 p-4">
+          <div className="flex items-center gap-3">
+            <span className="flex size-12 items-center justify-center rounded-full border border-sidebar-foreground/40 bg-sidebar-foreground/15 text-lg font-semibold">{initial}</span>
+            <div><p className="font-semibold">{userName}</p><span className="rounded bg-sidebar-foreground/20 px-2 py-0.5 text-xs">Admin</span></div>
+          </div>
+          <div className="space-y-1 border-t border-sidebar-foreground/20 pt-3 text-sm">
+            <p className="flex justify-between gap-2"><span>শাখা:</span><span className="text-right font-semibold">{name}</span></p>
+            {user?.phone && <p className="flex justify-between"><span>মোবাইল:</span><span className="font-semibold">{user.phone}</span></p>}
+          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-sidebar-foreground/30 px-3 py-0.5 text-xs"><span className="size-2 rounded-full bg-success" />অনলাইন</span>
+        </div>
+        <div className="p-1">
+          <DropdownMenuItem asChild className="min-h-11 text-sm"><Link to="/settings"><Settings className="size-4 text-primary" />প্রোফাইল ও পাসওয়ার্ড এডিট</Link></DropdownMenuItem>
+          <DropdownMenuItem asChild className="min-h-11 text-sm"><Link to="/staff"><Users className="size-4 text-primary" />সকল ব্যবহারকারী ও পদবী</Link></DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={signOut} className="min-h-11 text-sm text-destructive focus:text-destructive"><LogOut className="size-4" />লগ আউট</DropdownMenuItem>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 
   return (
     <div className="min-h-screen bg-background">
-      <aside className="no-print fixed inset-y-0 left-0 hidden w-64 lg:block">{nav}</aside>
-      <div className="min-w-0 lg:pl-64">
+      <aside className="no-print fixed inset-y-0 left-0 hidden w-72 lg:block">{nav}</aside>
+      <div className="min-w-0 lg:pl-72">
         <header className="no-print sticky top-0 z-30 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card px-4 py-3 lg:grid-cols-[minmax(0,1fr)_auto]">
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild><Button variant="ghost" size="icon" className="shrink-0 lg:hidden" aria-label="মেনু"><Menu className="size-5" /></Button></SheetTrigger>
-            <SheetContent side="left" aria-describedby={undefined} className="no-print w-72 max-w-[85vw] border-sidebar-border bg-sidebar p-0 text-sidebar-foreground data-[state=open]:duration-150 data-[state=closed]:duration-100 motion-reduce:animate-none lg:hidden">
+            <SheetTrigger asChild><Button variant="outline" size="icon" className="shrink-0 lg:hidden" aria-label="মেনু"><Menu className="size-5" /></Button></SheetTrigger>
+            <SheetContent side="left" aria-describedby={undefined} className="no-print w-80 max-w-[88vw] border-sidebar-border bg-sidebar p-0 text-sidebar-foreground data-[state=open]:duration-150 data-[state=closed]:duration-100 motion-reduce:animate-none lg:hidden">
               <SheetTitle className="sr-only">সমিতির মেনু</SheetTitle>{nav}
             </SheetContent>
           </Sheet>
-          <div>
+          <div className="min-w-0">
             <p className="text-xs text-muted-foreground">আজকের তারিখ</p>
             <p className="text-sm font-semibold">{bnDate(todayISO())}</p>
           </div>
-          {loading && <LoaderCircle aria-label="পৃষ্ঠা লোড হচ্ছে" className="size-5 shrink-0 animate-spin text-primary" />}
+          <div className="flex items-center gap-2">
+            {loading && <LoaderCircle aria-label="পৃষ্ঠা লোড হচ্ছে" className="size-5 shrink-0 animate-spin text-primary" />}
+            <span className="hidden max-w-xs truncate rounded-full border border-success/40 bg-success/10 px-3 py-1.5 text-sm text-success md:inline">{name}</span>
+            {profile}
+          </div>
           <div className="col-span-full flex min-w-0 items-center gap-3"><span className="shrink-0 text-sm text-muted-foreground">কেন্দ্র</span><CenterSelector /></div>
         </header>
         <main key={`${pathname}-${center}`} className="page-transition min-w-0 p-4 md:p-6">{children}</main>
