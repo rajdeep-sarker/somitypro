@@ -5,7 +5,7 @@ import { FIREBASE_TABLES } from "./firebase-format";
 
 export const TABLES = new Set<string>(FIREBASE_TABLES);
 const ADMIN_ONLY_WRITE = new Set(["user_roles", "staff_permissions", "somiti_settings", "profiles"]);
-const ADMIN_ONLY_EXTRA = new Set(["somiti_rules"]);
+const ADMIN_ONLY_EXTRA = new Set(["somiti_rules", "fdr_schemes"]);
 // Each table belongs to one permission module (menu section). Ledger tables
 // take their module from the account they post to.
 const MODULE_TABLES: Record<string, string> = {
