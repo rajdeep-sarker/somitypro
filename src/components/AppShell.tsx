@@ -119,6 +119,7 @@ function ShellContent({ children }: { children: ReactNode }) {
         {menuSections.map((section) => {
           const isOpen = expanded[section.label] === true;
           const single = section.items.length === 1 ? section.items[0] : null;
+          const SectionIcon = section.items[0].icon;
           if (single) return (
             <Link key={section.label} to={single.to} onClick={() => setOpen(false)}
               className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card">
@@ -128,7 +129,7 @@ function ShellContent({ children }: { children: ReactNode }) {
           return (
           <section key={section.label} aria-label={section.label}>
             <h2><button type="button" aria-expanded={isOpen} onClick={()=>setExpanded({...expanded,[section.label]:!isOpen})} className="nav-pill flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2 text-left font-semibold">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-foreground/20"><section.items[0].icon className="size-4" /></span>
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-foreground/20"><SectionIcon className="size-4" /></span>
               <span className="flex-1">{section.label}</span>
               <span className="flex size-7 items-center justify-center rounded-full bg-sidebar-foreground/20"><ChevronDown className={isOpen?"size-4 transition-transform":"size-4 -rotate-90 transition-transform"}/></span>
             </button></h2>
