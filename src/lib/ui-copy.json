@@ -236,9 +236,9 @@
   "জমা": "Deposit",
   "উত্তোলন": "Withdrawal",
   "লোনের অবস্থা": "Loan status",
-  "টি": "items",
+  "টি": "",
   "সদস্য বৃদ্ধি": "Member growth",
-  "জন": "people",
+  "জন": "members",
   "সদস্য": "Member",
   "আয় বনাম ব্যয় (জমা খরচ)": "Income vs. expenses (cash flow)",
   "আয়": "Income",
@@ -938,5 +938,9 @@
   "সফটওয়্যারে প্রবেশ করুন": "Open the application",
   "ক্লাউড ভিত্তিক নিরাপদ সেবা": "Secure cloud-based service",
   "হিসাবরক্ষকের স্বাক্ষর": "Accountant Signature",
-  "ব্যবস্থাপক / সভাপতির স্বাক্ষর": "Manager / President Signature"
+  "ব্যবস্থাপক / সভাপতির স্বাক্ষর": "Manager / President Signature",
+  "নতুন শেয়ার শ্রেণি": "New share class",
+  "নতুন প্রকল্প": "New project",
+  "নতুন তহবিল": "New fund",
+  "নতুন ব্যাংক হিসাব": "New bank account"
 }
