@@ -71,6 +71,7 @@ function fromFsValue(v: FsValue): unknown {
 export function docToRow(d: { name?: string; fields?: Record<string, FsValue> }): Row {
   const out: Row = {};
   for (const [k, v] of Object.entries(d.fields ?? {})) out[k] = fromFsValue(v);
+  if (out["id"] === undefined && d.name) out["id"] = decodeURIComponent(d.name.split("/").pop() ?? "");
   return out;
 }
 

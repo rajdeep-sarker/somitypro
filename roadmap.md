@@ -47,3 +47,4 @@
 - [x] Changes needed: staff→admin→CTO workflow, hidden CTO role
 - [ ] CTO announcement banner: popup shown for the next N logins per user, closes only via ×
 - [ ] Reset all somiti data to zero (keep logins/settings)
+- [ ] Activity log: every change by every user with time (admin/CTO view)
