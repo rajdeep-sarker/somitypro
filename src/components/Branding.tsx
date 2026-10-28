@@ -32,8 +32,8 @@ export function SignatureRow() {
     <div className="mt-16 grid gap-8 break-inside-avoid" style={{ gridTemplateColumns: `repeat(${slots.length}, minmax(0, 1fr))` }}>
       {slots.map((s) => (
         <div key={s.id} className="flex flex-col items-center">
-          <div className="flex h-16 w-full items-end justify-center">{s.image && <img src={s.image} alt={s.label} className="max-h-16 max-w-full object-contain" />}</div>
-          <div className="w-full border-t-2 border-foreground/50 pt-1 text-center text-sm font-semibold">{s.label}</div>
+          <div className="flex h-16 w-full items-end justify-center">{s.image && <img src={s.image} alt={uiText(s.label)} className="max-h-16 max-w-full object-contain" />}</div>
+          <div className="w-full border-t-2 border-foreground/50 pt-1 text-center text-sm font-semibold">{uiText(s.label)}</div>
         </div>
       ))}
     </div>
@@ -54,7 +54,7 @@ export function BrandingSettings() {
 
   async function persist(nextLogo: string, nextSlots: SignatureSlot[], ok: string) {
     setBusy(true);
-    try { await save({ data: { logo: nextLogo, signatures: nextSlots } }); setLogo(nextLogo); setSlots(nextSlots); await qc.invalidateQueries({ queryKey: ["branding"] }); toast.success(ok); }
+    try { await save({ data: { logo: nextLogo, signatures: nextSlots } }); setLogo(nextLogo); setSlots(nextSlots); await qc.invalidateQueries({ queryKey: ["branding"] }); toast.success(uiText(ok)); }
     catch (e) { toast.error(e instanceof Error ? e.message : uiText("সংরক্ষণ হয়নি")); }
     finally { setBusy(false); }
   }

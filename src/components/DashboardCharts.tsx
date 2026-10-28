@@ -92,10 +92,10 @@ export function DashboardCharts(p: {
         </AreaChart>
       </ChartCard>
       <ChartCard title={uiText("লোনের অবস্থা")}>
-        {loanPie.length ? <PieChart><Pie data={loanPie} dataKey="value" nameKey="name" outerRadius={90} label={(e) => bn(e.value)}>{loanPie.map((x) => <Cell key={x.name} fill={x.fill} />)}</Pie><Tooltip formatter={(v: number) => `${bn(v)} টি`} /><Legend /></PieChart> : empty}
+        {loanPie.length ? <PieChart><Pie data={loanPie} dataKey="value" nameKey="name" outerRadius={90} label={(e) => bn(e.value)}>{loanPie.map((x) => <Cell key={x.name} fill={x.fill} />)}</Pie><Tooltip formatter={(v: number) => bn(v)} /><Legend /></PieChart> : empty}
       </ChartCard>
       <ChartCard title={uiText("সদস্য বৃদ্ধি")}>
-        <AreaChart data={growth}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="name" /><YAxis allowDecimals={false} tickFormatter={(v) => bn(v)} width={40} /><Tooltip formatter={(v: number) => `${bn(v)} জন`} />
+        <AreaChart data={growth}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="name" /><YAxis allowDecimals={false} tickFormatter={(v) => bn(v)} width={40} /><Tooltip formatter={(v: number) => bn(v)} />
           <Area type="monotone" dataKey={uiText("সদস্য")} stroke={C[0]} fill={C[0]} fillOpacity={0.25} />
         </AreaChart>
       </ChartCard>
