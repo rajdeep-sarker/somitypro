@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { countNewRequests } from "@/lib/requests.functions";
 import {
   LayoutDashboard, MapPin, Users, PiggyBank, HandCoins, CalendarClock, Landmark, Receipt, Wallet, FileBarChart, Settings, LogOut, Menu, Calculator, AlertTriangle, Briefcase, Shield, Coins, Upload, ClipboardList, MessageSquare, BookOpen, LoaderCircle, ChevronDown,
 } from "lucide-react";
@@ -33,6 +35,8 @@ function ShellContent({ children }: { children: ReactNode }) {
   const access = useAccess();
   const { t } = useLang();
   const menuSections = visibleSections(access);
+  const countRequests = useServerFn(countNewRequests);
+  const { data: newRequests = 0 } = useQuery({ queryKey: ["change-requests", "new"], queryFn: () => countRequests(), enabled: access.admin, refetchInterval: 60_000 });
   useEffect(()=>{
     const section=menuSections.find(s=>s.items.some(item=>pathname===item.to||pathname.startsWith(item.to+"/")));
     if(section)setExpanded(previous=>({...previous,[section.label]:true}));
@@ -116,8 +120,9 @@ function ShellContent({ children }: { children: ReactNode }) {
           </section>
           );
         })}
-        {access.admin && <Link to="/requests" onClick={() => setOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card hover:bg-secondary">
-          <MessageSquare className="size-5 text-gold" />{t("পরিবর্তনের অনুরোধ (Changes needed)", "Changes needed")}
+        {<Link to="/requests" onClick={() => setOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card hover:bg-secondary">
+          <MessageSquare className="size-5 text-gold" /><span className="flex-1">{t("পরিবর্তনের অনুরোধ (Changes needed)", "Changes needed")}</span>
+          {newRequests > 0 && <span aria-label={t("নতুন অনুরোধ", "New requests")} className="flex min-w-6 items-center justify-center rounded-full bg-destructive px-1.5 text-xs text-destructive-foreground">{newRequests}</span>}
         </Link>}
         <Button variant="ghost" onClick={signOut} className="min-h-12 w-full justify-start gap-3 rounded-xl bg-card px-3 font-semibold text-card-foreground shadow-card hover:bg-secondary">
           <LogOut className="size-5 text-destructive" /> {t("লগ আউট", "Log out")}

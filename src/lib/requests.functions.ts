@@ -15,7 +15,7 @@ export const submitChangeRequest = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
   .inputValidator(z.object({ title: z.string().trim().min(2).max(150), details: z.string().trim().min(5).max(4000) }))
   .handler(async ({ data, context }) => {
-    const admin = await requireAdmin(context.userId);
+    const admin = await import("./firebase-admin.server");
     const user = await admin.getDocument("profiles", context.userId);
     const id = crypto.randomUUID();
     const fsDb = await admin.fsDb();
@@ -32,6 +32,25 @@ export const listChangeRequests = createServerFn({ method: "GET" })
     const admin = await requireAdmin(context.userId);
     const rows = await admin.listCollection("change_requests");
     return rows
-      .map((r) => ({ id: String(r["id"]), title: String(r["title"] ?? ""), details: String(r["details"] ?? ""), user_name: String(r["user_name"] ?? ""), created_at: String(r["created_at"] ?? "") }))
+      .map((r) => ({ id: String(r["id"]), status: String(r["status"] ?? "new"), title: String(r["title"] ?? ""), details: String(r["details"] ?? ""), user_name: String(r["user_name"] ?? ""), created_at: String(r["created_at"] ?? "") }))
       .sort((a, b) => b.created_at.localeCompare(a.created_at));
+  });
+
+/** Number of requests the administrator has not opened yet (0 for others). */
+export const countNewRequests = createServerFn({ method: "GET" })
+  .middleware([requireAppAuth])
+  .handler(async ({ context }) => {
+    try { const admin = await requireAdmin(context.userId); return (await admin.listCollection("change_requests")).filter((r) => r["status"] === "new").length; }
+    catch { return 0; }
+  });
+
+export const markRequestsSeen = createServerFn({ method: "POST" })
+  .middleware([requireAppAuth])
+  .handler(async ({ context }) => {
+    const admin = await requireAdmin(context.userId);
+    const fresh = (await admin.listCollection("change_requests")).filter((r) => r["status"] === "new");
+    if (!fresh.length) return { ok: true };
+    const fsDb = await admin.fsDb();
+    await admin.commitWrites(fresh.map((r) => admin.wUpdate(fsDb, "change_requests", String(r["id"]), { status: "seen" })));
+    return { ok: true };
   });

@@ -172,7 +172,7 @@ export const menuSections: MenuSection[] = [
 ];
 
 /** Routes only the administrator may open, whatever permissions a user has. */
-export const ADMIN_ROUTES = new Set<string>(["/users", "/settings", "/import", "/requests"]);
+export const ADMIN_ROUTES = new Set<string>(["/users", "/settings", "/import"]);
 
 /** Which permission modules unlock a route (a route can appear in several sections). */
 export function modulesForRoute(path: string): string[] {
@@ -181,7 +181,7 @@ export function modulesForRoute(path: string): string[] {
 
 export type Access = { admin: boolean; view: Set<string> };
 export function canOpen(access: Access, to: string): boolean {
-  if (access.admin || to === homeItem.to) return true;
+  if (access.admin || to === homeItem.to || to === "/requests") return true;
   if (ADMIN_ROUTES.has(to)) return false;
   return modulesForRoute(to).some((k) => access.view.has(k));
 }
