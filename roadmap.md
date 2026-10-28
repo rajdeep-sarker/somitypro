@@ -40,6 +40,8 @@
 - [x] Dashboard quick search, favorites, insight charts
 
 ## Current batch
+- [ ] Consolidate duplicate navigation destinations into work-based groups without changing permissions or losing shortcuts
+- [ ] Add smooth menu/page/logout transitions and verify desktop/mobile with reduced-motion support
 - [x] Quick Actions "Add" picker on dashboard
 - [x] Bangla/English (menus, dashboard, staff, attendance, users; other pages still Bangla) language switch
 - [x] Staff page UI cleanup; separate attendance page

@@ -16,7 +16,7 @@
 - Signed-in menus warm route chunks and shared row queries through a bounded, cancellable background queue; all reads reuse the same query options to avoid duplicate network work.
 - The authenticated layout deduplicates verified-user checks in QueryClient for one minute; auth events invalidate this cache and logout clears it, while database RLS remains authoritative.
 - Interface font sizes are global typography tokens so tables, forms, menus and portal controls remain consistent.
-- Desktop and mobile navigation share one sectioned menu definition, flattened for preloading, so grouping cannot drop or duplicate preload destinations.
+- Desktop/mobile navigation and dashboard pickers share one unique-destination menu; display groups are separate from stable legacy permission modules so regrouping cannot change access. Saved shortcut labels resolve to destination IDs to survive renames.
 - App browser reads and bearer middleware use the app-owned client with a session/persistent storage adapter; generated integrations remain untouched, and only persistent logins use the preview broker.
 - Password resets for other accounts run through an authenticated server function that verifies the caller's database admin role before loading the privileged client; self-changes still require the current password.
 

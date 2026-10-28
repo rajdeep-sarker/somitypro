@@ -61,7 +61,7 @@ function AuthPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-hero p-4">
-      <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-card">
+      <div className="page-transition w-full max-w-md rounded-2xl bg-card p-8 shadow-card">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-gold text-sidebar-primary-foreground">
             <SomitiLogo className="size-9" />

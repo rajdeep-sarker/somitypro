@@ -38,7 +38,7 @@ function Index() {
     return () => { active = false; };
   }, [navigate]);
   return (
-    <div className="min-h-screen bg-background">
+    <div className="page-transition min-h-screen bg-background">
       <section className="bg-hero text-primary-foreground">
         <div className="mx-auto max-w-6xl px-5 py-6">
           <div className="flex items-center justify-between">
