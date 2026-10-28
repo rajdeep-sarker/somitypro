@@ -36,7 +36,7 @@ function ShellContent({ children }: { children: ReactNode }) {
   const { t } = useLang();
   const menuSections = visibleSections(access);
   const countRequests = useServerFn(countNewRequests);
-  const { data: newRequests = 0 } = useQuery({ queryKey: ["change-requests", "new"], queryFn: () => countRequests(), enabled: access.admin || access.cto, refetchInterval: 60_000 });
+  const { data: newRequests = 0 } = useQuery({ queryKey: ["change-requests", "new"], queryFn: () => countRequests(), enabled: access.admin || access.cto === true, refetchInterval: 60_000 });
   useEffect(()=>{
     const section=menuSections.find(s=>s.items.some(item=>pathname===item.to||pathname.startsWith(item.to+"/")));
     if(section)setExpanded(previous=>({...previous,[section.label]:true}));
