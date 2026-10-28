@@ -174,3 +174,56 @@ export const setupCtoAccount = createServerFn({ method: "POST" })
     ]);
     return { ok: true };
   });
+
+async function isCto(userId: string): Promise<boolean> {
+  const admin = await db();
+  const roles = await admin.listCollection("user_roles");
+  return roles.some((r) => r["user_id"] === userId && r["role"] === "cto");
+}
+
+/** CTO: list every login (admin and staff) so passwords can be reset. */
+export const ctoListUsers = createServerFn({ method: "GET" })
+  .middleware([requireAppAuth])
+  .handler(async ({ context }) => {
+    if (!(await isCto(context.userId))) throw new Error("শুধু CTO");
+    const admin = await db();
+    const [users, roles] = await Promise.all([admin.listCollection("auth_users"), admin.listCollection("user_roles")]);
+    return users
+      .filter((u) => u["id"] !== context.userId)
+      .map((u) => {
+        const r = roles.filter((x) => x["user_id"] === u["id"]).map((x) => String(x["role"]));
+        return { id: String(u["id"]), name: String(u["full_name"] ?? ""), phone: String(u["phone"] ?? ""), role: r.includes("admin") ? "admin" : "staff" };
+      });
+  });
+
+export const ctoResetPassword = createServerFn({ method: "POST" })
+  .middleware([requireAppAuth])
+  .inputValidator(z.object({ userId: z.string().min(1), password: z.string().min(8).max(128) }))
+  .handler(async ({ data, context }) => {
+    if (!(await isCto(context.userId))) throw new Error("শুধু CTO");
+    const admin = await db();
+    if (!(await admin.getDocument("auth_users", data.userId))) throw new Error("ইউজার পাওয়া যায়নি");
+    const fsDb = await admin.fsDb();
+    await admin.commitWrites([admin.wUpdate(fsDb, "auth_users", data.userId, { password_hash: await hashPassword(data.password) })]);
+    return { ok: true };
+  });
+
+/** CTO: change own mobile number and/or password (current password required). */
+export const ctoUpdateOwnLogin = createServerFn({ method: "POST" })
+  .middleware([requireAppAuth])
+  .inputValidator(z.object({ current: z.string().min(1), phone: z.string().regex(/^01\d{9}$/), next: z.string().max(128).default("") }))
+  .handler(async ({ data, context }) => {
+    if (!(await isCto(context.userId))) throw new Error("শুধু CTO");
+    const admin = await db();
+    const user = await admin.getDocument("auth_users", context.userId);
+    if (!user || !(await verifyPassword(data.current, String(user["password_hash"] ?? "")))) throw new Error("বর্তমান পাসওয়ার্ড ভুল");
+    if (data.next && data.next.length < 8) throw new Error("নতুন পাসওয়ার্ড কমপক্ষে ৮ অক্ষর");
+    const email = phoneToEmail(data.phone);
+    const other = await findAuthUser(email);
+    if (other && other["id"] !== context.userId) throw new Error("এই নম্বরে অন্য অ্যাকাউন্ট আছে");
+    const values: Record<string, unknown> = { email, phone: data.phone };
+    if (data.next) values["password_hash"] = await hashPassword(data.next);
+    const fsDb = await admin.fsDb();
+    await admin.commitWrites([admin.wUpdate(fsDb, "auth_users", context.userId, values), admin.wUpdate(fsDb, "profiles", context.userId, { phone: data.phone })]);
+    return { ok: true };
+  });
