@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireAppAuth } from "./auth-middleware";
 import { calcLoan } from "./calc";
+import { entryFields } from "./edit-fields";
 
 // Financial writes that used to be database procedures/triggers, now enforced
 // here: validation, balance invariants, atomic batches and audit history.
@@ -11,6 +12,8 @@ type Row = Record<string, unknown>;
 async function db() {
   return import("./firebase-admin.server");
 }
+
+const perm = () => import("./permissions.server");
 
 async function isAdmin(userId: string): Promise<boolean> {
   const admin = await db();
@@ -75,6 +78,15 @@ export const bulkCollect = createServerFn({ method: "POST" })
     const writes = [];
     const fsDb = await admin.fsDb();
     const loanIds: string[] = [];
+    const [allMembers, allLoans, allDps] = await Promise.all([admin.listCollection("members"), admin.listCollection("loans"), admin.listCollection("dps_accounts")]);
+    const memberIds = new Set(allMembers.map((m) => String(m["id"])));
+    const loanOwner = new Map(allLoans.map((l) => [String(l["id"]), String(l["member_id"])]));
+    const dpsOwner = new Map(allDps.map((a) => [String(a["id"]), String(a["member_id"])]));
+    for (const row of data.rows) {
+      if (!memberIds.has(row.member_id)) throw new Error("সদস্য পাওয়া যায়নি");
+      if (row.kind === "loan" && loanOwner.get(row.account_id) !== row.member_id) throw new Error("ঋণ হিসাবটি এই সদস্যের নয়");
+      if (row.kind === "dps" && dpsOwner.get(row.account_id) !== row.member_id) throw new Error("DPS হিসাবটি এই সদস্যের নয়");
+    }
     for (const row of data.rows) {
       if (row.kind === "savings") {
         writes.push(admin.wSet(fsDb, "savings_transactions", crypto.randomUUID(), { member_id: row.member_id, type: "deposit", amount: row.amount, txn_date: data.date, note: null, created_by: context.userId, created_at: now }));
@@ -169,9 +181,15 @@ export const editSavedEntry = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
   .validator(editSchema)
   .handler(async ({ data, context }) => {
+    const p = await perm();
+    if (!p.TABLES.has(data.table) || ["user_roles", "staff_permissions", "profiles", "ledger_transactions", "ledger_revisions", "entry_edit_history", "activity_log"].includes(data.table)) throw new Error("এই তালিকা এখানে সংশোধন করা যায় না");
+    const editable = new Set(entryFields(data.table).map((f) => f.key));
+    for (const k of Object.keys(data.values)) if (!editable.has(k)) throw new Error("এই ঘর সংশোধন করা যায় না");
+    data.values = p.cleanValues(data.values, "update");
     const admin = await db();
     const current = await admin.getDocument(data.table, data.id);
     if (!current) throw new Error("এন্ট্রি পাওয়া যায়নি");
+    await p.requireWrite(context.userId, data.table, current);
     checkExpected(current, data.values, data.expected);
     checkNumbers(data.values);
     const next: Row = { ...current, ...data.values };
@@ -222,6 +240,8 @@ export const correctLedgerEntry = createServerFn({ method: "POST" })
     const admin = await db();
     const current = await admin.getDocument("ledger_transactions", data.id);
     if (!current) throw new Error("লেনদেন পাওয়া যায়নি");
+    for (const k of Object.keys(data.values)) if (!["amount", "units", "txn_date", "note", "reference"].includes(k)) throw new Error("এই ঘর সংশোধন করা যায় না");
+    await (await perm()).requireWrite(context.userId, "ledger_transactions", { account_id: current["account_id"] });
     checkExpected(current, data.values, data.expected);
     checkNumbers(data.values);
     const revisions = await admin.listCollection("ledger_revisions");
@@ -255,6 +275,7 @@ export const transferBank = createServerFn({ method: "POST" })
   .validator(z.object({ from: z.string().uuid(), to: z.string().uuid(), amount, date: z.string().regex(dateRe), note: z.string().max(300).nullish() }))
   .handler(async ({ data, context }) => {
     if (data.from === data.to) throw new Error("একই হিসাবে স্থানান্তর হয় না");
+    await (await perm()).requireWrite(context.userId, "ledger_transactions", { module: "banks" });
     const admin = await db();
     const [from, to] = await Promise.all([admin.getDocument("ledger_accounts", data.from), admin.getDocument("ledger_accounts", data.to)]);
     if (!from || !to || from["module"] !== "banks" || to["module"] !== "banks") throw new Error("ব্যাংক হিসাব সঠিক নয়");
