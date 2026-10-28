@@ -1,13 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireAppAuth } from "./auth-middleware";
-import { TABLES, cleanValues, requireWrite, rolesOf } from "./permissions.server";
+import { FIREBASE_TABLES } from "./firebase-format";
 
 // All app data lives in Firestore. The browser never talks to Firestore
 // directly; every read/write goes through these functions, which check the
 // caller's session and role first.
 
-type Row = import("./permissions.server").Row;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Row = Record<string, any>;
+const TABLES = new Set<string>(FIREBASE_TABLES);
+const perm = () => import("./permissions.server");
 const tableSchema = z.object({ table: z.string().refine((t) => TABLES.has(t), "অজানা তালিকা") });
 const act = () => import("./activity.server");
 async function db() {
@@ -32,7 +35,7 @@ function applyRevisions(txns: Row[], revisions: Row[]): Row[] {
 export const myAccess = createServerFn({ method: "GET" })
   .middleware([requireAppAuth])
   .handler(async ({ context }) => {
-    const r = await rolesOf(context.userId);
+    const r = await (await perm()).rolesOf(context.userId);
     return { admin: r.admin, cto: r.cto, view: [...r.view], write: [...r.modules] };
   });
 
@@ -41,7 +44,7 @@ export const listRows = createServerFn({ method: "GET" })
   .validator(tableSchema)
   .handler(async ({ data, context }) => {
     const admin = await db();
-    const me = await rolesOf(context.userId);
+    const me = await (await perm()).rolesOf(context.userId);
     // The CTO account never reads somiti records.
     if (me.cto && data.table !== "somiti_settings") return [];
     if (data.table === "user_roles") return (await admin.listCollection("user_roles")).filter((r) => r["role"] !== "cto");
@@ -70,8 +73,8 @@ export const insertRow = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
   .validator(z.object({ table: tableSchema.shape.table, values: z.record(z.string(), z.unknown()) }))
   .handler(async ({ data, context }) => {
-    const clean = cleanValues(data.values, "insert");
-    await requireWrite(context.userId, data.table, clean);
+    const clean = (await perm()).cleanValues(data.values, "insert");
+    await (await perm()).requireWrite(context.userId, data.table, clean);
     const admin = await db();
     const values: Row = { ...clean };
     const id = String(values["id"] ?? crypto.randomUUID());
@@ -92,12 +95,12 @@ export const updateRow = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
   .validator(z.object({ table: tableSchema.shape.table, id: z.string().min(1), values: z.record(z.string(), z.unknown()) }))
   .handler(async ({ data, context }) => {
-    const values = cleanValues(data.values, "update");
+    const values = (await perm()).cleanValues(data.values, "update");
     const admin = await db();
     const current = await admin.getDocument(data.table, data.id);
     if (!current) throw new Error("এন্ট্রি পাওয়া যায়নি");
     // Permission is checked against the existing row's module as well as the new values.
-    await requireWrite(context.userId, data.table, { ...current, ...values });
+    await (await perm()).requireWrite(context.userId, data.table, { ...current, ...values });
     const fsDb = await admin.fsDb();
     await admin.commitWrites([admin.wUpdate(fsDb, data.table, data.id, values), (await act()).logWrite(fsDb, context, "update", data.table, data.id, Object.keys(values))]);
     return { ok: true };
@@ -107,7 +110,7 @@ export const deleteRow = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
   .validator(z.object({ table: tableSchema.shape.table, id: z.string().min(1) }))
   .handler(async ({ data, context }) => {
-    await requireWrite(context.userId, data.table);
+    await (await perm()).requireWrite(context.userId, data.table);
     const admin = await db();
     const fsDb = await admin.fsDb();
     await admin.commitWrites([admin.wDelete(fsDb, data.table, data.id), (await act()).logWrite(fsDb, context, "delete", data.table, data.id)]);
@@ -119,8 +122,8 @@ export const upsertRow = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
   .validator(z.object({ table: tableSchema.shape.table, keys: z.array(z.string()).min(1), values: z.record(z.string(), z.unknown()) }))
   .handler(async ({ data, context }) => {
-    const values = cleanValues(data.values, "update");
-    await requireWrite(context.userId, data.table, values);
+    const values = (await perm()).cleanValues(data.values, "update");
+    await (await perm()).requireWrite(context.userId, data.table, values);
     const admin = await db();
     const rows = await admin.listCollection(data.table);
     const existing = rows.find((r) => data.keys.every((k) => String(r[k] ?? "") === String(values[k] ?? "")));
@@ -138,7 +141,7 @@ export const upsertRow = createServerFn({ method: "POST" })
 export const listActivity = createServerFn({ method: "GET" })
   .middleware([requireAppAuth])
   .handler(async ({ context }) => {
-    const r = await rolesOf(context.userId);
+    const r = await (await perm()).rolesOf(context.userId);
     if (!r.admin && !r.cto) throw new Error("শুধু অ্যাডমিন");
     const admin = await db();
     const rows = await admin.listCollection("activity_log");
