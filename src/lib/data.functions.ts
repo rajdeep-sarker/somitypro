@@ -7,7 +7,12 @@ import { TABLES, cleanValues, requireWrite, rolesOf } from "./permissions.server
 // directly; every read/write goes through these functions, which check the
 // caller's session and role first.
 
-const ADMIN_ONLY_WRITE = new Set(["user_roles", "staff_permissions", "somiti_settings", "profiles"]);
+type Row = import("./permissions.server").Row;
+const tableSchema = z.object({ table: z.string().refine((t) => TABLES.has(t), "অজানা তালিকা") });
+const act = () => import("./activity.server");
+async function db() {
+  return import("./firebase-admin.server");
+}
 /** Apply the latest revision of each ledger entry (append-only corrections). */
 function applyRevisions(txns: Row[], revisions: Row[]): Row[] {
   const latest = new Map<string, Row>();
