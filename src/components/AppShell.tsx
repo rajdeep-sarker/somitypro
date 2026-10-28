@@ -13,7 +13,9 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { CenterProvider, CenterSelector, useCenterScope } from "@/components/CenterScope";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-import { homeItem, iconTone, menuDestinations, menuSections } from "@/components/menu";
+import { canOpen, homeItem, iconTone, menuDestinations, visibleSections } from "@/components/menu";
+import { useAccess } from "@/lib/access";
+import { LangToggle, useLang } from "@/lib/i18n";
 
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -28,10 +30,13 @@ function ShellContent({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [activeLabel,setActiveLabel]=useState<string|null>(null);
   const [expanded,setExpanded]=useState<Record<string,boolean>>({});
+  const access = useAccess();
+  const { t } = useLang();
+  const menuSections = visibleSections(access);
   useEffect(()=>{
     const section=menuSections.find(s=>s.items.some(item=>pathname===item.to||pathname.startsWith(item.to+"/")));
     if(section)setExpanded(previous=>({...previous,[section.label]:true}));
-  },[pathname]);
+  },[pathname, access.ready]);
   const qc = useQueryClient();
   const router = useRouter();
   const preloadController = useRef<AbortController | null>(null);
@@ -39,7 +44,8 @@ function ShellContent({ children }: { children: ReactNode }) {
   const name = settings[0]?.name ?? "সমিতি";
   const [user, setUser] = useState<{ full_name?: string; phone?: string; email: string } | null>(null);
   useEffect(() => { void auth.getUser().then(({ data }) => setUser(data.user)); }, []);
-  const userName = user?.full_name || "অ্যাডমিন";
+  const userName = user?.full_name || (access.admin ? t("অ্যাডমিন", "Admin") : t("ব্যবহারকারী", "User"));
+  const roleLabel = access.admin ? "Admin" : "Staff";
   const initial = userName.trim().charAt(0) || "অ";
 
   useEffect(() => {
@@ -47,14 +53,15 @@ function ShellContent({ children }: { children: ReactNode }) {
     preloadController.current = controller;
     // Let the current screen paint before warming the remaining menus.
     const timer = window.setTimeout(() => {
-      void runPreloadQueue(menuDestinations.map((to) => () => router.preloadRoute({ to })), controller.signal, 1);
+      void runPreloadQueue(menuDestinations.filter((to) => canOpen(access, to)).map((to) => () => router.preloadRoute({ to })), controller.signal, 1);
       void runPreloadQueue(preloadTables.map((table) => () => qc.prefetchQuery(rowQueryOptions(table))), controller.signal);
     }, 250);
     return () => {
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [qc, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qc, router, access.ready]);
 
   async function signOut() {
     preloadController.current?.abort();
@@ -71,15 +78,15 @@ function ShellContent({ children }: { children: ReactNode }) {
           <div className="nav-teal mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl">
             <Landmark className="size-7" />
           </div>
-          <p className="font-display text-base font-semibold leading-snug">{name}</p>
+          <p className="font-display text-base font-semibold leading-snug">{t(name, "Sonali Savings & Credit Co-operative Society Ltd.")}</p>
         </div>
         <div className="mt-3 flex items-center gap-2 rounded-lg border-l-4 border-sidebar-ring bg-sidebar-accent px-3 py-2.5 font-semibold">
-          <Menu className="size-4" /> প্রধান মেনু তালিকা
+          <Menu className="size-4" /> {t("প্রধান মেনু তালিকা", "Main Menu")}
         </div>
       </div>
       <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain px-3 pb-3">
         <Link to={homeItem.to} onClick={() => setOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card">
-          <homeItem.icon className="size-5 text-success" />{homeItem.label}
+          <homeItem.icon className="size-5 text-success" />{t(homeItem.label, homeItem.en)}
         </Link>
         {menuSections.map((section) => {
           const isOpen = expanded[section.label] === true;
@@ -87,7 +94,7 @@ function ShellContent({ children }: { children: ReactNode }) {
           <section key={section.label} aria-label={section.label}>
             <h2><button type="button" aria-expanded={isOpen} onClick={()=>setExpanded({...expanded,[section.label]:!isOpen})} className="nav-pill flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2 text-left font-semibold">
               <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-foreground/20"><section.icon className="size-4" /></span>
-              <span className="flex-1">{section.label}</span>
+              <span className="flex-1">{t(section.label, section.en)}</span>
               <span className="flex size-7 items-center justify-center rounded-full bg-sidebar-foreground/20"><ChevronDown className={isOpen?"size-4 transition-transform":"size-4 -rotate-90 transition-transform"}/></span>
             </button></h2>
             {isOpen&&<div className="ml-2 mt-1.5 space-y-1.5 rounded-b-xl border-l-2 border-nav-rail pb-1 pl-2">
@@ -101,7 +108,7 @@ function ShellContent({ children }: { children: ReactNode }) {
             className={"flex min-h-10 items-center gap-3 rounded-lg bg-card px-3 py-2 text-sm text-card-foreground shadow-card transition-colors hover:bg-secondary " + (active ? "ring-2 ring-nav-rail font-semibold" : "")}
           >
             <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-muted"><m.icon className={"size-4 " + iconTone(index)} /></span>
-            {m.label}
+            {t(m.label, m.en)}
           </Link>
           );
         })}
@@ -110,7 +117,7 @@ function ShellContent({ children }: { children: ReactNode }) {
           );
         })}
         <Button variant="ghost" onClick={signOut} className="min-h-12 w-full justify-start gap-3 rounded-xl bg-card px-3 font-semibold text-card-foreground shadow-card hover:bg-secondary">
-          <LogOut className="size-5 text-destructive" /> লগ আউট
+          <LogOut className="size-5 text-destructive" /> {t("লগ আউট", "Log out")}
         </Button>
       </div>
     </nav>
@@ -121,26 +128,26 @@ function ShellContent({ children }: { children: ReactNode }) {
       <DropdownMenuTrigger asChild>
         <button type="button" className="flex shrink-0 items-center gap-2 rounded-full p-1 text-left hover:bg-muted" aria-label="প্রোফাইল">
           <span className="nav-teal flex size-10 items-center justify-center rounded-full border-2 border-secondary font-semibold">{initial}</span>
-          <span className="hidden leading-tight sm:block"><span className="block text-sm font-semibold">{userName}</span><span className="flex items-center gap-1 text-xs text-muted-foreground">Admin <ChevronDown className="size-3" /></span></span>
+          <span className="hidden leading-tight sm:block"><span className="block text-sm font-semibold">{userName}</span><span className="flex items-center gap-1 text-xs text-muted-foreground">{roleLabel} <ChevronDown className="size-3" /></span></span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 overflow-hidden p-0">
         <div className="profile-card space-y-3 p-4">
           <div className="flex items-center gap-3">
             <span className="flex size-12 items-center justify-center rounded-full border border-sidebar-foreground/40 bg-sidebar-foreground/15 text-lg font-semibold">{initial}</span>
-            <div><p className="font-semibold">{userName}</p><span className="rounded bg-sidebar-foreground/20 px-2 py-0.5 text-xs">Admin</span></div>
+            <div><p className="font-semibold">{userName}</p><span className="rounded bg-sidebar-foreground/20 px-2 py-0.5 text-xs">{roleLabel}</span></div>
           </div>
           <div className="space-y-1 border-t border-sidebar-foreground/20 pt-3 text-sm">
-            <p className="flex justify-between gap-2"><span>শাখা:</span><span className="text-right font-semibold">{name}</span></p>
-            {user?.phone && <p className="flex justify-between"><span>মোবাইল:</span><span className="font-semibold">{user.phone}</span></p>}
+            <p className="flex justify-between gap-2"><span>{t("শাখা:", "Branch:")}</span><span className="text-right font-semibold">{name}</span></p>
+            {user?.phone && <p className="flex justify-between"><span>{t("মোবাইল:", "Mobile:")}</span><span className="font-semibold">{user.phone}</span></p>}
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-sidebar-foreground/30 px-3 py-0.5 text-xs"><span className="size-2 rounded-full bg-success" />অনলাইন</span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-sidebar-foreground/30 px-3 py-0.5 text-xs"><span className="size-2 rounded-full bg-success" />{t("অনলাইন", "Online")}</span>
         </div>
         <div className="p-1">
-          <DropdownMenuItem asChild className="min-h-11 text-sm"><Link to="/settings"><Settings className="size-4 text-primary" />প্রোফাইল ও পাসওয়ার্ড এডিট</Link></DropdownMenuItem>
-          <DropdownMenuItem asChild className="min-h-11 text-sm"><Link to="/staff"><Users className="size-4 text-primary" />সকল ব্যবহারকারী ও পদবী</Link></DropdownMenuItem>
+          {access.admin && <DropdownMenuItem asChild className="min-h-11 text-sm"><Link to="/settings"><Settings className="size-4 text-primary" />{t("প্রোফাইল ও পাসওয়ার্ড এডিট", "Profile & Password")}</Link></DropdownMenuItem>}
+          {access.admin && <DropdownMenuItem asChild className="min-h-11 text-sm"><Link to="/users"><Users className="size-4 text-primary" />{t("ইউজার ম্যানেজমেন্ট", "User Management")}</Link></DropdownMenuItem>}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={signOut} className="min-h-11 text-sm text-destructive focus:text-destructive"><LogOut className="size-4" />লগ আউট</DropdownMenuItem>
+          <DropdownMenuItem onSelect={signOut} className="min-h-11 text-sm text-destructive focus:text-destructive"><LogOut className="size-4" />{t("লগ আউট", "Log out")}</DropdownMenuItem>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -158,15 +165,16 @@ function ShellContent({ children }: { children: ReactNode }) {
             </SheetContent>
           </Sheet>
           <div className="min-w-0">
-            <p className="text-xs text-muted-foreground">আজকের তারিখ</p>
+            <p className="text-xs text-muted-foreground">{t("আজকের তারিখ", "Today")}</p>
             <p className="text-sm font-semibold">{bnDate(todayISO())}</p>
           </div>
           <div className="flex items-center gap-2">
             {loading && <LoaderCircle aria-label="পৃষ্ঠা লোড হচ্ছে" className="size-5 shrink-0 animate-spin text-primary" />}
             <span className="hidden max-w-xs truncate rounded-full border border-success/40 bg-success/10 px-3 py-1.5 text-sm text-success md:inline">{name}</span>
+            <LangToggle />
             {profile}
           </div>
-          <div className="col-span-full flex min-w-0 items-center gap-3"><span className="shrink-0 text-sm text-muted-foreground">কেন্দ্র</span><CenterSelector /></div>
+          <div className="col-span-full flex min-w-0 items-center gap-3"><span className="shrink-0 text-sm text-muted-foreground">{t("কেন্দ্র", "Center")}</span><CenterSelector /></div>
         </header>
         <main key={`${pathname}-${center}`} className="page-transition min-w-0 p-4 md:p-6">{children}</main>
       </div>
