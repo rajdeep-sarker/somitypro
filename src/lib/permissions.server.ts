@@ -81,3 +81,25 @@ export function cleanValues(values: Row, mode: "insert" | "update"): Row {
   }
   return out;
 }
+
+/** Transactions must post to an existing account of the same member and never overdraw it. */
+export async function validateAccountTxn(table: string, values: Row) {
+  const accountTable = table === "fdr_transactions" ? "fdr_accounts" : table === "dps_transactions" ? "dps_accounts" : null;
+  if (!accountTable) return;
+  const amount = Number(values["amount"]);
+  if (!Number.isFinite(amount) || amount <= 0) throw new Error("টাকার পরিমাণ শূন্যের বেশি হতে হবে");
+  const admin = await db();
+  const account = await admin.getDocument(accountTable, String(values["account_id"] ?? ""));
+  if (!account) throw new Error("হিসাব পাওয়া যায়নি");
+  if (String(account["member_id"]) !== String(values["member_id"])) throw new Error("হিসাবটি এই সদস্যের নয়");
+  const type = String(values["type"] ?? "");
+  if (["withdraw", "withdrawal", "payout", "close", "charge"].includes(type)) {
+    const txns = (await admin.listCollection(table)).filter((t) => t["account_id"] === account["id"]);
+    let bal = accountTable === "fdr_accounts" ? Number(account["amount"]) || 0 : 0;
+    for (const t of txns) {
+      const a = Number(t["amount"]) || 0;
+      bal += ["deposit", "profit"].includes(String(t["type"])) ? a : -a;
+    }
+    if (amount > bal + 0.001) throw new Error("হিসাবের ব্যালেন্সের চেয়ে বেশি উত্তোলন করা যায় না");
+  }
+}

@@ -11,6 +11,6 @@ export function parseMemberRows(rows:unknown[][], existing:string[] = []) {
  });return {members,errors};
 }
 export function csvDownload(name:string,rows:(string|number)[][]){
- const csv="\uFEFF"+rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n');
+ const csv="\uFEFF"+rows.map(r=>r.map(v=>{let t=String(v);if(typeof v==="string"&&/^[=+\-@\t\r]/.test(t))t="'"+t;return '"'+t.replaceAll('"','""')+'"';}).join(',')).join('\r\n');
  const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
 }

@@ -76,6 +76,7 @@ export const insertRow = createServerFn({ method: "POST" })
     const clean = (await perm()).cleanValues(data.values, "insert");
     await (await perm()).requireWrite(context.userId, data.table, clean);
     const admin = await db();
+    await (await perm()).validateAccountTxn(data.table, clean);
     const values: Row = { ...clean };
     const id = String(values["id"] ?? crypto.randomUUID());
     values["id"] = id;

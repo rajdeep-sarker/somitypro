@@ -68,9 +68,13 @@ function safeKey(memberId: string, kind: string, fileName: string): string {
 
 export const getMemberDocUploadUrl = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .validator((input: { memberId: string; kind: "photo" | "id_doc"; fileName: string }) => input)
+  .validator((input: { memberId: string; kind: "photo" | "id_doc"; fileName: string }) => {
+    if (!/^[0-9a-f-]{36}$/i.test(String(input?.memberId)) || !["photo", "id_doc"].includes(input?.kind) || typeof input?.fileName !== "string" || !input.fileName || input.fileName.length > 255) throw new Error("সদস্য ও ফাইল নির্বাচন করুন");
+    return input;
+  })
   .handler(async ({ data, context }) => {
-    if (!data.memberId || !data.fileName) throw new Error("সদস্য ও ফাইল নির্বাচন করুন");
+    // Only people who may enter member data can upload member documents.
+    await (await import("./permissions.server")).requireWrite(context.userId, "members");
     const key = safeKey(data.memberId, data.kind, data.fileName);
     const url = await presign("PUT", key);
     return { url, key, userId: context.userId };
