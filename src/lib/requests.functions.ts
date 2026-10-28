@@ -19,7 +19,7 @@ async function who(userId: string) {
 
 export const submitChangeRequest = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ title: z.string().trim().min(2).max(150), details: z.string().trim().min(5).max(4000) }))
+  .validator(z.object({ title: z.string().trim().min(2).max(150), details: z.string().trim().min(5).max(4000) }))
   .handler(async ({ data, context }) => {
     const { admin, role } = await who(context.userId);
     if (role === "cto") throw new Error("CTO অনুরোধ পাঠান না");
@@ -65,7 +65,7 @@ export const countNewRequests = createServerFn({ method: "GET" })
 
 export const actOnRequest = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ id: z.string().min(1), action: z.enum(["forward", "close", "implemented", "declined"]), note: z.string().trim().max(2000).default("") }))
+  .validator(z.object({ id: z.string().min(1), action: z.enum(["forward", "close", "implemented", "declined"]), note: z.string().trim().max(2000).default("") }))
   .handler(async ({ data, context }) => {
     const { admin, role } = await who(context.userId);
     const row = await admin.getDocument("change_requests", data.id);

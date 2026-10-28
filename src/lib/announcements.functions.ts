@@ -23,7 +23,7 @@ export const getAnnouncement = createServerFn({ method: "GET" })
 
 export const saveAnnouncement = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ title: z.string().trim().min(1).max(150), message: z.string().trim().min(1).max(2000), shows: z.number().int().min(1).max(50) }))
+  .validator(z.object({ title: z.string().trim().min(1).max(150), message: z.string().trim().min(1).max(2000), shows: z.number().int().min(1).max(50) }))
   .handler(async ({ data, context }) => {
     const { admin, cto } = await load(context.userId);
     if (!cto) throw new Error("শুধু CTO");

@@ -68,7 +68,7 @@ function safeKey(memberId: string, kind: string, fileName: string): string {
 
 export const getMemberDocUploadUrl = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator((input: { memberId: string; kind: "photo" | "id_doc"; fileName: string }) => input)
+  .validator((input: { memberId: string; kind: "photo" | "id_doc"; fileName: string }) => input)
   .handler(async ({ data, context }) => {
     if (!data.memberId || !data.fileName) throw new Error("সদস্য ও ফাইল নির্বাচন করুন");
     const key = safeKey(data.memberId, data.kind, data.fileName);
@@ -78,7 +78,7 @@ export const getMemberDocUploadUrl = createServerFn({ method: "POST" })
 
 export const getMemberDocViewUrl = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator((input: { key: string }) => input)
+  .validator((input: { key: string }) => input)
   .handler(async ({ data }) => {
     if (!data.key.startsWith("members/")) throw new Error("অবৈধ ফাইল");
     return { url: await presign("GET", data.key, 300) };

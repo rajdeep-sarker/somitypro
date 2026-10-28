@@ -94,7 +94,7 @@ export const myAccess = createServerFn({ method: "GET" })
 
 export const listRows = createServerFn({ method: "GET" })
   .middleware([requireAppAuth])
-  .inputValidator(tableSchema)
+  .validator(tableSchema)
   .handler(async ({ data, context }) => {
     const admin = await db();
     const me = await rolesOf(context.userId);
@@ -124,7 +124,7 @@ async function allocateMemberNo(admin: Awaited<ReturnType<typeof db>>): Promise<
 
 export const insertRow = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ table: tableSchema.shape.table, values: z.record(z.string(), z.unknown()) }))
+  .validator(z.object({ table: tableSchema.shape.table, values: z.record(z.string(), z.unknown()) }))
   .handler(async ({ data, context }) => {
     await requireWrite(context.userId, data.table, data.values);
     const admin = await db();
@@ -145,7 +145,7 @@ export const insertRow = createServerFn({ method: "POST" })
 
 export const updateRow = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ table: tableSchema.shape.table, id: z.string().min(1), values: z.record(z.string(), z.unknown()) }))
+  .validator(z.object({ table: tableSchema.shape.table, id: z.string().min(1), values: z.record(z.string(), z.unknown()) }))
   .handler(async ({ data, context }) => {
     await requireWrite(context.userId, data.table, data.values);
     const admin = await db();
@@ -156,7 +156,7 @@ export const updateRow = createServerFn({ method: "POST" })
 
 export const deleteRow = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ table: tableSchema.shape.table, id: z.string().min(1) }))
+  .validator(z.object({ table: tableSchema.shape.table, id: z.string().min(1) }))
   .handler(async ({ data, context }) => {
     await requireWrite(context.userId, data.table);
     const admin = await db();
@@ -168,7 +168,7 @@ export const deleteRow = createServerFn({ method: "POST" })
 /** Upsert keyed by natural unique columns (attendance, staff_permissions). */
 export const upsertRow = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ table: tableSchema.shape.table, keys: z.array(z.string()).min(1), values: z.record(z.string(), z.unknown()) }))
+  .validator(z.object({ table: tableSchema.shape.table, keys: z.array(z.string()).min(1), values: z.record(z.string(), z.unknown()) }))
   .handler(async ({ data, context }) => {
     await requireWrite(context.userId, data.table, data.values);
     const admin = await db();
