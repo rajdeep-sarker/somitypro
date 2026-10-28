@@ -32,6 +32,7 @@ import { Route as AuthenticatedSavingsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSharesRouteImport } from './routes/_authenticated/shares'
 import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/staff'
+import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedLoansIndexRouteImport } from './routes/_authenticated/loans.index'
 import { Route as AuthenticatedLoansCollectRouteImport } from './routes/_authenticated/loans.collect'
 import { Route as AuthenticatedLoansDueRouteImport } from './routes/_authenticated/loans.due'
@@ -155,6 +156,11 @@ const AuthenticatedStaffRoute = AuthenticatedStaffRouteImport.update({
   path: '/staff',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLoansIndexRoute = AuthenticatedLoansIndexRouteImport.update({
   id: '/loans/',
   path: '/loans/',
@@ -211,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/shares': typeof AuthenticatedSharesRoute
   '/staff': typeof AuthenticatedStaffRoute
+  '/users': typeof AuthenticatedUsersRoute
   '/loans/collect': typeof AuthenticatedLoansCollectRoute
   '/loans/due': typeof AuthenticatedLoansDueRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
@@ -241,6 +248,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/shares': typeof AuthenticatedSharesRoute
   '/staff': typeof AuthenticatedStaffRoute
+  '/users': typeof AuthenticatedUsersRoute
   '/loans/collect': typeof AuthenticatedLoansCollectRoute
   '/loans/due': typeof AuthenticatedLoansDueRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
@@ -273,6 +281,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/shares': typeof AuthenticatedSharesRoute
   '/_authenticated/staff': typeof AuthenticatedStaffRoute
+  '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/loans/collect': typeof AuthenticatedLoansCollectRoute
   '/_authenticated/loans/due': typeof AuthenticatedLoansDueRoute
   '/_authenticated/members/$id': typeof AuthenticatedMembersIdRoute
@@ -305,6 +314,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shares'
     | '/staff'
+    | '/users'
     | '/loans/collect'
     | '/loans/due'
     | '/members/$id'
@@ -335,6 +345,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shares'
     | '/staff'
+    | '/users'
     | '/loans/collect'
     | '/loans/due'
     | '/members/$id'
@@ -366,6 +377,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/shares'
     | '/_authenticated/staff'
+    | '/_authenticated/users'
     | '/_authenticated/loans/collect'
     | '/_authenticated/loans/due'
     | '/_authenticated/members/$id'
@@ -544,6 +556,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStaffRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/users': {
+      id: '/_authenticated/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AuthenticatedUsersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/loans/': {
       id: '/_authenticated/loans/'
       path: '/loans'
@@ -610,6 +629,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSharesRoute: typeof AuthenticatedSharesRoute
   AuthenticatedStaffRoute: typeof AuthenticatedStaffRoute
+  AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedLoansCollectRoute: typeof AuthenticatedLoansCollectRoute
   AuthenticatedLoansDueRoute: typeof AuthenticatedLoansDueRoute
   AuthenticatedMembersIdRoute: typeof AuthenticatedMembersIdRoute
@@ -638,6 +658,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSharesRoute: AuthenticatedSharesRoute,
   AuthenticatedStaffRoute: AuthenticatedStaffRoute,
+  AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedLoansCollectRoute: AuthenticatedLoansCollectRoute,
   AuthenticatedLoansDueRoute: AuthenticatedLoansDueRoute,
   AuthenticatedMembersIdRoute: AuthenticatedMembersIdRoute,
