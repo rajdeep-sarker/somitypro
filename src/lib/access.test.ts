@@ -11,6 +11,7 @@ describe("user permissions", () => {
     expect(visibleSections(staff).map((s) => s.key)).toEqual(["savings"]);
     expect(canOpen(staff, "/loans")).toBe(false);
     expect(canOpen(staff, "/savings")).toBe(true);
+    expect(visibleSections(staff).flatMap(section => section.items.map(item => item.to))).toEqual(["/savings"]);
   });
   it("admin can open everything", () => {
     expect(canOpen({ admin: true, view: new Set() }, "/users")).toBe(true);

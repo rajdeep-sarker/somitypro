@@ -40,12 +40,12 @@
 - [x] Dashboard quick search, favorites, insight charts
 
 ## Current batch
-- [ ] Consolidate duplicate navigation destinations into work-based groups without changing permissions or losing shortcuts
-- [ ] Add smooth menu/page/logout transitions and verify desktop/mobile with reduced-motion support
-- [ ] Restyle sidebar without blue pills and add a persistent desktop minimize/expand control
-- [ ] Complete English-language page content, labels, dates and shared controls
+- [x] Consolidate duplicate navigation destinations into work-based groups without changing permissions or losing shortcuts
+- [x] Add smooth menu/page/logout transitions and verify desktop/mobile with reduced-motion support
+- [x] Restyle sidebar without blue pills and add a persistent desktop minimize/expand control
+- [x] Complete English-language page content, labels, dates and shared controls
 - [x] Quick Actions "Add" picker on dashboard
-- [x] Bangla/English (menus, dashboard, staff, attendance, users; other pages still Bangla) language switch
+- [x] Bangla/English language switch across page controls and shared formatting
 - [x] Staff page UI cleanup; separate attendance page
 - [x] User Management (admin-only) with per-section permissions; users see only allowed menus
 - [x] Changes needed: staff→admin→CTO workflow, hidden CTO role

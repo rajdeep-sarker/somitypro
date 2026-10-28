@@ -12,7 +12,7 @@ function lastMonths(n: number) {
   const d = new Date();
   return Array.from({ length: n }, (_, i) => {
     const x = new Date(d.getFullYear(), d.getMonth() - (n - 1 - i), 1);
-    return { key: `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}`, label: months[x.getMonth()]! };
+    return { key: `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}`, label: uiText(months[x.getMonth()] ?? "") };
   });
 }
 const byMonth = (rows: Txn[], key: string, pick: (r: Txn) => number) =>
@@ -43,36 +43,36 @@ export function DashboardCharts(p: {
   const ms = lastMonths(6);
   const collection = ms.map((m) => ({
     name: m.label,
-    সঞ্চয়: byMonth(p.sav.filter((t) => t.type !== "withdraw"), m.key, (t) => Number(t.amount)),
-    লোন: byMonth(p.rep, m.key, (t) => Number(t.amount) + Number(t.late_fee ?? 0)),
+    [uiText("সঞ্চয়")]: byMonth(p.sav.filter((t) => t.type !== "withdraw"), m.key, (t) => Number(t.amount)),
+    [uiText("লোন")]: byMonth(p.rep, m.key, (t) => Number(t.amount) + Number(t.late_fee ?? 0)),
     DPS: byMonth(p.dps.filter((t) => t.type === "deposit"), m.key, (t) => Number(t.amount)),
-    ফি: byMonth(p.fees, m.key, (t) => Number(t.amount)),
+    [uiText("ফি")]: byMonth(p.fees, m.key, (t) => Number(t.amount)),
   }));
   const flow = ms.map((m) => ({
     name: m.label,
-    জমা: byMonth(p.sav.filter((t) => t.type !== "withdraw"), m.key, (t) => Number(t.amount)),
-    উত্তোলন: byMonth(p.sav.filter((t) => t.type === "withdraw"), m.key, (t) => Number(t.amount)),
+    [uiText("জমা")]: byMonth(p.sav.filter((t) => t.type !== "withdraw"), m.key, (t) => Number(t.amount)),
+    [uiText("উত্তোলন")]: byMonth(p.sav.filter((t) => t.type === "withdraw"), m.key, (t) => Number(t.amount)),
   }));
   const income = ms.map((m) => ({
     name: m.label,
-    আয়: byMonth(p.cash.filter((t) => t.type === "income"), m.key, (t) => Number(t.amount)),
-    ব্যয়: byMonth(p.cash.filter((t) => t.type === "expense"), m.key, (t) => Number(t.amount)),
+    [uiText("আয়")]: byMonth(p.cash.filter((t) => t.type === "income"), m.key, (t) => Number(t.amount)),
+    [uiText("ব্যয়")]: byMonth(p.cash.filter((t) => t.type === "expense"), m.key, (t) => Number(t.amount)),
   }));
-  let running = p.members.filter((m) => m.admission_date < `${ms[0]!.key}-01`).length;
+  let running = p.members.filter((m) => m.admission_date < `${ms[0]?.key ?? ""}-01`).length;
   const growth = ms.map((m) => {
     running += p.members.filter((x) => x.admission_date?.startsWith(m.key)).length;
-    return { name: m.label, সদস্য: running };
+    return { name: m.label, [uiText("সদস্য")]: running };
   });
   const loanPie = [
-    { name: "নিয়মিত", value: p.loanCounts.active - p.loanCounts.overdue, fill: C[2] },
-    { name: "মেয়াদোত্তীর্ণ", value: p.loanCounts.overdue, fill: C[3] },
-    { name: "পরিশোধিত", value: p.loanCounts.closed, fill: C[0] },
+    { name: uiText("নিয়মিত"), value: p.loanCounts.active - p.loanCounts.overdue, fill: C[2] },
+    { name: uiText("মেয়াদোত্তীর্ণ"), value: p.loanCounts.overdue, fill: C[3] },
+    { name: uiText("পরিশোধিত"), value: p.loanCounts.closed, fill: C[0] },
   ].filter((x) => x.value > 0);
   const mixPie = [
-    { name: "সঞ্চয়", value: p.mix.savings, fill: C[0] },
+    { name: uiText("সঞ্চয়"), value: p.mix.savings, fill: C[0] },
     { name: "DPS", value: p.mix.dps, fill: C[1] },
     { name: "FDR", value: p.mix.fdr, fill: C[4] },
-    { name: "বাকি ঋণ", value: p.mix.loanOut, fill: C[3] },
+    { name: uiText("বাকি ঋণ"), value: p.mix.loanOut, fill: C[3] },
   ].filter((x) => x.value > 0);
   const empty = <p className="flex h-full items-center justify-center text-muted-foreground">{uiText("এখনো তথ্য নেই")}</p>;
 
