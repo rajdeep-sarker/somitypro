@@ -30,7 +30,7 @@ const image = z.string().max(700_000).refine((s) => s === "" || s.startsWith("da
 
 export const saveBranding = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ logo: image, signatures: z.array(z.object({ id: z.string().min(1).max(40), label: z.string().trim().min(1).max(60), image })).max(6) }))
+  .validator(z.object({ logo: image, signatures: z.array(z.object({ id: z.string().min(1).max(40), label: z.string().trim().min(1).max(60), image })).max(6) }))
   .handler(async ({ data, context }) => {
     const admin = await import("./firebase-admin.server");
     const roles = await admin.listCollection("user_roles");

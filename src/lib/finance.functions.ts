@@ -58,7 +58,7 @@ function checkExpected(current: Row, changed: Row, expected: Row) {
 
 export const bulkCollect = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(
+  .validator(
     z.object({
       batch: z.string().uuid(),
       date: z.string().regex(dateRe),
@@ -107,7 +107,7 @@ export const bulkCollect = createServerFn({ method: "POST" })
 
 export const importMembers = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(
+  .validator(
     z.object({
       batch: z.string().uuid(),
       rows: z
@@ -167,7 +167,7 @@ const editSchema = z.object({
 
 export const editSavedEntry = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(editSchema)
+  .validator(editSchema)
   .handler(async ({ data, context }) => {
     const admin = await db();
     const current = await admin.getDocument(data.table, data.id);
@@ -217,7 +217,7 @@ export const editSavedEntry = createServerFn({ method: "POST" })
 
 export const correctLedgerEntry = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(editSchema.omit({ table: true }))
+  .validator(editSchema.omit({ table: true }))
   .handler(async ({ data, context }) => {
     const admin = await db();
     const current = await admin.getDocument("ledger_transactions", data.id);
@@ -252,7 +252,7 @@ export const correctLedgerEntry = createServerFn({ method: "POST" })
 
 export const transferBank = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ from: z.string().uuid(), to: z.string().uuid(), amount, date: z.string().regex(dateRe), note: z.string().max(300).nullish() }))
+  .validator(z.object({ from: z.string().uuid(), to: z.string().uuid(), amount, date: z.string().regex(dateRe), note: z.string().max(300).nullish() }))
   .handler(async ({ data, context }) => {
     if (data.from === data.to) throw new Error("একই হিসাবে স্থানান্তর হয় না");
     const admin = await db();

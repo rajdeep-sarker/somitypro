@@ -77,7 +77,7 @@ export const renewSession = createServerFn({ method: "POST" })
   });
 
 export const loginWithPhone = createServerFn({ method: "POST" })
-  .inputValidator(z.object({ phone: z.string().min(11), password: z.string().min(1) }))
+  .validator(z.object({ phone: z.string().min(11), password: z.string().min(1) }))
   .handler(async ({ data }) => {
     const user = await findAuthUser(phoneToEmail(data.phone));
     if (!user || !(await verifyPassword(data.password, String(user["password_hash"] ?? "")))) {
@@ -91,7 +91,7 @@ export const loginWithPhone = createServerFn({ method: "POST" })
   });
 
 export const signUpAccount = createServerFn({ method: "POST" })
-  .inputValidator(z.object({ phone: z.string().regex(/^01\d{9}$/), password: z.string().min(6).max(128), name: z.string().min(1).max(120) }))
+  .validator(z.object({ phone: z.string().regex(/^01\d{9}$/), password: z.string().min(6).max(128), name: z.string().min(1).max(120) }))
   .handler(async ({ data }) => {
     const email = phoneToEmail(data.phone);
     if (await findAuthUser(email)) throw new Error("এই নম্বরে অ্যাকাউন্ট আছে — লগইন করুন");
@@ -109,7 +109,7 @@ export const signUpAccount = createServerFn({ method: "POST" })
 
 export const changeOwnPassword = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ current: z.string().min(1), next: z.string().min(6).max(128) }))
+  .validator(z.object({ current: z.string().min(1), next: z.string().min(6).max(128) }))
   .handler(async ({ data, context }) => {
     const admin = await db();
     const user = await admin.getDocument("auth_users", context.userId);
@@ -123,7 +123,7 @@ export const changeOwnPassword = createServerFn({ method: "POST" })
 
 export const resetAccountPassword = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ userId: z.string().uuid(), password: z.string().min(8).max(128) }))
+  .validator(z.object({ userId: z.string().uuid(), password: z.string().min(8).max(128) }))
   .handler(async ({ data, context }) => {
     if (!(await isAdmin(context.userId))) throw new Error("শুধু অ্যাডমিন পাসওয়ার্ড রিসেট করতে পারবেন");
     if (data.userId === context.userId) throw new Error("নিজের পাসওয়ার্ড পরিবর্তনের ফর্ম ব্যবহার করুন");
@@ -137,7 +137,7 @@ export const resetAccountPassword = createServerFn({ method: "POST" })
 
 export const createStaffLogin = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ staffId: z.string().uuid(), phone: z.string().regex(/^01\d{9}$/), password: z.string().min(8).max(128) }))
+  .validator(z.object({ staffId: z.string().uuid(), phone: z.string().regex(/^01\d{9}$/), password: z.string().min(8).max(128) }))
   .handler(async ({ data, context }) => {
     if (!(await isAdmin(context.userId))) throw new Error("শুধু প্রশাসক কর্মীর লগইন তৈরি করতে পারবেন");
     const admin = await db();
@@ -160,7 +160,7 @@ export const createStaffLogin = createServerFn({ method: "POST" })
 /** One hidden CTO account that only sees forwarded change requests. Created by the admin once. */
 export const setupCtoAccount = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ phone: z.string().regex(/^01\d{9}$/), password: z.string().min(8).max(128), name: z.string().min(1).max(120) }))
+  .validator(z.object({ phone: z.string().regex(/^01\d{9}$/), password: z.string().min(8).max(128), name: z.string().min(1).max(120) }))
   .handler(async ({ data, context }) => {
     if (!(await isAdmin(context.userId))) throw new Error("শুধু প্রশাসক");
     const admin = await db();
@@ -209,7 +209,7 @@ export const ctoListUsers = createServerFn({ method: "GET" })
 
 export const ctoResetPassword = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ userId: z.string().min(1), password: z.string().min(8).max(128) }))
+  .validator(z.object({ userId: z.string().min(1), password: z.string().min(8).max(128) }))
   .handler(async ({ data, context }) => {
     if (!(await isCto(context.userId))) throw new Error("শুধু CTO");
     const admin = await db();
@@ -222,7 +222,7 @@ export const ctoResetPassword = createServerFn({ method: "POST" })
 /** CTO: change own mobile number and/or password (current password required). */
 export const ctoUpdateOwnLogin = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
-  .inputValidator(z.object({ current: z.string().min(1), phone: z.string().regex(/^01\d{9}$/), next: z.string().max(128).default("") }))
+  .validator(z.object({ current: z.string().min(1), phone: z.string().regex(/^01\d{9}$/), next: z.string().max(128).default("") }))
   .handler(async ({ data, context }) => {
     if (!(await isCto(context.userId))) throw new Error("শুধু CTO");
     const admin = await db();
