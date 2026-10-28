@@ -58,15 +58,15 @@ export function DashboardCharts(p: {
     return { name: m.label, সদস্য: running };
   });
   const loanPie = [
-    { name: "নিয়মিত", value: p.loanCounts.active - p.loanCounts.overdue },
-    { name: "মেয়াদোত্তীর্ণ", value: p.loanCounts.overdue },
-    { name: "পরিশোধিত", value: p.loanCounts.closed },
+    { name: "নিয়মিত", value: p.loanCounts.active - p.loanCounts.overdue, fill: C[2] },
+    { name: "মেয়াদোত্তীর্ণ", value: p.loanCounts.overdue, fill: C[3] },
+    { name: "পরিশোধিত", value: p.loanCounts.closed, fill: C[0] },
   ].filter((x) => x.value > 0);
   const mixPie = [
-    { name: "সঞ্চয়", value: p.mix.savings },
-    { name: "DPS", value: p.mix.dps },
-    { name: "FDR", value: p.mix.fdr },
-    { name: "বাকি ঋণ", value: p.mix.loanOut },
+    { name: "সঞ্চয়", value: p.mix.savings, fill: C[0] },
+    { name: "DPS", value: p.mix.dps, fill: C[1] },
+    { name: "FDR", value: p.mix.fdr, fill: C[4] },
+    { name: "বাকি ঋণ", value: p.mix.loanOut, fill: C[3] },
   ].filter((x) => x.value > 0);
   const empty = <p className="flex h-full items-center justify-center text-muted-foreground">এখনো তথ্য নেই</p>;
 
@@ -78,7 +78,7 @@ export function DashboardCharts(p: {
         </BarChart>
       </ChartCard>
       <ChartCard title="তহবিলের বণ্টন">
-        {mixPie.length ? <PieChart><Pie data={mixPie} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={2}>{mixPie.map((_, i) => <Cell key={i} fill={C[i]} />)}</Pie><Tooltip formatter={tip} /><Legend /></PieChart> : empty}
+        {mixPie.length ? <PieChart><Pie data={mixPie} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={2}>{mixPie.map((x) => <Cell key={x.name} fill={x.fill} />)}</Pie><Tooltip formatter={tip} /><Legend /></PieChart> : empty}
       </ChartCard>
       <ChartCard title="সঞ্চয় জমা বনাম উত্তোলন">
         <AreaChart data={flow}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="name" /><YAxis tickFormatter={axis} width={40} /><Tooltip formatter={tip} /><Legend />
@@ -86,7 +86,7 @@ export function DashboardCharts(p: {
         </AreaChart>
       </ChartCard>
       <ChartCard title="লোনের অবস্থা">
-        {loanPie.length ? <PieChart><Pie data={loanPie} dataKey="value" nameKey="name" outerRadius={90} label={(e) => bn(e.value)}>{loanPie.map((x, i) => <Cell key={x.name} fill={[C[2], C[3], C[0]][i]} />)}</Pie><Tooltip formatter={(v: number) => `${bn(v)} টি`} /><Legend /></PieChart> : empty}
+        {loanPie.length ? <PieChart><Pie data={loanPie} dataKey="value" nameKey="name" outerRadius={90} label={(e) => bn(e.value)}>{loanPie.map((x) => <Cell key={x.name} fill={x.fill} />)}</Pie><Tooltip formatter={(v: number) => `${bn(v)} টি`} /><Legend /></PieChart> : empty}
       </ChartCard>
       <ChartCard title="সদস্য বৃদ্ধি">
         <AreaChart data={growth}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="name" /><YAxis allowDecimals={false} tickFormatter={(v) => bn(v)} width={40} /><Tooltip formatter={(v: number) => `${bn(v)} জন`} />
