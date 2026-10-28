@@ -4,7 +4,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Users, PiggyBank, HandCoins, Wallet, CalendarClock, Landmark, AlertTriangle, Receipt } from "lucide-react";
 import { PageHeader, StatCard } from "@/components/kit";
 import { useRows } from "@/lib/db";
-import { DashboardModules } from "@/components/DashboardModules";
+import { DashboardModules, QuickActions } from "@/components/DashboardModules";
+import { useLang } from "@/lib/i18n";
+import { useAccess } from "@/lib/access";
 import { DashboardCharts } from "@/components/DashboardCharts";
 import { bn, sum, taka, todayISO } from "@/lib/format";
 import { loanStatus } from "@/lib/calc";
@@ -16,6 +18,9 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function Dashboard() {
   const today = todayISO();
+  const { t: tr, lang } = useLang();
+  const access = useAccess();
+  const n = (x: number) => (lang === "en" ? String(x) : bn(x));
   const { data: members = [] } = useCenterRows("members");
   const { data: sav = [] } = useCenterRows("savings_transactions");
   const { data: loans = [] } = useCenterRows("loans");
@@ -43,19 +48,22 @@ function Dashboard() {
 
   return (
     <div>
-      <PageHeader title="ড্যাশবোর্ড" subtitle="সমিতির আজকের সার্বিক অবস্থা" />
+      <PageHeader title={tr("ড্যাশবোর্ড", "Dashboard")} subtitle={tr("সমিতির আজকের সার্বিক অবস্থা", "Today's overview of the somiti")} />
+      <QuickActions />
+      {access.admin && <div className="mt-6">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="মোট সদস্য" value={bn(members.length)} hint={`সক্রিয় ${bn(members.filter((m) => m.status === "active").length)}`} icon={<Users className="size-5" />} />
-        <StatCard label="মোট সঞ্চয়" value={taka(savBal)} tone="success" icon={<PiggyBank className="size-5" />} />
-        <StatCard label="অবশিষ্ট ঋণ" value={taka(loanOut)} hint={`সক্রিয় লোন ${bn(active.length)}`} tone="gold" icon={<HandCoins className="size-5" />} />
-        <StatCard label="আজকের কালেকশন" value={taka(todayColl)} icon={<Receipt className="size-5" />} />
-        <StatCard label="DPS ব্যালেন্স" value={taka(dpsBal)} icon={<CalendarClock className="size-5" />} />
-        <StatCard label="FDR আমানত" value={taka(fdrBal)} tone="success" icon={<Landmark className="size-5" />} />
-        <StatCard label="মেয়াদোত্তীর্ণ লোন" value={bn(overdue)} tone="destructive" icon={<AlertTriangle className="size-5" />} />
-        <StatCard label="মোট ফি আদায়" value={taka(sum(fees, (f) => f.amount))} tone="gold" icon={<Wallet className="size-5" />} />
-      </div>
+        <StatCard label={tr("মোট সদস্য", "Total members")} value={n(members.length)} hint={`${tr("সক্রিয়", "Active")} ${n(members.filter((m) => m.status === "active").length)}`} icon={<Users className="size-5" />} />
+        <StatCard label={tr("মোট সঞ্চয়", "Total savings")} value={taka(savBal)} tone="success" icon={<PiggyBank className="size-5" />} />
+        <StatCard label={tr("অবশিষ্ট ঋণ", "Loan outstanding")} value={taka(loanOut)} hint={`${tr("সক্রিয় লোন", "Active loans")} ${n(active.length)}`} tone="gold" icon={<HandCoins className="size-5" />} />
+        <StatCard label={tr("আজকের কালেকশন", "Today's collection")} value={taka(todayColl)} icon={<Receipt className="size-5" />} />
+        <StatCard label={tr("DPS ব্যালেন্স", "DPS balance")} value={taka(dpsBal)} icon={<CalendarClock className="size-5" />} />
+        <StatCard label={tr("FDR আমানত", "FDR deposits")} value={taka(fdrBal)} tone="success" icon={<Landmark className="size-5" />} />
+        <StatCard label={tr("মেয়াদোত্তীর্ণ লোন", "Overdue loans")} value={n(overdue)} tone="destructive" icon={<AlertTriangle className="size-5" />} />
+        <StatCard label={tr("মোট ফি আদায়", "Total fees")} value={taka(sum(fees, (f) => f.amount))} tone="gold" icon={<Wallet className="size-5" />} />
+      </div></div>}
       <div className="mt-6"><DashboardModules /></div>
-      <h2 className="mb-3 mt-8 text-lg font-semibold">সমিতির অবস্থা — গ্রাফ</h2>
+      {access.admin && <>
+      <h2 className="mb-3 mt-8 text-lg font-semibold">{tr("সমিতির অবস্থা — গ্রাফ", "Somiti status — charts")}</h2>
       <DashboardCharts
         sav={sav} rep={rep} dps={dps} fees={fees}
         cash={cash.map((c) => ({ txn_date: c.txn_date, amount: c.amount, type: c.kind }))}
@@ -63,6 +71,7 @@ function Dashboard() {
         loanCounts={{ active: active.length, overdue, closed: loans.length - active.length }}
         mix={{ savings: savBal, dps: dpsBal, fdr: fdrBal, loanOut }}
       />
+      </>}
     </div>
   );
 }
