@@ -41,8 +41,8 @@ export function BrandingSettings() {
   const { data } = useQuery({ queryKey: ["branding", "all"], queryFn: () => get() });
   const [logo, setLogo] = useState("");
   const [slots, setSlots] = useState<SignatureSlot[]>([]);
-  const [busy, setBusy] = useState(false);
-  useEffect(() => { if (data) { setLogo(data.logo); setSlots(data.signatures); } }, [data]);
+  const [busy, setBusy] = useState(true);
+  useEffect(() => { if (data) { setLogo(data.logo); setSlots(data.signatures); setBusy(false); } }, [data]);
 
   async function persist(nextLogo: string, nextSlots: SignatureSlot[], ok: string) {
     setBusy(true);

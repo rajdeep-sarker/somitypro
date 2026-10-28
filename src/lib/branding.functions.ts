@@ -17,7 +17,7 @@ async function read(): Promise<Branding> {
   const admin = await import("./firebase-admin.server");
   const doc = await admin.getDocument("branding", "main");
   let signatures = DEFAULT_SIGNATURES;
-  try { if (doc?.["signatures"]) signatures = JSON.parse(String(doc["signatures"])) as SignatureSlot[]; } catch { /* keep defaults */ }
+  try { if (doc?.["signatures"]) { const parsed = JSON.parse(String(doc["signatures"])) as SignatureSlot[]; if (parsed.length) signatures = parsed; } } catch { /* keep defaults */ }
   return { logo: String(doc?.["logo"] ?? ""), signatures };
 }
 
