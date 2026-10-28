@@ -150,7 +150,7 @@ export const deleteRow = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])
   .inputValidator(z.object({ table: tableSchema.shape.table, id: z.string().min(1) }))
   .handler(async ({ data, context }) => {
-    if (ADMIN_ONLY_WRITE.has(data.table)) await requireWrite(context.userId, data.table);
+    await requireWrite(context.userId, data.table);
     const admin = await db();
     const fsDb = await admin.fsDb();
     await admin.commitWrites([admin.wDelete(fsDb, data.table, data.id)]);
