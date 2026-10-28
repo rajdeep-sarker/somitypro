@@ -181,20 +181,24 @@ function ShellContent({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <aside className="no-print fixed inset-y-0 left-0 hidden w-64 lg:block">{nav}</aside>
-      <div className="min-w-0 lg:pl-64">
+      <aside className="no-print fixed inset-y-0 left-0 hidden w-72 lg:block">{nav}</aside>
+      <div className="min-w-0 lg:pl-72">
         <header className="no-print sticky top-0 z-30 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card px-4 py-3 lg:grid-cols-[minmax(0,1fr)_auto]">
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild><Button variant="ghost" size="icon" className="shrink-0 lg:hidden" aria-label="মেনু"><Menu className="size-5" /></Button></SheetTrigger>
-            <SheetContent side="left" aria-describedby={undefined} className="no-print w-72 max-w-[85vw] border-sidebar-border bg-sidebar p-0 text-sidebar-foreground data-[state=open]:duration-150 data-[state=closed]:duration-100 motion-reduce:animate-none lg:hidden">
+            <SheetTrigger asChild><Button variant="outline" size="icon" className="shrink-0 lg:hidden" aria-label="মেনু"><Menu className="size-5" /></Button></SheetTrigger>
+            <SheetContent side="left" aria-describedby={undefined} className="no-print w-80 max-w-[88vw] border-sidebar-border bg-sidebar p-0 text-sidebar-foreground data-[state=open]:duration-150 data-[state=closed]:duration-100 motion-reduce:animate-none lg:hidden">
               <SheetTitle className="sr-only">সমিতির মেনু</SheetTitle>{nav}
             </SheetContent>
           </Sheet>
-          <div>
+          <div className="min-w-0">
             <p className="text-xs text-muted-foreground">আজকের তারিখ</p>
             <p className="text-sm font-semibold">{bnDate(todayISO())}</p>
           </div>
-          {loading && <LoaderCircle aria-label="পৃষ্ঠা লোড হচ্ছে" className="size-5 shrink-0 animate-spin text-primary" />}
+          <div className="flex items-center gap-2">
+            {loading && <LoaderCircle aria-label="পৃষ্ঠা লোড হচ্ছে" className="size-5 shrink-0 animate-spin text-primary" />}
+            <span className="hidden max-w-xs truncate rounded-full border border-success/40 bg-success/10 px-3 py-1.5 text-sm text-success md:inline">{name}</span>
+            {profile}
+          </div>
           <div className="col-span-full flex min-w-0 items-center gap-3"><span className="shrink-0 text-sm text-muted-foreground">কেন্দ্র</span><CenterSelector /></div>
         </header>
         <main key={`${pathname}-${center}`} className="page-transition min-w-0 p-4 md:p-6">{children}</main>
