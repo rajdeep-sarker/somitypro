@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireAppAuth } from "./auth-middleware";
 import { calcLoan } from "./calc";
+import { entryFields } from "./edit-fields";
 
 // Financial writes that used to be database procedures/triggers, now enforced
 // here: validation, balance invariants, atomic batches and audit history.
@@ -13,7 +14,6 @@ async function db() {
 }
 
 const perm = () => import("./permissions.server");
-const EDITABLE = new Set(["amount", "units", "txn_date", "note", "reference", "late_fee", "type", "principal", "interest_rate", "service_charge", "installment_count", "installment_type", "first_due_date", "disburse_date", "purpose", "guarantor", "status", "installment_amount", "maturity_date", "start_date", "month", "fee_type", "head_id", "kind", "name", "phone", "address"]);
 
 async function isAdmin(userId: string): Promise<boolean> {
   const admin = await db();
@@ -183,7 +183,8 @@ export const editSavedEntry = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const p = await perm();
     if (!p.TABLES.has(data.table) || ["user_roles", "staff_permissions", "profiles", "ledger_transactions", "ledger_revisions", "entry_edit_history", "activity_log"].includes(data.table)) throw new Error("এই তালিকা এখানে সংশোধন করা যায় না");
-    for (const k of Object.keys(data.values)) if (!EDITABLE.has(k)) throw new Error("এই ঘর সংশোধন করা যায় না");
+    const editable = new Set(entryFields(data.table).map((f) => f.key));
+    for (const k of Object.keys(data.values)) if (!editable.has(k)) throw new Error("এই ঘর সংশোধন করা যায় না");
     data.values = p.cleanValues(data.values, "update");
     const admin = await db();
     const current = await admin.getDocument(data.table, data.id);
