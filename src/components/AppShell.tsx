@@ -13,47 +13,8 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { CenterProvider, CenterSelector, useCenterScope } from "@/components/CenterScope";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-const menuSections = [
-  { label: "সারসংক্ষেপ", items: [
-  { to: "/dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
-  ] },
-  { label: "সদস্য ও কেন্দ্র", items: [
-  { to: "/centers", label: "এরিয়া / কেন্দ্র সেটআপ", icon: MapPin },
-  { to: "/members", label: "সদস্য ব্যবস্থাপনা", icon: Users },
-  { to: "/import", label: "এক্সেল সদস্য আমদানি", icon: Upload },
-  ] },
-  { label: "সঞ্চয় ও ঋণ", items: [
-  { to: "/savings", label: "সঞ্চয় ব্যবস্থাপনা", icon: PiggyBank },
-  { to: "/loans", label: "লোন ব্যবস্থাপনা", icon: HandCoins },
-  { to: "/dps", label: "DPS ব্যবস্থাপনা", icon: CalendarClock },
-  { to: "/fdr", label: "FDR ব্যবস্থাপনা", icon: Landmark },
-  ] },
-  { label: "কালেকশন", items: [
-  { to: "/loans/collect", label: "লোন কিস্তি কালেকশন", icon: Receipt },
-  { to: "/loans/due", label: "আজকের কিস্তি ও বকেয়া", icon: AlertTriangle },
-  { to: "/collection", label: "দৈনিক ও বাল্ক কালেকশন", icon: ClipboardList },
-  { to: "/fees", label: "সমিতি ফি কালেকশন", icon: Wallet },
-  ] },
-  { label: "হিসাব ও বিনিয়োগ", items: [
-  { to: "/cash", label: "জমা খরচ ব্যবস্থাপনা", icon: Calculator },
-  { to: "/shares", label: "শেয়ার ব্যবস্থাপনা", icon: Coins },
-  { to: "/investments", label: "বিনিয়োগ ও প্রকল্প", icon: Briefcase },
-  { to: "/fund", label: "বীমা / নিরাপত্তা তহবিল", icon: Shield },
-  { to: "/banks", label: "ব্যাংক হিসাব", icon: Landmark },
-  ] },
-  { label: "রিপোর্ট ও রসিদ", items: [
-  { to: "/reports", label: "সমিতির রিপোর্ট", icon: FileBarChart },
-  { to: "/receipts", label: "লেনদেন রসিদ", icon: Receipt },
-  ] },
-  { label: "প্রশাসন ও যোগাযোগ", items: [
-  { to: "/staff", label: "কর্মী, হাজিরা ও বেতন", icon: Users },
-  { to: "/notifications", label: "SMS ও ইমেইল বার্তা", icon: MessageSquare },
-  { to: "/rules", label: "নিয়ম ও নীতিমালা", icon: BookOpen },
-  { to: "/settings", label: "সেটিং", icon: Settings },
-  ] },
-] as const;
+import { homeItem, iconTone, menuDestinations, menuSections } from "@/components/menu";
 
-const menu = menuSections.flatMap((section) => [...section.items]);
 
 export function AppShell({ children }: { children: ReactNode }) {
   return <CenterProvider><ShellContent>{children}</ShellContent></CenterProvider>;
@@ -65,6 +26,7 @@ function ShellContent({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const loading = useRouterState({ select: (state) => state.isLoading });
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const [activeLabel,setActiveLabel]=useState<string|null>(null);
   const [expanded,setExpanded]=useState<Record<string,boolean>>({});
   useEffect(()=>{
     const section=menuSections.find(s=>s.items.some(item=>pathname===item.to||pathname.startsWith(item.to+"/")));
@@ -85,7 +47,7 @@ function ShellContent({ children }: { children: ReactNode }) {
     preloadController.current = controller;
     // Let the current screen paint before warming the remaining menus.
     const timer = window.setTimeout(() => {
-      void runPreloadQueue(menu.map((item) => () => router.preloadRoute({ to: item.to })), controller.signal, 1);
+      void runPreloadQueue(menuDestinations.map((to) => () => router.preloadRoute({ to })), controller.signal, 1);
       void runPreloadQueue(preloadTables.map((table) => () => qc.prefetchQuery(rowQueryOptions(table))), controller.signal);
     }, 250);
     return () => {
@@ -116,41 +78,40 @@ function ShellContent({ children }: { children: ReactNode }) {
         </div>
       </div>
       <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain px-3 pb-3">
+        <Link to={homeItem.to} onClick={() => setOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card">
+          <homeItem.icon className="size-5 text-success" />{homeItem.label}
+        </Link>
         {menuSections.map((section) => {
           const isOpen = expanded[section.label] === true;
-          const single = section.items.length === 1 ? section.items[0] : null;
-          const SectionIcon = section.items[0].icon;
-          if (single) return (
-            <Link key={section.label} to={single.to} onClick={() => setOpen(false)}
-              className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card">
-              <span className="nav-teal flex size-8 items-center justify-center rounded-lg"><single.icon className="size-4" /></span>{single.label}
-            </Link>
-          );
           return (
           <section key={section.label} aria-label={section.label}>
             <h2><button type="button" aria-expanded={isOpen} onClick={()=>setExpanded({...expanded,[section.label]:!isOpen})} className="nav-pill flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2 text-left font-semibold">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-foreground/20"><SectionIcon className="size-4" /></span>
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-foreground/20"><section.icon className="size-4" /></span>
               <span className="flex-1">{section.label}</span>
               <span className="flex size-7 items-center justify-center rounded-full bg-sidebar-foreground/20"><ChevronDown className={isOpen?"size-4 transition-transform":"size-4 -rotate-90 transition-transform"}/></span>
             </button></h2>
-            {isOpen&&<div className="mt-1.5 space-y-1 border-l-2 border-sidebar-border pl-3 ml-4">
-        {section.items.map((m) => (
+            {isOpen&&<div className="ml-2 mt-1.5 space-y-1.5 rounded-b-xl border-l-2 border-nav-rail pb-1 pl-2">
+        {section.items.map((m, index) => {
+          const active = activeLabel === m.label && pathname.startsWith(m.to);
+          return (
           <Link
-            key={m.to}
+            key={m.label}
             to={m.to}
-            onClick={() => setOpen(false)}
-            activeOptions={{ exact: m.to === "/loans" }}
-            className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent"
-            activeProps={{ className: "bg-card text-card-foreground font-semibold hover:bg-card" }}
+            onClick={() => { setActiveLabel(m.label); setOpen(false); }}
+            className={"flex min-h-10 items-center gap-3 rounded-lg bg-card px-3 py-2 text-sm text-card-foreground shadow-card transition-colors hover:bg-secondary " + (active ? "ring-2 ring-nav-rail font-semibold" : "")}
           >
-            <m.icon className="size-4 shrink-0" />
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-muted"><m.icon className={"size-4 " + iconTone(index)} /></span>
             {m.label}
           </Link>
-        ))}
+          );
+        })}
             </div>}
           </section>
           );
         })}
+        <Button variant="ghost" onClick={signOut} className="min-h-12 w-full justify-start gap-3 rounded-xl bg-card px-3 font-semibold text-card-foreground shadow-card hover:bg-secondary">
+          <LogOut className="size-5 text-destructive" /> লগ আউট
+        </Button>
       </div>
     </nav>
   );
