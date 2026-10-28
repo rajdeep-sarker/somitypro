@@ -77,7 +77,7 @@ export function BrandingSettings() {
             <div key={s.id} className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-3">
               <div className="flex h-14 w-36 items-center justify-center rounded border border-dashed bg-background">{s.image ? <img src={s.image} alt={s.label} className="max-h-12 max-w-32 object-contain" /> : <span className="text-xs text-muted-foreground">স্বাক্ষর নেই</span>}</div>
               <Input className="w-48" value={s.label} onChange={(e) => setSlots(slots.map((x) => (x.id === s.id ? { ...x, label: e.target.value } : x)))} onBlur={() => void persist(logo, slots, "নাম সংরক্ষিত")} aria-label="স্বাক্ষরের ঘরের নাম" />
-              <Input type="file" accept="image/*" className="w-56" disabled={busy} onChange={(e) => void pickSign(s.id, e.target.files?.[0])} />
+              {s.id === "member" ? <span className="text-sm text-muted-foreground">প্রিন্টের পরে হাতে স্বাক্ষর করা হবে</span> : <Input type="file" accept="image/*" className="w-56" disabled={busy} onChange={(e) => void pickSign(s.id, e.target.files?.[0])} />}
               {s.image && <Button size="sm" variant="outline" disabled={busy} onClick={() => void persist(logo, slots.map((x) => (x.id === s.id ? { ...x, image: "" } : x)), "স্বাক্ষর সরানো হয়েছে")}>ছবি সরান</Button>}
               <Button size="icon" variant="ghost" aria-label="ঘর মুছুন" disabled={busy || slots.length <= 1} onClick={() => void persist(logo, slots.filter((x) => x.id !== s.id), "ঘর মুছে ফেলা হয়েছে")}><Trash2 className="size-4 text-destructive" /></Button>
             </div>
