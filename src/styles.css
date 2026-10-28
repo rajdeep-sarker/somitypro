@@ -105,14 +105,20 @@
   --chart-3: oklch(0.6 0.15 150);
   --chart-4: oklch(0.58 0.21 27);
   --chart-5: oklch(0.55 0.12 230);
-  --sidebar: oklch(0.27 0.05 172);
-  --sidebar-foreground: oklch(0.93 0.02 160);
+  --sidebar: oklch(0.2 0.03 245);
+  --sidebar-foreground: oklch(0.97 0.01 250);
   --sidebar-primary: oklch(0.76 0.13 80);
   --sidebar-primary-foreground: oklch(0.22 0.04 70);
-  --sidebar-accent: oklch(0.34 0.06 172);
-  --sidebar-accent-foreground: oklch(0.98 0.01 160);
-  --sidebar-border: oklch(0.36 0.05 172);
-  --sidebar-ring: oklch(0.76 0.13 80);
+  --sidebar-accent: oklch(0.27 0.04 245);
+  --sidebar-accent-foreground: oklch(0.98 0.01 250);
+  --sidebar-border: oklch(0.3 0.04 245);
+  --sidebar-ring: oklch(0.62 0.18 265);
+  --nav-pill: linear-gradient(180deg, oklch(0.6 0.2 268), oklch(0.5 0.21 268));
+  --nav-pill-foreground: oklch(0.99 0 0);
+  --nav-pill-shadow: 0 3px 0 oklch(0.38 0.17 268), 0 6px 14px -6px oklch(0.4 0.2 268 / 60%);
+  --nav-brand: linear-gradient(180deg, oklch(0.27 0.03 240), oklch(0.17 0.03 240));
+  --nav-teal: linear-gradient(180deg, oklch(0.58 0.11 185), oklch(0.47 0.1 185));
+  --profile-card: linear-gradient(160deg, oklch(0.5 0.1 172), oklch(0.32 0.07 172));
   --gradient-hero: linear-gradient(135deg, oklch(0.27 0.05 172), oklch(0.42 0.1 168) 60%, oklch(0.55 0.1 150));
   --gradient-gold: linear-gradient(135deg, oklch(0.8 0.13 85), oklch(0.7 0.14 70));
   --shadow-card: 0 1px 2px oklch(0.3 0.05 170 / 6%), 0 8px 24px -12px oklch(0.3 0.05 170 / 18%);
@@ -154,6 +160,22 @@
 }
 @utility font-display {
   font-family: var(--font-display);
+}
+@utility nav-pill {
+  background-image: var(--nav-pill);
+  color: var(--nav-pill-foreground);
+  box-shadow: var(--nav-pill-shadow);
+}
+@utility nav-brand {
+  background-image: var(--nav-brand);
+}
+@utility nav-teal {
+  background-image: var(--nav-teal);
+  color: var(--nav-pill-foreground);
+}
+@utility profile-card {
+  background-image: var(--profile-card);
+  color: var(--nav-pill-foreground);
 }
 
 @media print {
