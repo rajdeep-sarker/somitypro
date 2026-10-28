@@ -1,3 +1,4 @@
+import { BrandingSettings } from "@/components/Branding";
 import { pageHead } from "@/lib/metadata";
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -35,6 +36,7 @@ function Settings() {
   return (
     <div className="space-y-6">
       <PageHeader title="সমিতি ও ব্র্যান্ডিং সেটিংস" />
+      <BrandingSettings />
       <FormCard title="সমিতির তথ্য" onSubmit={() => upd.mutate({ id: 1, values: f })}>
         <Field label="সমিতির নাম" className="sm:col-span-2"><Input required value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></Field>
         <Field label="রেজিস্ট্রেশন নং"><Input value={f.reg_no} onChange={(e) => setF({ ...f, reg_no: e.target.value })} /></Field>

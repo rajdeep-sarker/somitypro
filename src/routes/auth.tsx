@@ -1,3 +1,4 @@
+import { SomitiLogo } from "@/components/Branding";
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Landmark } from "lucide-react";
@@ -63,7 +64,7 @@ function AuthPage() {
       <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-card">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-gold text-sidebar-primary-foreground">
-            <Landmark className="size-7" />
+            <SomitiLogo className="size-9" />
           </div>
           <h1 className="font-display text-xl">সোনালী সঞ্চয় ও ঋণদান সমবায় সমিতি লিমিটেড</h1>
           <p className="mt-1 text-sm text-muted-foreground">{mode === "login" ? "আপনার অ্যাকাউন্টে লগইন করুন" : "নতুন অ্যাকাউন্ট তৈরি করুন"}</p>

@@ -1,10 +1,11 @@
+import { SomitiLogo } from "@/components/Branding";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { countNewRequests } from "@/lib/requests.functions";
 import {
-  LayoutDashboard, MapPin, Users, PiggyBank, HandCoins, CalendarClock, Landmark, Receipt, Wallet, FileBarChart, Settings, LogOut, Menu, Calculator, AlertTriangle, Briefcase, Shield, Coins, Upload, ClipboardList, MessageSquare, BookOpen, LoaderCircle, ChevronDown,
+  LayoutDashboard, MapPin, Users, PiggyBank, HandCoins, CalendarClock, Landmark, Receipt, Wallet, FileBarChart, Settings, LogOut, Menu, Calculator, AlertTriangle, Briefcase, Shield, Coins, Upload, ClipboardList, MessageSquare, BookOpen, LoaderCircle, ChevronDown, History,
 } from "lucide-react";
 import { auth } from "@/lib/app-client";
 import { rowQueryOptions, useRows } from "@/lib/db";
@@ -17,6 +18,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 
 import { canOpen, homeItem, iconTone, menuDestinations, visibleSections } from "@/components/menu";
 import { useAccess } from "@/lib/access";
+import { AnnouncementPopup } from "@/components/Announcement";
 import { LangToggle, useLang } from "@/lib/i18n";
 
 
@@ -71,6 +73,7 @@ function ShellContent({ children }: { children: ReactNode }) {
     preloadController.current?.abort();
     await qc.cancelQueries();
     qc.clear();
+    sessionStorage.removeItem("somiti-announcement-checked");
     await auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
@@ -80,7 +83,7 @@ function ShellContent({ children }: { children: ReactNode }) {
       <div className="p-3">
         <div className="nav-brand rounded-2xl border border-sidebar-border px-4 py-5 text-center shadow-card">
           <div className="nav-teal mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl">
-            <Landmark className="size-7" />
+            <SomitiLogo className="size-10" />
           </div>
           <p className="font-display text-base font-semibold leading-snug">{t(name, "Sonali Savings & Credit Co-operative Society Ltd.")}</p>
         </div>
@@ -120,6 +123,7 @@ function ShellContent({ children }: { children: ReactNode }) {
           </section>
           );
         })}
+        {access.cto && <Link to="/activity" onClick={() => setOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card hover:bg-secondary"><History className="size-5 text-primary" />{t("অ্যাক্টিভিটি লগ", "Activity Log")}</Link>}
         {<Link to="/requests" onClick={() => setOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card hover:bg-secondary">
           <MessageSquare className="size-5 text-gold" /><span className="flex-1">{access.cto ? t("অনুরোধসমূহ (CTO)", "Requests (CTO)") : t("পরিবর্তনের অনুরোধ (Changes needed)", "Changes needed")}</span>
           {newRequests > 0 && <span aria-label={t("নতুন অনুরোধ", "New requests")} className="flex min-w-6 items-center justify-center rounded-full bg-destructive px-1.5 text-xs text-destructive-foreground">{newRequests}</span>}
@@ -185,6 +189,7 @@ function ShellContent({ children }: { children: ReactNode }) {
           <div className="col-span-full flex min-w-0 items-center gap-3"><span className="shrink-0 text-sm text-muted-foreground">{t("কেন্দ্র", "Center")}</span><CenterSelector /></div>
         </header>
         <main key={`${pathname}-${center}`} className="page-transition min-w-0 p-4 md:p-6">{children}</main>
+        <AnnouncementPopup />
       </div>
     </div>
   );

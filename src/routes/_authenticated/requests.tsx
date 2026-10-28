@@ -13,6 +13,7 @@ import { useAccess } from "@/lib/access";
 import { useLang } from "@/lib/i18n";
 import { bnDate } from "@/lib/format";
 import { pageHead } from "@/lib/metadata";
+import { CtoTools } from "@/components/CtoTools";
 
 export const Route = createFileRoute("/_authenticated/requests")({ head: () => pageHead("পরিবর্তনের অনুরোধ"), component: Requests });
 
@@ -108,6 +109,7 @@ function Requests() {
         {rest.length === 0 && <p className="text-muted-foreground">{t("কোনো অনুরোধ নেই", "No requests")}</p>}
         {rest.map((r) => card(r, false))}
       </section>
+      {role === "cto" && <CtoTools />}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { SomitiLogo } from "@/components/Branding";
 import { useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { auth } from "@/lib/app-client";
@@ -43,7 +44,7 @@ function Index() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="flex size-10 items-center justify-center rounded-xl bg-gold text-sidebar-primary-foreground">
-                <Landmark className="size-5" />
+                <SomitiLogo className="size-7" />
               </div>
               <span className="font-display text-lg">সোনালী সমিতি</span>
             </div>

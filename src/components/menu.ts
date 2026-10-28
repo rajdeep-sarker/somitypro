@@ -168,11 +168,12 @@ export const menuSections: MenuSection[] = [
     i("সমিতি সেটিংস", "Somiti Settings", "/settings", Settings2),
     i("সমিতির নীতিমালা", "Somiti Rules", "/rules", BookMarked),
     i("ইউজার ম্যানেজমেন্ট", "User Management", "/users", Users),
+    i("অ্যাক্টিভিটি লগ", "Activity Log", "/activity", History),
   ] },
 ];
 
 /** Routes only the administrator may open, whatever permissions a user has. */
-export const ADMIN_ROUTES = new Set<string>(["/users", "/settings", "/import"]);
+export const ADMIN_ROUTES = new Set<string>(["/users", "/settings", "/import", "/activity"]);
 
 /** Which permission modules unlock a route (a route can appear in several sections). */
 export function modulesForRoute(path: string): string[] {
@@ -181,7 +182,7 @@ export function modulesForRoute(path: string): string[] {
 
 export type Access = { admin: boolean; cto?: boolean; view: Set<string> };
 export function canOpen(access: Access, to: string): boolean {
-  if (access.cto) return to === "/requests";
+  if (access.cto) return to === "/requests" || to === "/activity";
   if (access.admin || to === homeItem.to || to === "/requests") return true;
   if (ADMIN_ROUTES.has(to)) return false;
   return modulesForRoute(to).some((k) => access.view.has(k));

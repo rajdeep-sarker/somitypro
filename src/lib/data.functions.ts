@@ -32,6 +32,8 @@ type Row = Record<string, any>;
 
 const tableSchema = z.object({ table: z.string().refine((t) => TABLES.has(t), "অজানা তালিকা") });
 
+const act = () => import("./activity.server");
+
 async function db() {
   return import("./firebase-admin.server");
 }
@@ -137,7 +139,7 @@ export const insertRow = createServerFn({ method: "POST" })
       values["created_by"] = context.userId;
     }
     const fsDb = await admin.fsDb();
-    await admin.commitWrites([admin.wSet(fsDb, data.table, id, values)]);
+    await admin.commitWrites([admin.wSet(fsDb, data.table, id, values), (await act()).logWrite(fsDb, context, "create", data.table, id, Object.keys(values))]);
     return { id };
   });
 
@@ -148,7 +150,7 @@ export const updateRow = createServerFn({ method: "POST" })
     await requireWrite(context.userId, data.table, data.values);
     const admin = await db();
     const fsDb = await admin.fsDb();
-    await admin.commitWrites([admin.wUpdate(fsDb, data.table, data.id, data.values)]);
+    await admin.commitWrites([admin.wUpdate(fsDb, data.table, data.id, data.values), (await act()).logWrite(fsDb, context, "update", data.table, data.id, Object.keys(data.values))]);
     return { ok: true };
   });
 
@@ -159,7 +161,7 @@ export const deleteRow = createServerFn({ method: "POST" })
     await requireWrite(context.userId, data.table);
     const admin = await db();
     const fsDb = await admin.fsDb();
-    await admin.commitWrites([admin.wDelete(fsDb, data.table, data.id)]);
+    await admin.commitWrites([admin.wDelete(fsDb, data.table, data.id), (await act()).logWrite(fsDb, context, "delete", data.table, data.id)]);
     return { ok: true };
   });
 
@@ -174,10 +176,24 @@ export const upsertRow = createServerFn({ method: "POST" })
     const existing = rows.find((r) => data.keys.every((k) => String(r[k] ?? "") === String(data.values[k] ?? "")));
     const fsDb = await admin.fsDb();
     if (existing) {
-      await admin.commitWrites([admin.wUpdate(fsDb, data.table, String(existing["id"]), data.values)]);
+      await admin.commitWrites([admin.wUpdate(fsDb, data.table, String(existing["id"]), data.values), (await act()).logWrite(fsDb, context, "update", data.table, String(existing["id"]), Object.keys(data.values))]);
       return { id: String(existing["id"]) };
     }
     const id = crypto.randomUUID();
-    await admin.commitWrites([admin.wSet(fsDb, data.table, id, { ...data.values, id, created_at: new Date().toISOString() })]);
+    await admin.commitWrites([admin.wSet(fsDb, data.table, id, { ...data.values, id, created_at: new Date().toISOString() }), (await act()).logWrite(fsDb, context, "create", data.table, id, Object.keys(data.values))]);
     return { id };
+  });
+
+/** Activity log for the admin and CTO, newest first. */
+export const listActivity = createServerFn({ method: "GET" })
+  .middleware([requireAppAuth])
+  .handler(async ({ context }) => {
+    const r = await rolesOf(context.userId);
+    if (!r.admin && !r.cto) throw new Error("শুধু অ্যাডমিন");
+    const admin = await db();
+    const rows = await admin.listCollection("activity_log");
+    return rows
+      .map((x) => ({ id: String(x["id"]), at: String(x["at"] ?? ""), user_name: String(x["user_name"] ?? ""), user_id: String(x["user_id"] ?? ""), action: String(x["action"] ?? ""), table: String(x["table"] ?? ""), row_id: String(x["row_id"] ?? ""), fields: String(x["fields"] ?? "") }))
+      .sort((a, b) => b.at.localeCompare(a.at))
+      .slice(0, 3000);
   });
