@@ -28,3 +28,5 @@
 - Login storage selection reads durable Remember Me preferences to survive installed-app restarts; public entry pages route restored sessions to the dashboard.
 - Firebase migration: data mirrored to Firestore (src/lib/firebase.functions.ts, admin-only full copy/compare in Settings, members mirrored on save); app still reads the primary database until cutover.
 - App session tokens last one year and are renewed on each app open via renewSession, so remembered devices stay signed in until explicit logout.
+- Menu sections carry a permission key; visibleSections/canOpen drive menu, dashboard and the route guard, and data.functions maps every table to a section so the server rejects writes outside granted sections. /users, /settings, /import, /requests are admin-only.
+- Language is a client-side bn/en toggle (src/lib/i18n.tsx, `t(bn,en)`); menu items carry their own English label.

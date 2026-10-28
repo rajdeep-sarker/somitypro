@@ -1,47 +1,126 @@
 import { EditEntry } from "@/components/EditEntry";
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { Printer } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Printer, UserPlus, Users, Wallet, CalendarCheck, BadgeCheck, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DataTable, Field, FormCard, PageHeader, SimpleSelect } from "@/components/kit";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DataTable, Field, FormCard, PageHeader, SimpleSelect, StatCard } from "@/components/kit";
 import { useInsert, useRows, useUpdate } from "@/lib/db";
-import { deleteRow, upsertRow } from "@/lib/data.functions";
-import { createStaffLogin } from "@/lib/auth.functions";
-import { bnDate, sum, taka, todayISO } from "@/lib/format";
+import { useAccess } from "@/lib/access";
+import { useLang } from "@/lib/i18n";
+import { bn, bnDate, sum, taka, todayISO } from "@/lib/format";
 import { pageHead } from "@/lib/metadata";
-export const Route = createFileRoute("/_authenticated/staff")({head:()=>pageHead("কর্মী ও বেতন"),component:Staff});
-const modules = [{id:"shares",name:"শেয়ার"},{id:"investments",name:"বিনিয়োগ"},{id:"fund",name:"তহবিল"},{id:"banks",name:"ব্যাংক"},{id:"collection",name:"বাল্ক কালেকশন"},{id:"notifications",name:"বার্তা"}];
-function Staff(){
- const {data:staff=[]}=useRows("staff"),{data:des=[]}=useRows("designations"),{data:att=[]}=useRows("attendance"),{data:pay=[]}=useRows("salary_payments"),{data:permissions=[]}=useRows("staff_permissions"),{data:roles=[]}=useRows("user_roles"),{data:settings=[]}=useRows("somiti_settings",{order:"id"});
- const add=useInsert("staff"),designation=useInsert("designations"),salary=useInsert("salary_payments"),update=useUpdate("staff");const qc=useQueryClient();const login=useServerFn(createStaffLogin);
- const [f,setF]=useState({name:"",phone:"",designation_id:"",salary:"",join_date:todayISO(),address:""}),[d,setD]=useState("");
- const [a,setA]=useState({staff_id:"",attendance_date:todayISO(),status:"present",check_in:"",check_out:"",note:""});
- const [p,setP]=useState({staff_id:"",month:todayISO().slice(0,7),amount:"",txn_date:todayISO(),note:""});
- const [selected,setSelected]=useState(""),[pw,setPw]=useState(""),[phone,setPhone]=useState(""),[busy,setBusy]=useState(false),[card,setCard]=useState("");
- const [attDate,setAttDate]=useState(todayISO()),[month,setMonth]=useState(todayISO().slice(0,7));
- const admin=roles.some(r=>r.role==="admin");const chosen=staff.find(s=>s.id===selected);const person=staff.find(s=>s.id===card);
- const options=staff.filter(s=>s.status==="active").map(s=>({value:s.id,label:s.name}));
- async function attendance(){setBusy(true);try{await upsertRow({data:{table:"attendance",keys:["staff_id","attendance_date"],values:{...a,check_in:a.check_in||null,check_out:a.check_out||null}}});toast.success("হাজিরা সংরক্ষিত");qc.invalidateQueries({queryKey:["t","attendance"]});}catch(e){toast.error(e instanceof Error?e.message:"হাজিরা সংরক্ষণ হয়নি");}finally{setBusy(false);}}
- async function provision(){setBusy(true);try{await login({data:{staffId:selected,phone,password:pw}});setPw("");toast.success("কর্মীর লগইন তৈরি হয়েছে");qc.invalidateQueries({queryKey:["t","staff"]});}catch(e){toast.error(e instanceof Error?e.message:"লগইন তৈরি হয়নি");}finally{setBusy(false);}}
- async function permission(module:string,enabled:boolean,write=false){if(!chosen?.user_id)return;setBusy(true);try{if(enabled)await upsertRow({data:{table:"staff_permissions",keys:["user_id","module"],values:{user_id:chosen.user_id,module,can_write:write}}});else{const existing=permissions.find(p=>p.user_id===chosen.user_id&&p.module===module);if(existing)await deleteRow({data:{table:"staff_permissions",id:existing.id}});}qc.invalidateQueries({queryKey:["t","staff_permissions"]});}catch(e){toast.error(e instanceof Error?e.message:"অনুমতি বদলায়নি");}finally{setBusy(false);}}
- return <div className="space-y-6"><div className={card?"no-print space-y-6":"space-y-6"}><PageHeader title="কর্মী, হাজিরা ও বেতন"/>
- {!admin?<DataTable head={["নাম","মোবাইল","অবস্থা"]} rows={staff.map(s=>[s.name,s.phone,s.status==="active"?"সক্রিয়":"বন্ধ"])}/>:<>
- <div className="grid gap-6 xl:grid-cols-2"><FormCard title="নতুন কর্মী" onSubmit={()=>add.mutate({...f,salary:Number(f.salary),designation_id:f.designation_id||null},{onSuccess:()=>setF({...f,name:"",phone:"",address:""})})}>
- <Field label="নাম"><Input required value={f.name} onChange={e=>setF({...f,name:e.target.value})}/></Field><Field label="মোবাইল"><Input inputMode="tel" value={f.phone} onChange={e=>setF({...f,phone:e.target.value})}/></Field><Field label="পদবি"><SimpleSelect value={f.designation_id} onChange={v=>setF({...f,designation_id:v})} options={des.map(x=>({value:x.id,label:x.name}))}/></Field><Field label="মাসিক বেতন"><Input type="number" min="0" required value={f.salary} onChange={e=>setF({...f,salary:e.target.value})}/></Field><Field label="যোগদানের তারিখ"><Input type="date" required value={f.join_date} onChange={e=>setF({...f,join_date:e.target.value})}/></Field><Field label="ঠিকানা"><Input value={f.address} onChange={e=>setF({...f,address:e.target.value})}/></Field><Button type="submit" disabled={add.isPending}>সংরক্ষণ করুন</Button></FormCard>
- <FormCard title="পদবি" onSubmit={()=>designation.mutate({name:d},{onSuccess:()=>setD("")})}><Field label="পদবির নাম"><Input required value={d} onChange={e=>setD(e.target.value)}/></Field><Button type="submit" disabled={designation.isPending}>যোগ করুন</Button><div className="sm:col-span-2"><DataTable head={["পদবি",""]} rows={des.map(x=>[x.name,<EditEntry key="e" table="designations" row={x}/>])}/></div></FormCard></div>
- <DataTable head={["কর্মী","মোবাইল","পদবি","বেতন","যোগদান","লগইন","অবস্থা",""]} rows={staff.map(s=>[s.name,s.phone,des.find(d=>d.id===s.designation_id)?.name,taka(s.salary),bnDate(s.join_date),s.user_id?"আছে":"নেই",s.status==="active"?"সক্রিয়":"বন্ধ",<div className="flex gap-2"><EditEntry table="staff" row={s}/><Button variant="outline" size="sm" onClick={()=>{setSelected(s.id);setPhone(s.phone??"");}}>লগইন / অনুমতি</Button><Button variant="outline" size="icon" aria-label="আইডি কার্ড" onClick={()=>setCard(s.id)}><Printer className="size-4"/></Button><Button variant="outline" size="sm" onClick={()=>update.mutate({id:s.id,values:{status:s.status==="active"?"inactive":"active"}})}>{s.status==="active"?"বন্ধ":"সক্রিয়"}</Button></div>])}/>
- {chosen&&<section className="space-y-4 border-y border-border py-5"><h2 className="text-lg font-semibold">{chosen.name} — লগইন ও অনুমতি</h2>{!chosen.user_id?<FormCard title="মোবাইল লগইন তৈরি" onSubmit={provision}><Field label="মোবাইল নম্বর"><Input required pattern="01[0-9]{9}" value={phone} onChange={e=>setPhone(e.target.value)}/></Field><Field label="পাসওয়ার্ড"><Input type="password" minLength={8} required value={pw} onChange={e=>setPw(e.target.value)}/></Field><Button type="submit" disabled={busy}>লগইন তৈরি করুন</Button></FormCard>:<DataTable head={["বিভাগ","দেখার অনুমতি","এন্ট্রির অনুমতি"]} rows={modules.map(m=>{const perm=permissions.find(p=>p.user_id===chosen.user_id&&p.module===m.id);return [m.name,<Checkbox aria-label={`${m.name} দেখার অনুমতি`} checked={!!perm} disabled={busy} onCheckedChange={v=>permission(m.id,v===true)}/>,<Checkbox aria-label={`${m.name} এন্ট্রির অনুমতি`} checked={perm?.can_write??false} disabled={busy||!perm} onCheckedChange={v=>permission(m.id,true,v===true)}/>];})}/>}</section>}
- <FormCard title="দৈনিক হাজিরা" onSubmit={attendance}><Field label="কর্মী"><SimpleSelect value={a.staff_id} onChange={v=>setA({...a,staff_id:v})} options={options}/></Field><Field label="তারিখ"><Input required type="date" value={a.attendance_date} onChange={e=>setA({...a,attendance_date:e.target.value})}/></Field><Field label="হাজিরা"><SimpleSelect value={a.status} onChange={v=>setA({...a,status:v})} options={[{value:"present",label:"উপস্থিত"},{value:"absent",label:"অনুপস্থিত"},{value:"leave",label:"ছুটি"},{value:"late",label:"বিলম্ব"}]}/></Field><Field label="প্রবেশ"><Input type="time" value={a.check_in} onChange={e=>setA({...a,check_in:e.target.value})}/></Field><Field label="প্রস্থান"><Input type="time" value={a.check_out} onChange={e=>setA({...a,check_out:e.target.value})}/></Field><Field label="মন্তব্য"><Input value={a.note} onChange={e=>setA({...a,note:e.target.value})}/></Field><Button type="submit" disabled={busy||!a.staff_id}>হাজিরা সংরক্ষণ</Button></FormCard>
- <Field label="হাজিরার তারিখ"><Input className="max-w-xs" type="date" value={attDate} onChange={e=>setAttDate(e.target.value)}/></Field><DataTable head={["কর্মী","হাজিরা","প্রবেশ","প্রস্থান",""]} rows={att.filter(x=>x.attendance_date===attDate).map(x=>[staff.find(s=>s.id===x.staff_id)?.name,({present:"উপস্থিত",absent:"অনুপস্থিত",leave:"ছুটি",late:"বিলম্ব"} as Record<string,string>)[x.status],x.check_in,x.check_out,<EditEntry key="e" table="attendance" row={x}/>])}/>
- <FormCard title="বেতন প্রদান" onSubmit={()=>salary.mutate({...p,amount:Number(p.amount)},{onSuccess:()=>setP({...p,amount:"",note:""})})}><Field label="কর্মী"><SimpleSelect value={p.staff_id} onChange={v=>setP({...p,staff_id:v,amount:String(staff.find(s=>s.id===v)?.salary??"")})} options={options}/></Field><Field label="বেতনের মাস"><Input type="month" required value={p.month} onChange={e=>setP({...p,month:e.target.value})}/></Field><Field label="টাকা"><Input type="number" min="0.01" step="0.01" required value={p.amount} onChange={e=>setP({...p,amount:e.target.value})}/></Field><Field label="প্রদানের তারিখ"><Input type="date" required value={p.txn_date} onChange={e=>setP({...p,txn_date:e.target.value})}/></Field><Button type="submit" disabled={!p.staff_id||salary.isPending}>বেতন সংরক্ষণ</Button></FormCard>
- <div className="no-print flex flex-wrap gap-3"><Field label="বেতনের মাস"><Input type="month" value={month} onChange={e=>setMonth(e.target.value)}/></Field><Button variant="outline" onClick={()=>window.print()}><Printer className="size-4"/>বেতন রিপোর্ট</Button></div><DataTable head={["কর্মী","নির্ধারিত বেতন","প্রদান","বাকি"]} rows={staff.map(s=>{const paid=sum(pay.filter(p=>p.staff_id===s.id&&p.month===month),p=>p.amount);return [s.name,taka(s.salary),taka(paid),taka(Math.max(0,s.salary-paid))];})}/>
- <h2 className="text-lg font-semibold">সংরক্ষিত বেতন প্রদান</h2><DataTable head={["কর্মী","মাস","টাকা","তারিখ",""]} rows={pay.filter(x=>x.month===month).map(x=>[staff.find(s=>s.id===x.staff_id)?.name,x.month,taka(x.amount),bnDate(x.txn_date),<EditEntry key="e" table="salary_payments" row={x}/>])}/>
- </>}</div>
- {person&&<section className="mx-auto max-w-sm border border-border p-6"><div className="no-print mb-4 flex gap-2"><Button onClick={()=>window.print()}>প্রিন্ট</Button><Button variant="outline" onClick={()=>setCard("")}>বন্ধ</Button></div><h2 className="text-center font-display text-xl">{settings[0]?.name}</h2><h3 className="my-5 text-center text-lg">কর্মী পরিচয়পত্র</h3><p className="text-xl font-semibold">{person.name}</p><p>{des.find(d=>d.id===person.designation_id)?.name}</p><p>মোবাইল: {person.phone}</p><p>যোগদান: {bnDate(person.join_date)}</p><p>আইডি: {person.id.slice(0,8).toUpperCase()}</p><p className="mt-10 text-right">অনুমোদনকারীর স্বাক্ষর</p></section>}
- </div>;
+
+export const Route = createFileRoute("/_authenticated/staff")({ head: () => pageHead("কর্মী ও বেতন"), component: Staff });
+
+function Staff() {
+  const { t } = useLang();
+  const access = useAccess();
+  const canWrite = access.admin || access.write.has("staff");
+  const { data: staff = [] } = useRows("staff"), { data: des = [] } = useRows("designations"), { data: att = [] } = useRows("attendance"), { data: pay = [] } = useRows("salary_payments"), { data: settings = [] } = useRows("somiti_settings", { order: "id" });
+  const add = useInsert("staff"), designation = useInsert("designations"), salary = useInsert("salary_payments"), update = useUpdate("staff");
+  const [f, setF] = useState({ name: "", phone: "", designation_id: "", salary: "", join_date: todayISO(), address: "" }), [d, setD] = useState("");
+  const [p, setP] = useState({ staff_id: "", month: todayISO().slice(0, 7), amount: "", txn_date: todayISO(), note: "" });
+  const [card, setCard] = useState(""), [month, setMonth] = useState(todayISO().slice(0, 7)), [attMonth, setAttMonth] = useState(todayISO().slice(0, 7));
+  const person = staff.find((s) => s.id === card);
+  const active = staff.filter((s) => s.status === "active");
+  const options = active.map((s) => ({ value: s.id, label: s.name }));
+  const monthPaid = sum(pay.filter((x) => x.month === month), (x) => x.amount);
+  const monthDue = sum(active, (s) => s.salary);
+  const todayPresent = att.filter((a) => a.attendance_date === todayISO() && (a.status === "present" || a.status === "late")).length;
+  const desName = (id: string | null) => des.find((x) => x.id === id)?.name ?? "—";
+
+  return (
+    <div className="space-y-6">
+      <div className={card ? "no-print space-y-6" : "space-y-6"}>
+        <PageHeader title={t("কর্মী ও বেতন", "Staff & Salary")} subtitle={t("কর্মীর তথ্য, পদবি, বেতন ও হাজিরার রিপোর্ট", "Staff details, designations, salary and attendance report")}
+          actions={<Button asChild className="gap-1.5"><Link to="/attendance"><UserCheck className="size-4" />{t("হাজিরা দিন", "Take attendance")}</Link></Button>} />
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard label={t("সক্রিয় কর্মী", "Active staff")} value={bn(active.length)} icon={<Users className="size-5" />} />
+          <StatCard label={t("আজ উপস্থিত", "Present today")} value={`${bn(todayPresent)} / ${bn(active.length)}`} tone="success" icon={<CalendarCheck className="size-5" />} />
+          <StatCard label={t("এ মাসের বেতন", "Salary this month")} value={taka(monthDue)} tone="gold" icon={<Wallet className="size-5" />} />
+          <StatCard label={t("বেতন বাকি", "Salary due")} value={taka(Math.max(0, monthDue - monthPaid))} tone="destructive" icon={<BadgeCheck className="size-5" />} />
+        </div>
+
+        <Tabs defaultValue="list">
+          <TabsList className="h-auto flex-wrap justify-start gap-1 bg-muted p-1">
+            <TabsTrigger value="list" className="min-h-10">{t("কর্মী তালিকা", "Staff list")}</TabsTrigger>
+            {canWrite && <TabsTrigger value="add" className="min-h-10">{t("নতুন কর্মী ও পদবি", "New staff & designations")}</TabsTrigger>}
+            <TabsTrigger value="salary" className="min-h-10">{t("বেতন", "Salary")}</TabsTrigger>
+            <TabsTrigger value="attendance" className="min-h-10">{t("হাজিরা রিপোর্ট", "Attendance report")}</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="list" className="mt-4">
+            {staff.length === 0 ? <p className="rounded-2xl border bg-card p-10 text-center text-muted-foreground">{t("এখনো কোনো কর্মী নেই", "No staff yet")}</p> :
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {staff.map((s) => (
+                  <article key={s.id} className="rounded-2xl border bg-card p-4 shadow-card">
+                    <div className="flex items-start gap-3">
+                      <span className="nav-teal flex size-12 shrink-0 items-center justify-center rounded-full text-lg font-semibold">{s.name.charAt(0)}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-lg font-semibold">{s.name}</p>
+                        <p className="text-sm text-muted-foreground">{desName(s.designation_id)}</p>
+                      </div>
+                      <span className={"rounded-full px-2.5 py-0.5 text-xs font-semibold " + (s.status === "active" ? "bg-success/15 text-success" : "bg-muted text-muted-foreground")}>{s.status === "active" ? t("সক্রিয়", "Active") : t("বন্ধ", "Inactive")}</span>
+                    </div>
+                    <dl className="mt-3 grid grid-cols-2 gap-y-1 text-sm">
+                      <dt className="text-muted-foreground">{t("মোবাইল", "Mobile")}</dt><dd>{s.phone || "—"}</dd>
+                      <dt className="text-muted-foreground">{t("বেতন", "Salary")}</dt><dd>{taka(s.salary)}</dd>
+                      <dt className="text-muted-foreground">{t("যোগদান", "Joined")}</dt><dd>{bnDate(s.join_date)}</dd>
+                      <dt className="text-muted-foreground">{t("লগইন", "Login")}</dt><dd>{s.user_id ? t("আছে", "Yes") : t("নেই", "No")}</dd>
+                    </dl>
+                    <div className="mt-3 flex flex-wrap gap-2 border-t pt-3">
+                      {canWrite && <EditEntry table="staff" row={s} />}
+                      <Button variant="outline" size="sm" className="gap-1" onClick={() => setCard(s.id)}><Printer className="size-4" />{t("আইডি কার্ড", "ID card")}</Button>
+                      {canWrite && <Button variant="outline" size="sm" onClick={() => update.mutate({ id: s.id, values: { status: s.status === "active" ? "inactive" : "active" } })}>{s.status === "active" ? t("বন্ধ করুন", "Deactivate") : t("সক্রিয় করুন", "Activate")}</Button>}
+                    </div>
+                  </article>
+                ))}
+              </div>}
+          </TabsContent>
+
+          {canWrite && <TabsContent value="add" className="mt-4">
+            <div className="grid gap-6 xl:grid-cols-2">
+              <FormCard title={t("নতুন কর্মী", "New staff")} onSubmit={() => add.mutate({ ...f, salary: Number(f.salary), designation_id: f.designation_id || null }, { onSuccess: () => setF({ ...f, name: "", phone: "", address: "" }) })}>
+                <Field label={t("নাম", "Name")}><Input required value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></Field>
+                <Field label={t("মোবাইল", "Mobile")}><Input inputMode="tel" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></Field>
+                <Field label={t("পদবি", "Designation")}><SimpleSelect value={f.designation_id} onChange={(v) => setF({ ...f, designation_id: v })} options={des.map((x) => ({ value: x.id, label: x.name }))} /></Field>
+                <Field label={t("মাসিক বেতন", "Monthly salary")}><Input type="number" min="0" required value={f.salary} onChange={(e) => setF({ ...f, salary: e.target.value })} /></Field>
+                <Field label={t("যোগদানের তারিখ", "Join date")}><Input type="date" required value={f.join_date} onChange={(e) => setF({ ...f, join_date: e.target.value })} /></Field>
+                <Field label={t("ঠিকানা", "Address")}><Input value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} /></Field>
+                <Button type="submit" disabled={add.isPending} className="gap-1.5"><UserPlus className="size-4" />{t("সংরক্ষণ করুন", "Save")}</Button>
+              </FormCard>
+              <FormCard title={t("পদবি", "Designations")} onSubmit={() => designation.mutate({ name: d }, { onSuccess: () => setD("") })}>
+                <Field label={t("পদবির নাম", "Designation name")}><Input required value={d} onChange={(e) => setD(e.target.value)} /></Field>
+                <Button type="submit" disabled={designation.isPending}>{t("যোগ করুন", "Add")}</Button>
+                <div className="sm:col-span-2"><DataTable head={[t("পদবি", "Designation"), ""]} rows={des.map((x) => [x.name, <EditEntry key="e" table="designations" row={x} />])} /></div>
+              </FormCard>
+            </div>
+          </TabsContent>}
+
+          <TabsContent value="salary" className="mt-4 space-y-5">
+            {canWrite && <FormCard title={t("বেতন প্রদান", "Pay salary")} onSubmit={() => salary.mutate({ ...p, amount: Number(p.amount) }, { onSuccess: () => setP({ ...p, amount: "", note: "" }) })}>
+              <Field label={t("কর্মী", "Staff")}><SimpleSelect value={p.staff_id} onChange={(v) => setP({ ...p, staff_id: v, amount: String(staff.find((s) => s.id === v)?.salary ?? "") })} options={options} /></Field>
+              <Field label={t("বেতনের মাস", "Month")}><Input type="month" required value={p.month} onChange={(e) => setP({ ...p, month: e.target.value })} /></Field>
+              <Field label={t("টাকা", "Amount")}><Input type="number" min="0.01" step="0.01" required value={p.amount} onChange={(e) => setP({ ...p, amount: e.target.value })} /></Field>
+              <Field label={t("প্রদানের তারিখ", "Paid on")}><Input type="date" required value={p.txn_date} onChange={(e) => setP({ ...p, txn_date: e.target.value })} /></Field>
+              <Button type="submit" disabled={!p.staff_id || salary.isPending}>{t("বেতন সংরক্ষণ", "Save salary")}</Button>
+            </FormCard>}
+            <div className="no-print flex flex-wrap items-end gap-3"><Field label={t("বেতনের মাস", "Month")}><Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} /></Field><Button variant="outline" onClick={() => window.print()} className="gap-1.5"><Printer className="size-4" />{t("বেতন রিপোর্ট প্রিন্ট", "Print salary report")}</Button></div>
+            <DataTable head={[t("কর্মী", "Staff"), t("নির্ধারিত বেতন", "Salary"), t("প্রদান", "Paid"), t("বাকি", "Due")]} rows={staff.map((s) => { const paid = sum(pay.filter((x) => x.staff_id === s.id && x.month === month), (x) => x.amount); return [s.name, taka(s.salary), taka(paid), taka(Math.max(0, s.salary - paid))]; })} />
+            <h2 className="text-lg font-semibold">{t("সংরক্ষিত বেতন প্রদান", "Saved salary payments")}</h2>
+            <DataTable head={[t("কর্মী", "Staff"), t("মাস", "Month"), t("টাকা", "Amount"), t("তারিখ", "Date"), ""]} rows={pay.filter((x) => x.month === month).map((x) => [staff.find((s) => s.id === x.staff_id)?.name, x.month, taka(x.amount), bnDate(x.txn_date), canWrite ? <EditEntry key="e" table="salary_payments" row={x} /> : null])} />
+          </TabsContent>
+
+          <TabsContent value="attendance" className="mt-4 space-y-4">
+            <Field label={t("মাস", "Month")}><Input className="max-w-xs" type="month" value={attMonth} onChange={(e) => setAttMonth(e.target.value)} /></Field>
+            <DataTable head={[t("কর্মী", "Staff"), t("উপস্থিত", "Present"), t("বিলম্ব", "Late"), t("অনুপস্থিত", "Absent"), t("ছুটি", "Leave")]}
+              rows={staff.map((s) => { const m = att.filter((a) => a.staff_id === s.id && a.attendance_date.startsWith(attMonth)); const c = (x: string) => bn(m.filter((a) => a.status === x).length); return [s.name, c("present"), c("late"), c("absent"), c("leave")]; })} />
+          </TabsContent>
+        </Tabs>
+      </div>
+      {person && <section className="mx-auto max-w-sm rounded-2xl border border-border p-6"><div className="no-print mb-4 flex gap-2"><Button onClick={() => window.print()}>{t("প্রিন্ট", "Print")}</Button><Button variant="outline" onClick={() => setCard("")}>{t("বন্ধ", "Close")}</Button></div><h2 className="text-center font-display text-xl">{settings[0]?.name}</h2><h3 className="my-5 text-center text-lg">{t("কর্মী পরিচয়পত্র", "Staff ID Card")}</h3><p className="text-xl font-semibold">{person.name}</p><p>{desName(person.designation_id)}</p><p>{t("মোবাইল", "Mobile")}: {person.phone}</p><p>{t("যোগদান", "Joined")}: {bnDate(person.join_date)}</p><p>ID: {person.id.slice(0, 8).toUpperCase()}</p><p className="mt-10 text-right">{t("অনুমোদনকারীর স্বাক্ষর", "Authorized signature")}</p></section>}
+    </div>
+  );
 }
