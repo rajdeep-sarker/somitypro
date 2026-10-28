@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_authenticated")({
     if (!user) throw redirect({ to: "/auth" });
     // Users only reach pages the administrator allowed; the server re-checks every write.
     const access = toAccess(await context.queryClient.ensureQueryData(accessQueryOptions));
-    if (!canOpen(access, location.pathname)) throw redirect({ to: "/dashboard" });
+    if (!canOpen(access, location.pathname)) throw redirect({ to: access.cto ? "/requests" : "/dashboard" });
     return { user };
   },
   component: () => (

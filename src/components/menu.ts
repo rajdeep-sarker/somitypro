@@ -179,14 +179,16 @@ export function modulesForRoute(path: string): string[] {
   return menuSections.filter((s) => s.items.some((m) => path === m.to || path.startsWith(m.to + "/"))).map((s) => s.key);
 }
 
-export type Access = { admin: boolean; view: Set<string> };
+export type Access = { admin: boolean; cto?: boolean; view: Set<string> };
 export function canOpen(access: Access, to: string): boolean {
+  if (access.cto) return to === "/requests";
   if (access.admin || to === homeItem.to || to === "/requests") return true;
   if (ADMIN_ROUTES.has(to)) return false;
   return modulesForRoute(to).some((k) => access.view.has(k));
 }
 /** Menu trimmed to what this user may open; empty sections disappear. */
 export function visibleSections(access: Access): MenuSection[] {
+  if (access.cto) return [];
   return menuSections
     .map((s) => ({ ...s, items: access.admin ? s.items : access.view.has(s.key) ? s.items.filter((m) => !ADMIN_ROUTES.has(m.to)) : [] }))
     .filter((s) => s.items.length > 0);

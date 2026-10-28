@@ -36,7 +36,7 @@ function ShellContent({ children }: { children: ReactNode }) {
   const { t } = useLang();
   const menuSections = visibleSections(access);
   const countRequests = useServerFn(countNewRequests);
-  const { data: newRequests = 0 } = useQuery({ queryKey: ["change-requests", "new"], queryFn: () => countRequests(), enabled: access.admin, refetchInterval: 60_000 });
+  const { data: newRequests = 0 } = useQuery({ queryKey: ["change-requests", "new"], queryFn: () => countRequests(), enabled: access.admin || access.cto === true, refetchInterval: 60_000 });
   useEffect(()=>{
     const section=menuSections.find(s=>s.items.some(item=>pathname===item.to||pathname.startsWith(item.to+"/")));
     if(section)setExpanded(previous=>({...previous,[section.label]:true}));
@@ -49,7 +49,7 @@ function ShellContent({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<{ full_name?: string; phone?: string; email: string } | null>(null);
   useEffect(() => { void auth.getUser().then(({ data }) => setUser(data.user)); }, []);
   const userName = user?.full_name || (access.admin ? t("অ্যাডমিন", "Admin") : t("ব্যবহারকারী", "User"));
-  const roleLabel = access.admin ? "Admin" : "Staff";
+  const roleLabel = access.cto ? "CTO" : access.admin ? "Admin" : "Staff";
   const initial = userName.trim().charAt(0) || "অ";
 
   useEffect(() => {
@@ -89,9 +89,9 @@ function ShellContent({ children }: { children: ReactNode }) {
         </div>
       </div>
       <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain px-3 pb-3">
-        <Link to={homeItem.to} onClick={() => setOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card">
+        {!access.cto && <Link to={homeItem.to} onClick={() => setOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card">
           <homeItem.icon className="size-5 text-success" />{t(homeItem.label, homeItem.en)}
-        </Link>
+        </Link>}
         {menuSections.map((section) => {
           const isOpen = expanded[section.label] === true;
           return (
@@ -121,7 +121,7 @@ function ShellContent({ children }: { children: ReactNode }) {
           );
         })}
         {<Link to="/requests" onClick={() => setOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl bg-card px-3 py-2 font-semibold text-card-foreground shadow-card hover:bg-secondary">
-          <MessageSquare className="size-5 text-gold" /><span className="flex-1">{t("পরিবর্তনের অনুরোধ (Changes needed)", "Changes needed")}</span>
+          <MessageSquare className="size-5 text-gold" /><span className="flex-1">{access.cto ? t("অনুরোধসমূহ (CTO)", "Requests (CTO)") : t("পরিবর্তনের অনুরোধ (Changes needed)", "Changes needed")}</span>
           {newRequests > 0 && <span aria-label={t("নতুন অনুরোধ", "New requests")} className="flex min-w-6 items-center justify-center rounded-full bg-destructive px-1.5 text-xs text-destructive-foreground">{newRequests}</span>}
         </Link>}
         <Button variant="ghost" onClick={signOut} className="min-h-12 w-full justify-start gap-3 rounded-xl bg-card px-3 font-semibold text-card-foreground shadow-card hover:bg-secondary">

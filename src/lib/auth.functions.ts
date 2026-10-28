@@ -152,3 +152,25 @@ export const createStaffLogin = createServerFn({ method: "POST" })
     ]);
     return { userId };
   });
+
+/** One hidden CTO account that only sees forwarded change requests. Created by the admin once. */
+export const setupCtoAccount = createServerFn({ method: "POST" })
+  .middleware([requireAppAuth])
+  .inputValidator(z.object({ phone: z.string().regex(/^01\d{9}$/), password: z.string().min(8).max(128), name: z.string().min(1).max(120) }))
+  .handler(async ({ data, context }) => {
+    if (!(await isAdmin(context.userId))) throw new Error("শুধু প্রশাসক");
+    const admin = await db();
+    const roles = await admin.listCollection("user_roles");
+    if (roles.some((r) => r["role"] === "cto")) throw new Error("CTO অ্যাকাউন্ট আগে থেকেই আছে");
+    const email = phoneToEmail(data.phone);
+    if (await findAuthUser(email)) throw new Error("এই নম্বরে অ্যাকাউন্ট আছে");
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    const fsDb = await admin.fsDb();
+    await admin.commitWrites([
+      admin.wSet(fsDb, "auth_users", id, { id, email, password_hash: await hashPassword(data.password), full_name: data.name, phone: data.phone, created_at: now }),
+      admin.wSet(fsDb, "profiles", id, { id, full_name: data.name, phone: data.phone, created_at: now }),
+      admin.wSet(fsDb, "user_roles", crypto.randomUUID(), { user_id: id, role: "cto" }),
+    ]);
+    return { ok: true };
+  });
