@@ -16,3 +16,13 @@ describe("user permissions", () => {
     expect(canOpen({ admin: true, view: new Set() }, "/users")).toBe(true);
   });
 });
+
+describe("CTO role", () => {
+  const cto = { admin: false, cto: true, view: new Set<string>() };
+  it("CTO only opens the requests page", () => {
+    expect(canOpen(cto, "/requests")).toBe(true);
+    expect(canOpen(cto, "/dashboard")).toBe(false);
+    expect(canOpen(cto, "/users")).toBe(false);
+    expect(visibleSections(cto)).toEqual([]);
+  });
+});
