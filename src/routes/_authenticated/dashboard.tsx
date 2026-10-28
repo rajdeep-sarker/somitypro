@@ -1,10 +1,11 @@
 import { useCenterRows } from "@/components/CenterScope";
 import { pageHead } from "@/lib/metadata";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Users, PiggyBank, HandCoins, Wallet, CalendarClock, Landmark, AlertTriangle, Receipt } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { PageHeader, StatCard } from "@/components/kit";
 import { useRows } from "@/lib/db";
+import { DashboardModules } from "@/components/DashboardModules";
+import { DashboardCharts } from "@/components/DashboardCharts";
 import { bn, sum, taka, todayISO } from "@/lib/format";
 import { loanStatus } from "@/lib/calc";
 
@@ -22,6 +23,7 @@ function Dashboard() {
   const { data: dps = [] } = useCenterRows("dps_transactions");
   const { data: fdr = [] } = useCenterRows("fdr_accounts");
   const { data: fees = [] } = useCenterRows("member_fees");
+  const { data: cash = [] } = useRows("cash_entries");
 
   const savBal = sum(sav, (t) => (t.type === "withdraw" ? -t.amount : t.amount));
   const active = loans.filter((l) => l.status === "active");
@@ -38,16 +40,6 @@ function Dashboard() {
     sum(dps.filter((t) => t.txn_date === today && t.type === "deposit"), (t) => t.amount) +
     sum(fees.filter((t) => t.txn_date === today), (t) => t.amount);
 
-  const quick = [
-    { to: "/members", label: "সদস্য তৈরি করুন", icon: Users },
-    { to: "/savings", label: "সঞ্চয় কালেকশন", icon: PiggyBank },
-    { to: "/loans", label: "লোন প্রদান", icon: HandCoins },
-    { to: "/loans/collect", label: "লোন কিস্তি আদায়", icon: Receipt },
-    { to: "/dps", label: "DPS কালেকশন", icon: CalendarClock },
-    { to: "/fdr", label: "FDR জমা", icon: Landmark },
-    { to: "/fees", label: "সমিতি ফি", icon: Wallet },
-    { to: "/loans/due", label: "বকেয়া তালিকা", icon: AlertTriangle },
-  ] as const;
 
   return (
     <div>
@@ -62,19 +54,15 @@ function Dashboard() {
         <StatCard label="মেয়াদোত্তীর্ণ লোন" value={bn(overdue)} tone="destructive" icon={<AlertTriangle className="size-5" />} />
         <StatCard label="মোট ফি আদায়" value={taka(sum(fees, (f) => f.amount))} tone="gold" icon={<Wallet className="size-5" />} />
       </div>
-      <h2 className="mb-3 mt-8 text-lg font-semibold">দ্রুত কার্যক্রম</h2>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {quick.map((q) => (
-          <Link key={q.label} to={q.to}>
-            <Card className="flex flex-col items-center gap-2 p-5 text-center shadow-card transition-transform hover:-translate-y-0.5">
-              <div className="flex size-11 items-center justify-center rounded-full bg-secondary text-primary">
-                <q.icon className="size-5" />
-              </div>
-              <span className="text-sm font-medium">{q.label}</span>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      <div className="mt-6"><DashboardModules /></div>
+      <h2 className="mb-3 mt-8 text-lg font-semibold">সমিতির অবস্থা — গ্রাফ</h2>
+      <DashboardCharts
+        sav={sav} rep={rep} dps={dps} fees={fees}
+        cash={cash.map((c) => ({ txn_date: c.txn_date, amount: c.amount, type: c.kind }))}
+        members={members}
+        loanCounts={{ active: active.length, overdue, closed: loans.length - active.length }}
+        mix={{ savings: savBal, dps: dpsBal, fdr: fdrBal, loanOut }}
+      />
     </div>
   );
 }

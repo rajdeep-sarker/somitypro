@@ -17,7 +17,7 @@ const byMonth = (rows: Txn[], key: string, pick: (r: Txn) => number) =>
   rows.filter((r) => r.txn_date?.startsWith(key)).reduce((a, r) => a + pick(r), 0);
 
 const tip = (v: number) => taka(v);
-const axis = (v: number) => bn(v >= 1000 ? `${Math.round(v / 1000)}k` : v);
+const axis = (v: number) => (v >= 1000 ? `${bn(Math.round(v / 1000))}k` : bn(v));
 
 function ChartCard({ title, children }: { title: string; children: React.ReactElement }) {
   return (
