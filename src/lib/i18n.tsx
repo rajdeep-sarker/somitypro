@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { translateUi } from "./ui-translation";
+import { Button } from "@/components/ui/button";
 
 export type Lang = "bn" | "en";
 const KEY = "somiti-lang";
@@ -8,7 +10,7 @@ export function LangProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("bn");
   useEffect(() => { if (localStorage.getItem(KEY) === "en") setLangState("en"); }, []);
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
-  const setLang = (l: Lang) => { setLangState(l); localStorage.setItem(KEY, l); };
+  const setLang = (l: Lang) => { document.documentElement.lang = l; setLangState(l); localStorage.setItem(KEY, l); };
   return <Ctx.Provider value={{ lang, setLang }}>{children}</Ctx.Provider>;
 }
 
@@ -16,7 +18,8 @@ export function LangProvider({ children }: { children: ReactNode }) {
 export function useLang() {
   const { lang, setLang } = useContext(Ctx);
   const t = (bn: string, en: string) => (lang === "en" ? en : bn);
-  return { lang, setLang, t };
+  const ui = (text: string) => translateUi(text, lang);
+  return { lang, setLang, t, ui };
 }
 
 export function LangToggle() {
@@ -24,10 +27,10 @@ export function LangToggle() {
   return (
     <div role="group" aria-label="Language" className="flex shrink-0 rounded-full border border-border bg-muted p-0.5 text-sm">
       {(["bn", "en"] as const).map((l) => (
-        <button key={l} type="button" aria-pressed={lang === l} onClick={() => setLang(l)}
-          className={"rounded-full px-3 py-1 font-semibold transition-colors " + (lang === l ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}>
+        <Button variant="ghost" key={l} type="button" aria-pressed={lang === l} onClick={() => setLang(l)}
+          className={"h-auto rounded-full px-3 py-1 font-semibold transition-colors " + (lang === l ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground" : "text-muted-foreground hover:text-foreground")}>
           {l === "bn" ? "বাংলা" : "English"}
-        </button>
+        </Button>
       ))}
     </div>
   );

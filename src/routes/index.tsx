@@ -1,3 +1,5 @@
+import { useLang } from "@/lib/i18n";
+import { uiText } from "@/lib/ui-translation";
 import { SomitiLogo } from "@/components/Branding";
 import { useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -29,6 +31,8 @@ const features = [
 ];
 
 function Index() {
+  useLang();
+
   const navigate = useNavigate();
   useEffect(() => {
     let active = true;
@@ -38,7 +42,7 @@ function Index() {
     return () => { active = false; };
   }, [navigate]);
   return (
-    <div className="min-h-screen bg-background">
+    <div className="page-transition min-h-screen bg-background">
       <section className="bg-hero text-primary-foreground">
         <div className="mx-auto max-w-6xl px-5 py-6">
           <div className="flex items-center justify-between">
@@ -46,27 +50,29 @@ function Index() {
               <div className="flex size-10 items-center justify-center rounded-xl bg-gold text-sidebar-primary-foreground">
                 <SomitiLogo className="size-7" />
               </div>
-              <span className="font-display text-lg">সোনালী সমিতি</span>
+              <span className="font-display text-lg">{uiText("সোনালী সমিতি")}</span>
             </div>
             <Button asChild variant="secondary">
-              <Link to="/auth">লগইন</Link>
+              <Link to="/auth">{uiText("লগইন")}</Link>
             </Button>
           </div>
           <div className="py-16 md:py-24">
-            <p className="text-sm uppercase tracking-widest text-sidebar-primary">সমবায় সমিতির জন্য</p>
+            <p className="text-sm uppercase tracking-widest text-sidebar-primary">{uiText("সমবায় সমিতির জন্য")}</p>
             <h1 className="mt-3 max-w-3xl font-display text-4xl leading-tight md:text-6xl">
-              সোনালী সঞ্চয় ও ঋণদান সমবায় সমিতি লিমিটেড
+              
+              {uiText("সোনালী সঞ্চয় ও ঋণদান সমবায় সমিতি লিমিটেড")}
             </h1>
             <p className="mt-5 max-w-xl text-lg opacity-90">
-              সঞ্চয়, ঋণ, DPS, FDR, হিসাব ও সদস্য ব্যবস্থাপনা — এক জায়গায়, নির্ভুল ও নিরাপদ।
+              
+              {uiText("সঞ্চয়, ঋণ, DPS, FDR, হিসাব ও সদস্য ব্যবস্থাপনা — এক জায়গায়, নির্ভুল ও নিরাপদ।")}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="bg-gold text-sidebar-primary-foreground hover:opacity-90">
-                <Link to="/auth">সফটওয়্যারে প্রবেশ করুন</Link>
+                <Link to="/auth">{uiText("সফটওয়্যারে প্রবেশ করুন")}</Link>
               </Button>
             </div>
             <div className="mt-8 flex items-center gap-2 text-sm opacity-80">
-              <ShieldCheck className="size-4" /> ক্লাউড ভিত্তিক নিরাপদ সেবা
+              <ShieldCheck className="size-4" />  {uiText("ক্লাউড ভিত্তিক নিরাপদ সেবা")}
             </div>
           </div>
         </div>

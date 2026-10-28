@@ -1,3 +1,5 @@
+import { useLang } from "@/lib/i18n";
+import { uiText } from "@/lib/ui-translation";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Megaphone, X } from "lucide-react";
@@ -9,6 +11,8 @@ const PENDING = "somiti-announcement-pending";
 
 /** CTO banner popup; checked once per app visit and closable only with the × button. */
 export function AnnouncementPopup() {
+  useLang();
+
   const take = useServerFn(takeAnnouncement);
   const [a, setA] = useState<{ title: string; message: string } | null>(null);
   useEffect(() => {
@@ -30,7 +34,7 @@ export function AnnouncementPopup() {
             <DialogTitle className="text-lg">{a.title}</DialogTitle>
             <DialogDescription className="mt-2 whitespace-pre-wrap text-base text-foreground">{a.message}</DialogDescription>
           </div>
-          <button type="button" aria-label="বন্ধ করুন" onClick={() => { sessionStorage.removeItem(PENDING); setA(null); }} className="flex size-9 shrink-0 items-center justify-center rounded-full bg-card shadow-card hover:bg-muted">
+          <button type="button" aria-label={uiText("বন্ধ করুন")} onClick={() => { sessionStorage.removeItem(PENDING); setA(null); }} className="flex size-9 shrink-0 items-center justify-center rounded-full bg-card shadow-card hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>

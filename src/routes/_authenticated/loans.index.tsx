@@ -1,3 +1,5 @@
+import { useLang } from "@/lib/i18n";
+import { uiText } from "@/lib/ui-translation";
 import { useCenterRows } from "@/components/CenterScope";
 import { EditEntry } from "@/components/EditEntry";
 import { pageHead } from "@/lib/metadata";
@@ -20,13 +22,15 @@ export const Route = createFileRoute("/_authenticated/loans/")({
 const typeOpts = (Object.keys(installmentLabels) as InstallmentType[]).map((k) => ({ value: k, label: installmentLabels[k] }));
 
 function Loans() {
+  useLang();
+
   const { data: allLoans = [] } = useRows("loans");
   const { data: loans = [] } = useCenterRows("loans");
   const { data: rep = [] } = useCenterRows("loan_repayments");
   const mm = useMemberMap();
-  const ins = useInsert("loans", "লোন প্রদান সম্পন্ন হয়েছে");
+  const ins = useInsert("loans", uiText("লোন প্রদান সম্পন্ন হয়েছে"));
   const upd = useUpdate("loans");
-  const feeIns = useInsert("member_fees", "সার্ভিস চার্জ জমা হয়েছে");
+  const feeIns = useInsert("member_fees", uiText("সার্ভিস চার্জ জমা হয়েছে"));
   const today = todayISO();
   const [f, setF] = useState({ member_id: "", principal: "", interest_rate: "10", service_charge: "0", installment_type: "weekly", installment_count: "45", disburse_date: today, purpose: "", guarantor: "" });
   const c = calcLoan(Number(f.principal) || 0, Number(f.interest_rate) || 0, Number(f.installment_count) || 1);
@@ -59,35 +63,35 @@ function Loans() {
 
   return (
     <div>
-      <PageHeader title="লোন ব্যবস্থাপনা" subtitle={`সক্রিয় লোন ${bn(loans.filter((l) => l.status === "active").length)} টি`} />
+      <PageHeader title={uiText("লোন ব্যবস্থাপনা")} subtitle={`সক্রিয় লোন ${bn(loans.filter((l) => l.status === "active").length)} টি`} />
       <Tabs defaultValue="list">
         <TabsList className="mb-4 flex-wrap">
-          <TabsTrigger value="list">সকল লোনের তথ্য</TabsTrigger>
-          <TabsTrigger value="new">লোন প্রদান</TabsTrigger>
+          <TabsTrigger value="list">{uiText("সকল লোনের তথ্য")}</TabsTrigger>
+          <TabsTrigger value="new">{uiText("লোন প্রদান")}</TabsTrigger>
         </TabsList>
         <TabsContent value="new">
-          <FormCard title="নতুন লোন প্রদান" onSubmit={save}>
-            <Field label="সদস্য"><MemberSelect value={f.member_id} onChange={(v) => setF({ ...f, member_id: v })} /></Field>
-            <Field label="লোনের পরিমাণ"><Input type="number" min={1} required value={f.principal} onChange={(e) => setF({ ...f, principal: e.target.value })} /></Field>
-            <Field label="সুদ / লাভের হার (%)"><Input type="number" step="0.01" value={f.interest_rate} onChange={(e) => setF({ ...f, interest_rate: e.target.value })} /></Field>
-            <Field label="সার্ভিস চার্জ (টাকা)"><Input type="number" value={f.service_charge} onChange={(e) => setF({ ...f, service_charge: e.target.value })} /></Field>
-            <Field label="কিস্তির ধরন"><SimpleSelect value={f.installment_type} onChange={(v) => setF({ ...f, installment_type: v })} options={typeOpts} /></Field>
-            <Field label="কিস্তির সংখ্যা"><Input type="number" min={1} value={f.installment_count} onChange={(e) => setF({ ...f, installment_count: e.target.value })} /></Field>
-            <Field label="প্রদানের তারিখ"><Input type="date" value={f.disburse_date} onChange={(e) => setF({ ...f, disburse_date: e.target.value })} /></Field>
-            <Field label="জামিনদার"><Input value={f.guarantor} onChange={(e) => setF({ ...f, guarantor: e.target.value })} /></Field>
-            <Field label="লোনের উদ্দেশ্য" className="sm:col-span-2"><Input value={f.purpose} onChange={(e) => setF({ ...f, purpose: e.target.value })} /></Field>
+          <FormCard title={uiText("নতুন লোন প্রদান")} onSubmit={save}>
+            <Field label={uiText("সদস্য")}><MemberSelect value={f.member_id} onChange={(v) => setF({ ...f, member_id: v })} /></Field>
+            <Field label={uiText("লোনের পরিমাণ")}><Input type="number" min={1} required value={f.principal} onChange={(e) => setF({ ...f, principal: e.target.value })} /></Field>
+            <Field label={uiText("সুদ / লাভের হার (%)")}><Input type="number" step="0.01" value={f.interest_rate} onChange={(e) => setF({ ...f, interest_rate: e.target.value })} /></Field>
+            <Field label={uiText("সার্ভিস চার্জ (টাকা)")}><Input type="number" value={f.service_charge} onChange={(e) => setF({ ...f, service_charge: e.target.value })} /></Field>
+            <Field label={uiText("কিস্তির ধরন")}><SimpleSelect value={f.installment_type} onChange={(v) => setF({ ...f, installment_type: v })} options={typeOpts} /></Field>
+            <Field label={uiText("কিস্তির সংখ্যা")}><Input type="number" min={1} value={f.installment_count} onChange={(e) => setF({ ...f, installment_count: e.target.value })} /></Field>
+            <Field label={uiText("প্রদানের তারিখ")}><Input type="date" value={f.disburse_date} onChange={(e) => setF({ ...f, disburse_date: e.target.value })} /></Field>
+            <Field label={uiText("জামিনদার")}><Input value={f.guarantor} onChange={(e) => setF({ ...f, guarantor: e.target.value })} /></Field>
+            <Field label={uiText("লোনের উদ্দেশ্য")} className="sm:col-span-2"><Input value={f.purpose} onChange={(e) => setF({ ...f, purpose: e.target.value })} /></Field>
             <div className="grid grid-cols-3 gap-2 rounded-lg bg-secondary p-4 text-sm sm:col-span-2">
-              <div>লাভ<br /><b>{taka(c.interest)}</b></div>
-              <div>মোট পরিশোধ<br /><b>{taka(c.total)}</b></div>
-              <div>প্রতি কিস্তি<br /><b>{taka(c.installment)}</b></div>
+              <div>{uiText("লাভ")}<br /><b>{taka(c.interest)}</b></div>
+              <div>{uiText("মোট পরিশোধ")}<br /><b>{taka(c.total)}</b></div>
+              <div>{uiText("প্রতি কিস্তি")}<br /><b>{taka(c.installment)}</b></div>
             </div>
-            <div className="sm:col-span-2"><Button type="submit" disabled={ins.isPending || !f.member_id}>লোন প্রদান করুন</Button></div>
+            <div className="sm:col-span-2"><Button type="submit" disabled={ins.isPending || !f.member_id}>{uiText("লোন প্রদান করুন")}</Button></div>
           </FormCard>
         </TabsContent>
         <TabsContent value="list" className="space-y-4">
           <DateFilter range={range} onChange={setRange} />
           <DataTable
-            head={["লোন নং", "সদস্য", "লোন", "মোট পরিশোধযোগ্য", "আদায়", "অবশিষ্ট", "কিস্তি", "বকেয়া", "অবস্থা", ""]}
+            head={[uiText("লোন নং"), uiText("সদস্য"), uiText("লোন"), uiText("মোট পরিশোধযোগ্য"), uiText("আদায়"), uiText("অবশিষ্ট"), uiText("কিস্তি"), uiText("বকেয়া"), uiText("অবস্থা"), ""]}
             rows={filteredLoans.map((l) => {
               const p = paid(l.id);
               const s = loanStatus(l, p, today);
@@ -95,23 +99,23 @@ function Loans() {
                 l.loan_no, `${mm.get(l.member_id)?.name ?? ""} (${mm.get(l.member_id)?.member_no ?? ""})`, taka(l.principal), taka(l.total_payable), taka(p), taka(s.remaining),
                 `${taka(l.installment_amount)} × ${bn(l.installment_count)} (${installmentLabels[l.installment_type as InstallmentType]})`,
                 s.overdueAmount > 0 && l.status === "active" ? <span key="o" className="text-destructive">{taka(s.overdueAmount)}</span> : "—",
-                <Badge key="s" variant={l.status === "active" ? "default" : "secondary"}>{l.status === "active" ? "চলমান" : "বন্ধ"}</Badge>,
+                <Badge key="s" variant={l.status === "active" ? "default" : "secondary"}>{l.status === "active" ? uiText("চলমান") : uiText("বন্ধ")}</Badge>,
                 <div key="a" className="flex gap-1"><EditEntry table="loans" row={l} />
-                  <Button size="sm" variant="outline" onClick={() => setSched(l.id)}>কিস্তির তারিখ</Button>
-                  {l.status === "active" && <Button size="sm" variant="ghost" onClick={() => confirm("লোন বন্ধ করবেন?") && upd.mutate({ id: l.id, values: { status: "closed" } })}>বন্ধ করুন</Button>}
+                  <Button size="sm" variant="outline" onClick={() => setSched(l.id)}>{uiText("কিস্তির তারিখ")}</Button>
+                  {l.status === "active" && <Button size="sm" variant="ghost" onClick={() => confirm(uiText("লোন বন্ধ করবেন?")) && upd.mutate({ id: l.id, values: { status: "closed" } })}>{uiText("বন্ধ করুন")}</Button>}
                 </div>,
               ];
             })}
           />
           {schedLoan && (
             <div>
-              <h3 className="mb-2 font-semibold">কিস্তির তারিখ — {schedLoan.loan_no}</h3>
+              <h3 className="mb-2 font-semibold">{uiText("কিস্তির তারিখ —")} {schedLoan.loan_no}</h3>
               <DataTable
-                head={["কিস্তি নং", "তারিখ", "টাকা", "অবস্থা"]}
+                head={[uiText("কিস্তি নং"), uiText("তারিখ"), uiText("টাকা"), uiText("অবস্থা")]}
                 rows={Array.from({ length: schedLoan.installment_count }, (_, i) => {
                   const date = addPeriods(schedLoan.first_due_date, schedLoan.installment_type as InstallmentType, i);
                   const covered = paid(schedLoan.id) >= (i + 1) * schedLoan.installment_amount - 0.01;
-                  return [bn(i + 1), bnDate(date), taka(schedLoan.installment_amount), covered ? "পরিশোধিত" : date < today ? <span key="x" className="text-destructive">বকেয়া</span> : "বাকি"];
+                  return [bn(i + 1), bnDate(date), taka(schedLoan.installment_amount), covered ? uiText("পরিশোধিত") : date < today ? <span key="x" className="text-destructive">{uiText("বকেয়া")}</span> : uiText("বাকি")];
                 })}
               />
             </div>

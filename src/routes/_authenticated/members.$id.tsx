@@ -1,3 +1,5 @@
+import { useLang } from "@/lib/i18n";
+import { uiText } from "@/lib/ui-translation";
 import { SignatureRow } from "@/components/Branding";
 import { useCenterRows } from "@/components/CenterScope";
 import { MemberForm } from "@/components/MemberForm";
@@ -19,6 +21,8 @@ export const Route = createFileRoute("/_authenticated/members/$id")({
 const typeLabel: Record<string, string> = { deposit: "জমা", withdraw: "উত্তোলন", profit: "লভ্যাংশ", profit_withdraw: "লভ্যাংশ উত্তোলন", service_charge: "সার্ভিস চার্জ" };
 
 function MemberDetail() {
+  useLang();
+
   const { id } = Route.useParams();
   const { data: members = [] } = useCenterRows("members");
   const { data: sav = [] } = useCenterRows("savings_transactions");
@@ -29,7 +33,7 @@ function MemberDetail() {
   const upd = useUpdate("members");
   const [range, setRange] = useDateRange();
   const m = members.find((x) => x.id === id);
-  if (!m) return <p className="text-muted-foreground">লোড হচ্ছে...</p>;
+  if (!m) return <p className="text-muted-foreground">{uiText("লোড হচ্ছে...")}</p>;
 
   const s = sav.filter((t) => t.member_id === id);
   const savBal = sum(s, (t) => (t.type === "withdraw" ? -t.amount : t.amount));
@@ -41,15 +45,15 @@ function MemberDetail() {
 
   const ledger = [
     ...s.map((t) => ({ date: t.txn_date, desc: `সঞ্চয় ${typeLabel[t.type]}`, amt: t.amount, at: t.created_at })),
-    ...myRep.map((t) => ({ date: t.txn_date, desc: "লোন কিস্তি", amt: Number(t.amount) + Number(t.late_fee), at: t.created_at })),
+    ...myRep.map((t) => ({ date: t.txn_date, desc: uiText("লোন কিস্তি"), amt: Number(t.amount) + Number(t.late_fee), at: t.created_at })),
     ...d.map((t) => ({ date: t.txn_date, desc: `DPS ${typeLabel[t.type]}`, amt: t.amount, at: t.created_at })),
-    ...fees.filter((f) => f.member_id === id).map((t) => ({ date: t.txn_date, desc: "সমিতি ফি", amt: t.amount, at: t.created_at })),
+    ...fees.filter((f) => f.member_id === id).map((t) => ({ date: t.txn_date, desc: uiText("সমিতি ফি"), amt: t.amount, at: t.created_at })),
     ...myLoans.map((l) => ({ date: l.disburse_date, desc: `লোন প্রদান (${l.loan_no})`, amt: l.principal, at: l.created_at })),
   ].sort((a, b) => (b.date + b.at).localeCompare(a.date + a.at));
 
   const info: [string, string | null][] = [
-    ["পিতা", m.father_name], ["মাতা", m.mother_name], ["স্বামী/স্ত্রী", m.spouse_name], ["মোবাইল", m.phone], ["NID", m.nid],
-    ["জন্ম তারিখ", m.dob ? bnDate(m.dob) : null], ["পেশা", m.occupation], ["ঠিকানা", m.address], ["নমিনি", m.nominee_name ? `${m.nominee_name} (${m.nominee_relation ?? ""})` : null], ["ভর্তি", bnDate(m.admission_date)],
+    [uiText("পিতা"), m.father_name], [uiText("মাতা"), m.mother_name], [uiText("স্বামী/স্ত্রী"), m.spouse_name], [uiText("মোবাইল"), m.phone], ["NID", m.nid],
+    [uiText("জন্ম তারিখ"), m.dob ? bnDate(m.dob) : null], [uiText("পেশা"), m.occupation], [uiText("ঠিকানা"), m.address], [uiText("নমিনি"), m.nominee_name ? `${m.nominee_name} (${m.nominee_relation ?? ""})` : null], [uiText("ভর্তি"), bnDate(m.admission_date)],
   ];
 
   return (
@@ -58,16 +62,16 @@ function MemberDetail() {
         title={m.name}
         subtitle={`সদস্য নং ${m.member_no}`}
         actions={<><MemberForm member={m} />
-          <Button asChild variant="outline"><Link to="/members"><ArrowLeft className="size-4" /> তালিকা</Link></Button>
-          <Button variant="outline" onClick={() => upd.mutate({ id, values: { status: m.status === "active" ? "inactive" : "active" } })}>{m.status === "active" ? "নিষ্ক্রিয় করুন" : "সক্রিয় করুন"}</Button>
-          <Button onClick={() => window.print()}><Printer className="size-4" /> প্রিন্ট</Button>
+          <Button asChild variant="outline"><Link to="/members"><ArrowLeft className="size-4" />  {uiText("তালিকা")}</Link></Button>
+          <Button variant="outline" onClick={() => upd.mutate({ id, values: { status: m.status === "active" ? "inactive" : "active" } })}>{m.status === "active" ? uiText("নিষ্ক্রিয় করুন") : uiText("সক্রিয় করুন")}</Button>
+          <Button onClick={() => window.print()}><Printer className="size-4" />  {uiText("প্রিন্ট")}</Button>
         </>}
       />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard label="সঞ্চয় ব্যালেন্স" value={taka(savBal)} tone="success" />
-        <StatCard label="অবশিষ্ট ঋণ" value={taka(loanDue)} tone="gold" />
-        <StatCard label="DPS ব্যালেন্স" value={taka(dpsBal)} />
-        <StatCard label="মোট লোন" value={myLoans.length} />
+        <StatCard label={uiText("সঞ্চয় ব্যালেন্স")} value={taka(savBal)} tone="success" />
+        <StatCard label={uiText("অবশিষ্ট ঋণ")} value={taka(loanDue)} tone="gold" />
+        <StatCard label={uiText("DPS ব্যালেন্স")} value={taka(dpsBal)} />
+        <StatCard label={uiText("মোট লোন")} value={myLoans.length} />
       </div>
       <Card className="grid gap-x-6 gap-y-2 p-5 shadow-card sm:grid-cols-2">
         {info.map(([k, v]) => (
@@ -75,9 +79,9 @@ function MemberDetail() {
         ))}
       </Card>
       <MemberDocs memberId={id} photoPath={m.photo_path} idDocPath={m.id_doc_path} />
-      <h2 className="text-lg font-semibold">লেনদেন খতিয়ান</h2>
+      <h2 className="text-lg font-semibold">{uiText("লেনদেন খতিয়ান")}</h2>
       <DateFilter range={range} onChange={setRange} />
-      <DataTable head={["তারিখ", "বিবরণ", "টাকা"]} rows={ledger.filter((l) => inRange(l.date, range)).map((l) => [bnDate(l.date), l.desc, taka(l.amt)])} />
+      <DataTable head={[uiText("তারিখ"), uiText("বিবরণ"), uiText("টাকা")]} rows={ledger.filter((l) => inRange(l.date, range)).map((l) => [bnDate(l.date), l.desc, taka(l.amt)])} />
       <div className="print-only"><SignatureRow /></div>
     </div>
   );

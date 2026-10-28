@@ -1,3 +1,5 @@
+import { useLang } from "@/lib/i18n";
+import { uiText } from "@/lib/ui-translation";
 import { useCenterRows } from "@/components/CenterScope";
 import { pageHead } from "@/lib/metadata";
 import { useState } from "react";
@@ -16,6 +18,8 @@ export const Route = createFileRoute("/_authenticated/reports")({
 });
 
 function Reports() {
+  useLang();
+
   const today = todayISO();
   const [from, setFrom] = useState(today);
   const [to, setTo] = useState(today);
@@ -41,27 +45,27 @@ function Reports() {
     const fdrOpen = fdrA.filter((a) => pick([{ txn_date: a.start_date }]).length);
     const loanOut = loans.filter((l) => pick([{ txn_date: l.disburse_date }]).length);
     const income: [string, number][] = [
-      ["প্রারম্ভিক ক্যাশ", sum(pick(cash).filter((x) => x.kind === "opening"), (x) => x.amount)],
-      ["সঞ্চয় জমা", sum(pick(sav).filter((x) => x.type === "deposit"), (x) => x.amount)],
-      ["লোন কিস্তি আদায়", sum(pick(rep), (x) => x.amount)],
-      ["বিলম্ব চার্জ", sum(pick(rep), (x) => x.late_fee)],
-      ["DPS জমা", sum(pick(dps).filter((x) => x.type === "deposit"), (x) => x.amount)],
-      ["FDR জমা", sum(fdrOpen, (a) => a.amount)],
-      ["সমিতি ফি / চার্জ", sum(pick(fees), (x) => x.amount)],
-      ["শেয়ার ক্রয় / তহবিল জমা / বিনিয়োগ ফেরত", sum(pick(ledgerTx).filter(t => ["purchase","deposit","return","profit"].includes(t.type) && accountMap.get(t.account_id)?.module !== "banks"), t => t.amount)],
-      ["ব্যাংক থেকে নগদ উত্তোলন", sum(pick(ledgerTx).filter(t => t.type === "withdraw" && accountMap.get(t.account_id)?.module === "banks"), t => t.amount)],
-      ["অন্যান্য আয়", sum(pick(cash).filter((x) => x.kind === "income"), (x) => x.amount)],
+      [uiText("প্রারম্ভিক ক্যাশ"), sum(pick(cash).filter((x) => x.kind === "opening"), (x) => x.amount)],
+      [uiText("সঞ্চয় জমা"), sum(pick(sav).filter((x) => x.type === "deposit"), (x) => x.amount)],
+      [uiText("লোন কিস্তি আদায়"), sum(pick(rep), (x) => x.amount)],
+      [uiText("বিলম্ব চার্জ"), sum(pick(rep), (x) => x.late_fee)],
+      [uiText("DPS জমা"), sum(pick(dps).filter((x) => x.type === "deposit"), (x) => x.amount)],
+      [uiText("FDR জমা"), sum(fdrOpen, (a) => a.amount)],
+      [uiText("সমিতি ফি / চার্জ"), sum(pick(fees), (x) => x.amount)],
+      [uiText("শেয়ার ক্রয় / তহবিল জমা / বিনিয়োগ ফেরত"), sum(pick(ledgerTx).filter(t => ["purchase","deposit","return","profit"].includes(t.type) && accountMap.get(t.account_id)?.module !== "banks"), t => t.amount)],
+      [uiText("ব্যাংক থেকে নগদ উত্তোলন"), sum(pick(ledgerTx).filter(t => t.type === "withdraw" && accountMap.get(t.account_id)?.module === "banks"), t => t.amount)],
+      [uiText("অন্যান্য আয়"), sum(pick(cash).filter((x) => x.kind === "income"), (x) => x.amount)],
     ];
     const expense: [string, number][] = [
-      ["লোন প্রদান", sum(loanOut, (l) => l.principal)],
-      ["সঞ্চয় উত্তোলন", sum(pick(sav).filter((x) => x.type === "withdraw"), (x) => x.amount)],
-      ["DPS উত্তোলন", sum(pick(dps).filter((x) => x.type === "withdraw" || x.type === "profit_withdraw"), (x) => x.amount)],
-      ["FDR উত্তোলন", sum(pick(fdrT).filter((x) => x.type === "withdraw"), (x) => x.amount)],
-      ["FDR মুনাফা প্রদান", sum(pick(fdrT).filter((x) => x.type === "profit"), (x) => x.amount)],
-      ["শেয়ার ফেরত / লভ্যাংশ / বিনিয়োগ / তহবিল খরচ", sum(pick(ledgerTx).filter(t => ["withdraw","dividend","invest","expense"].includes(t.type) && accountMap.get(t.account_id)?.module !== "banks"), t => t.amount)],
-      ["ব্যাংকে নগদ জমা", sum(pick(ledgerTx).filter(t => t.type === "deposit" && accountMap.get(t.account_id)?.module === "banks"), t => t.amount)],
-      ["কর্মীর বেতন", sum(pick(salaries), t => t.amount)],
-      ["সমিতির খরচ", sum(pick(cash).filter((x) => x.kind === "expense"), (x) => x.amount)],
+      [uiText("লোন প্রদান"), sum(loanOut, (l) => l.principal)],
+      [uiText("সঞ্চয় উত্তোলন"), sum(pick(sav).filter((x) => x.type === "withdraw"), (x) => x.amount)],
+      [uiText("DPS উত্তোলন"), sum(pick(dps).filter((x) => x.type === "withdraw" || x.type === "profit_withdraw"), (x) => x.amount)],
+      [uiText("FDR উত্তোলন"), sum(pick(fdrT).filter((x) => x.type === "withdraw"), (x) => x.amount)],
+      [uiText("FDR মুনাফা প্রদান"), sum(pick(fdrT).filter((x) => x.type === "profit"), (x) => x.amount)],
+      [uiText("শেয়ার ফেরত / লভ্যাংশ / বিনিয়োগ / তহবিল খরচ"), sum(pick(ledgerTx).filter(t => ["withdraw","dividend","invest","expense"].includes(t.type) && accountMap.get(t.account_id)?.module !== "banks"), t => t.amount)],
+      [uiText("ব্যাংকে নগদ জমা"), sum(pick(ledgerTx).filter(t => t.type === "deposit" && accountMap.get(t.account_id)?.module === "banks"), t => t.amount)],
+      [uiText("কর্মীর বেতন"), sum(pick(salaries), t => t.amount)],
+      [uiText("সমিতির খরচ"), sum(pick(cash).filter((x) => x.kind === "expense"), (x) => x.amount)],
     ];
     return { income, expense, inT: sum(income, (x) => x[1]), exT: sum(expense, (x) => x[1]) };
   }
@@ -76,18 +80,18 @@ function Reports() {
 
   const mName = new Map(members.map((m) => [m.id, `${m.member_no} ${m.name}`]));
   const coll = [
-    ...inR(sav).filter((x) => x.type === "deposit").map((x) => ({ d: x.txn_date, m: x.member_id, k: "সঞ্চয়", a: x.amount })),
-    ...inR(rep).map((x) => ({ d: x.txn_date, m: x.member_id, k: "লোন কিস্তি", a: Number(x.amount) + Number(x.late_fee) })),
+    ...inR(sav).filter((x) => x.type === "deposit").map((x) => ({ d: x.txn_date, m: x.member_id, k: uiText("সঞ্চয়"), a: x.amount })),
+    ...inR(rep).map((x) => ({ d: x.txn_date, m: x.member_id, k: uiText("লোন কিস্তি"), a: Number(x.amount) + Number(x.late_fee) })),
     ...inR(dps).filter((x) => x.type === "deposit").map((x) => ({ d: x.txn_date, m: x.member_id, k: "DPS", a: x.amount })),
-    ...inR(fees).map((x) => ({ d: x.txn_date, m: x.member_id, k: "ফি", a: x.amount })),
+    ...inR(fees).map((x) => ({ d: x.txn_date, m: x.member_id, k: uiText("ফি"), a: x.amount })),
   ].sort((a, b) => a.d.localeCompare(b.d));
 
   const Ledger = ({ l }: { l: ReturnType<typeof ledger> }) => (
     <div className="grid gap-4 md:grid-cols-2">
-      <DataTable head={["আয় / জমা", "টাকা"]} rows={l.income.map(([k, v]) => [k, taka(v)])} foot={["মোট", taka(l.inT)]} />
-      <DataTable head={["ব্যয় / প্রদান", "টাকা"]} rows={l.expense.map(([k, v]) => [k, taka(v)])} foot={["মোট", taka(l.exT)]} />
+      <DataTable head={[uiText("আয় / জমা"), uiText("টাকা")]} rows={l.income.map(([k, v]) => [k, taka(v)])} foot={[uiText("মোট"), taka(l.inT)]} />
+      <DataTable head={[uiText("ব্যয় / প্রদান"), uiText("টাকা")]} rows={l.expense.map(([k, v]) => [k, taka(v)])} foot={[uiText("মোট"), taka(l.exT)]} />
       <div className="rounded-xl bg-hero p-5 text-primary-foreground md:col-span-2">
-        <p className="text-sm opacity-80">হাতে নগদ (জমা − প্রদান)</p>
+        <p className="text-sm opacity-80">{uiText("হাতে নগদ (জমা − প্রদান)")}</p>
         <p className="text-3xl font-semibold">{taka(l.inT - l.exT)}</p>
       </div>
     </div>
@@ -95,49 +99,49 @@ function Reports() {
 
   return (
     <div>
-      <PageHeader title="সমিতির রিপোর্ট" subtitle={name} actions={<Button variant="outline" onClick={() => window.print()}><Printer className="size-4" /> প্রিন্ট</Button>} />
+      <PageHeader title={uiText("সমিতির রিপোর্ট")} subtitle={name} actions={<Button variant="outline" onClick={() => window.print()}><Printer className="size-4" />  {uiText("প্রিন্ট")}</Button>} />
       <div className="no-print mb-4 flex flex-wrap gap-3">
-        <Field label="শুরুর তারিখ"><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
-        <Field label="শেষ তারিখ"><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
+        <Field label={uiText("শুরুর তারিখ")}><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
+        <Field label={uiText("শেষ তারিখ")}><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
       </div>
       <Tabs defaultValue="daily">
         <TabsList className="no-print mb-4 flex-wrap">
-          <TabsTrigger value="daily">দৈনিক কালেকশন</TabsTrigger>
-          <TabsTrigger value="settle">তারিখভিত্তিক সেটেলমেন্ট</TabsTrigger>
-          <TabsTrigger value="cash">হাতে নগদ রিপোর্ট</TabsTrigger>
-          <TabsTrigger value="balance">সকল সদস্যের ব্যালেন্স</TabsTrigger>
-          <TabsTrigger value="summary">সমিতি সার সংক্ষেপ</TabsTrigger>
+          <TabsTrigger value="daily">{uiText("দৈনিক কালেকশন")}</TabsTrigger>
+          <TabsTrigger value="settle">{uiText("তারিখভিত্তিক সেটেলমেন্ট")}</TabsTrigger>
+          <TabsTrigger value="cash">{uiText("হাতে নগদ রিপোর্ট")}</TabsTrigger>
+          <TabsTrigger value="balance">{uiText("সকল সদস্যের ব্যালেন্স")}</TabsTrigger>
+          <TabsTrigger value="summary">{uiText("সমিতি সার সংক্ষেপ")}</TabsTrigger>
         </TabsList>
         <TabsContent value="daily">
           <p className="mb-2 text-sm text-muted-foreground">{bnDate(from)} — {bnDate(to)}</p>
-          <DataTable head={["তারিখ", "সদস্য", "খাত", "টাকা"]} rows={coll.map((c) => [bnDate(c.d), mName.get(c.m), c.k, taka(c.a)])} foot={["মোট কালেকশন", "", "", taka(sum(coll, (c) => c.a))]} />
+          <DataTable head={[uiText("তারিখ"), uiText("সদস্য"), uiText("খাত"), uiText("টাকা")]} rows={coll.map((c) => [bnDate(c.d), mName.get(c.m), c.k, taka(c.a)])} foot={[uiText("মোট কালেকশন"), "", "", taka(sum(coll, (c) => c.a))]} />
         </TabsContent>
         <TabsContent value="settle"><Ledger l={period} /></TabsContent>
         <TabsContent value="cash">
-          <p className="mb-2 text-sm text-muted-foreground">শুরু থেকে {bnDate(to)} পর্যন্ত</p>
+          <p className="mb-2 text-sm text-muted-foreground">{uiText("শুরু থেকে")} {bnDate(to)}  {uiText("পর্যন্ত")}</p>
           <Ledger l={total} />
         </TabsContent>
         <TabsContent value="balance">
           <DataTable
-            head={["সদস্য নং", "নাম", "সঞ্চয়", "DPS", "FDR", "অবশিষ্ট ঋণ"]}
+            head={[uiText("সদস্য নং"), uiText("নাম"), uiText("সঞ্চয়"), "DPS", "FDR", uiText("অবশিষ্ট ঋণ")]}
             rows={members.map((m) => [m.member_no, m.name, taka(savBal(m.id)), taka(dpsBal(m.id)), taka(fdrBal(m.id)), taka(loanRem(m.id))])}
-            foot={["মোট", "", taka(sum(members, (m) => savBal(m.id))), taka(sum(members, (m) => dpsBal(m.id))), taka(sum(members, (m) => fdrBal(m.id))), taka(sum(members, (m) => loanRem(m.id)))]}
+            foot={[uiText("মোট"), "", taka(sum(members, (m) => savBal(m.id))), taka(sum(members, (m) => dpsBal(m.id))), taka(sum(members, (m) => fdrBal(m.id))), taka(sum(members, (m) => loanRem(m.id)))]}
           />
         </TabsContent>
         <TabsContent value="summary">
           <DataTable
-            head={["বিষয়", "পরিমাণ"]}
+            head={[uiText("বিষয়"), uiText("পরিমাণ")]}
             rows={[
-              ["মোট সদস্য", members.length],
-              ["মোট সঞ্চয় স্থিতি", taka(sum(members, (m) => savBal(m.id)))],
-              ["মোট বিতরণকৃত লোন", taka(sum(loans, (l) => l.principal))],
-              ["মোট লোন আদায়", taka(sum(rep, (r) => r.amount))],
-              ["অবশিষ্ট ঋণ", taka(sum(members, (m) => loanRem(m.id)))],
-              ["DPS স্থিতি", taka(sum(members, (m) => dpsBal(m.id)))],
-              ["FDR স্থিতি", taka(sum(members, (m) => fdrBal(m.id)))],
-              ["মোট ফি আদায়", taka(sum(fees, (f) => f.amount))],
-              ["মোট খরচ", taka(sum(cash.filter((c) => c.kind === "expense"), (c) => c.amount))],
-              ["হাতে নগদ", taka(total.inT - total.exT)],
+              [uiText("মোট সদস্য"), members.length],
+              [uiText("মোট সঞ্চয় স্থিতি"), taka(sum(members, (m) => savBal(m.id)))],
+              [uiText("মোট বিতরণকৃত লোন"), taka(sum(loans, (l) => l.principal))],
+              [uiText("মোট লোন আদায়"), taka(sum(rep, (r) => r.amount))],
+              [uiText("অবশিষ্ট ঋণ"), taka(sum(members, (m) => loanRem(m.id)))],
+              [uiText("DPS স্থিতি"), taka(sum(members, (m) => dpsBal(m.id)))],
+              [uiText("FDR স্থিতি"), taka(sum(members, (m) => fdrBal(m.id)))],
+              [uiText("মোট ফি আদায়"), taka(sum(fees, (f) => f.amount))],
+              [uiText("মোট খরচ"), taka(sum(cash.filter((c) => c.kind === "expense"), (c) => c.amount))],
+              [uiText("হাতে নগদ"), taka(total.inT - total.exT)],
             ]}
           />
         </TabsContent>

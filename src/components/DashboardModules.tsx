@@ -4,7 +4,7 @@ import { Plus, Search, Star, X, Zap, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { iconTone, visibleSections, type MenuItem } from "@/components/menu";
+import { iconTone, shortcutDestination, visibleSections, type MenuItem } from "@/components/menu";
 import { useAccess } from "@/lib/access";
 import { useLang } from "@/lib/i18n";
 import { bn } from "@/lib/format";
@@ -16,7 +16,7 @@ type Entry = MenuItem & { section: string; sectionEn: string };
 function useStoredList(key: string) {
   const [list, setList] = useState<string[]>([]);
   useEffect(() => {
-    try { setList(JSON.parse(localStorage.getItem(key) ?? "[]")); } catch { setList([]); }
+    try { setList(Array.from(new Set((JSON.parse(localStorage.getItem(key) ?? "[]") as string[]).map(shortcutDestination)))); } catch { setList([]); }
   }, [key]);
   const save = (next: string[]) => { setList(next); localStorage.setItem(key, JSON.stringify(next)); };
   return [list, save] as const;
@@ -36,7 +36,7 @@ export function QuickActions() {
   const [picked, setPicked] = useStoredList(QUICK_KEY);
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
-  const chosen = picked.map((label) => all.find((m) => m.label === label)).filter((m): m is Entry => !!m);
+  const chosen = picked.map((to) => all.find((m) => m.to === to)).filter((m): m is Entry => !!m);
   const toggle = (label: string) => setPicked(picked.includes(label) ? picked.filter((p) => p !== label) : [...picked, label]);
   const term = q.trim().toLowerCase();
   const options = all.filter((m) => !term || [m.label, m.en, m.section, m.sectionEn].some((x) => x.toLowerCase().includes(term)));
@@ -60,7 +60,7 @@ export function QuickActions() {
               <m.icon className={"size-8 " + iconTone(index)} />
               <span className="text-sm font-medium leading-snug">{t(m.label, m.en)}</span>
             </Link>
-            <button type="button" onClick={() => toggle(m.label)} aria-label={t("সরিয়ে দিন", "Remove")}
+            <button type="button" onClick={() => toggle(m.to)} aria-label={t("সরিয়ে দিন", "Remove")}
               className="absolute right-1 top-1 flex size-7 items-center justify-center rounded-full bg-card text-muted-foreground shadow-card hover:text-destructive">
               <X className="size-3.5" />
             </button>
@@ -84,9 +84,9 @@ export function QuickActions() {
           </DialogHeader>
           <div className="max-h-[55vh] space-y-1 overflow-y-auto p-3">
             {options.map((m, index) => {
-              const on = picked.includes(m.label);
+              const on = picked.includes(m.to);
               return (
-                <button key={m.section + m.label} type="button" aria-pressed={on} onClick={() => toggle(m.label)}
+                <button key={m.to} type="button" aria-pressed={on} onClick={() => toggle(m.to)}
                   className={"flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors " + (on ? "bg-primary/10" : "hover:bg-muted")}>
                   <m.icon className={"size-5 shrink-0 " + iconTone(index)} />
                   <span className="flex-1"><span className="block text-sm font-medium">{t(m.label, m.en)}</span><span className="block text-xs text-muted-foreground">{lang === "en" ? m.sectionEn : m.section}</span></span>
@@ -115,7 +115,7 @@ export function DashboardModules() {
   const items = useMemo(() => {
     const term = q.trim().toLowerCase();
     return all.filter((m) =>
-      (tab === "all" || (tab === "fav" ? favs.includes(m.label) : m.section === tab)) &&
+      (tab === "all" || (tab === "fav" ? favs.includes(m.to) : m.section === tab)) &&
       (!term || [m.label, m.en, m.section, m.sectionEn].some((x) => x.toLowerCase().includes(term))));
   }, [q, tab, favs, all]);
 
@@ -150,14 +150,14 @@ export function DashboardModules() {
       ) : (
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
           {items.map((m, index) => {
-            const fav = favs.includes(m.label);
+            const fav = favs.includes(m.to);
             return (
               <div key={m.section + m.label} className="relative">
                 <Link to={m.to} className="flex h-full min-h-28 flex-col items-center justify-center gap-2 rounded-xl border bg-card p-3 text-center transition-transform hover:-translate-y-0.5 hover:shadow-card">
                   <m.icon className={"size-9 " + iconTone(index)} />
                   <span className="text-sm leading-snug">{t(m.label, m.en)}</span>
                 </Link>
-                <button type="button" aria-label={fav ? t("ফেভারিট থেকে সরান", "Unfavorite") : t("ফেভারিট করুন", "Favorite")} aria-pressed={fav} onClick={() => toggle(m.label)}
+                <button type="button" aria-label={fav ? t("ফেভারিট থেকে সরান", "Unfavorite") : t("ফেভারিট করুন", "Favorite")} aria-pressed={fav} onClick={() => toggle(m.to)}
                   className="absolute right-1 top-1 flex size-8 items-center justify-center rounded-full hover:bg-muted">
                   <Star className={"size-4 " + (fav ? "fill-gold text-gold" : "text-muted-foreground")} />
                 </button>

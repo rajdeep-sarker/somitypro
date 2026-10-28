@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PageHeader } from "@/components/kit";
-import { menuSections } from "@/components/menu";
+import { permissionSections } from "@/components/menu";
 import { useRows } from "@/lib/db";
 import { deleteRow, upsertRow } from "@/lib/data.functions";
 import { createStaffLogin } from "@/lib/auth.functions";
@@ -18,7 +18,7 @@ import { pageHead } from "@/lib/metadata";
 export const Route = createFileRoute("/_authenticated/users")({ head: () => pageHead("ইউজার ম্যানেজমেন্ট"), component: Users });
 
 // Sections a staff user can be given; settings stays with the administrator.
-const SECTIONS = menuSections.filter((s) => s.key !== "settings");
+const SECTIONS = permissionSections.filter((s) => s.key !== "settings");
 const ROLES: { id: string; bn: string; en: string; view: string[]; write: string[] }[] = [
   { id: "field", bn: "মাঠকর্মী", en: "Field officer", view: ["members", "savings", "loans", "dps"], write: ["savings", "loans", "dps"] },
   { id: "cashier", bn: "ক্যাশিয়ার", en: "Cashier", view: ["members", "savings", "loans", "dps", "fdr", "cash", "banks"], write: ["savings", "loans", "dps", "fdr", "cash", "banks"] },
