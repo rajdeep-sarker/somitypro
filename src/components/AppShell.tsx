@@ -17,6 +17,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 
 import { canOpen, homeItem, iconTone, menuDestinations, visibleSections } from "@/components/menu";
 import { useAccess } from "@/lib/access";
+import { AnnouncementPopup } from "@/components/Announcement";
 import { LangToggle, useLang } from "@/lib/i18n";
 
 
@@ -71,6 +72,7 @@ function ShellContent({ children }: { children: ReactNode }) {
     preloadController.current?.abort();
     await qc.cancelQueries();
     qc.clear();
+    sessionStorage.removeItem("somiti-announcement-checked");
     await auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
@@ -185,6 +187,7 @@ function ShellContent({ children }: { children: ReactNode }) {
           <div className="col-span-full flex min-w-0 items-center gap-3"><span className="shrink-0 text-sm text-muted-foreground">{t("কেন্দ্র", "Center")}</span><CenterSelector /></div>
         </header>
         <main key={`${pathname}-${center}`} className="page-transition min-w-0 p-4 md:p-6">{children}</main>
+        <AnnouncementPopup />
       </div>
     </div>
   );
