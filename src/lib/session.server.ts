@@ -5,13 +5,17 @@ const b64u = (buf: ArrayBuffer | Uint8Array) =>
   btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const unb64u = (s: string) => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0));
 
+// Remembered logins last a year and are renewed on every app open, so they
+// only end on explicit logout (or a year without opening the app).
+export const SESSION_TTL_SECONDS = 365 * 24 * 3600;
+
 export type SessionPayload = { uid: string; email: string; name: string; exp: number };
 
 async function hmacKey(secret: string) {
   return crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
 }
 
-export async function signSession(payload: Omit<SessionPayload, "exp">, secret: string, ttlSeconds = 30 * 24 * 3600): Promise<string> {
+export async function signSession(payload: Omit<SessionPayload, "exp">, secret: string, ttlSeconds = SESSION_TTL_SECONDS): Promise<string> {
   const body: SessionPayload = { ...payload, exp: Math.floor(Date.now() / 1000) + ttlSeconds };
   const data = b64u(enc.encode(JSON.stringify(body)));
   const sig = await crypto.subtle.sign("HMAC", await hmacKey(secret), enc.encode(data));
