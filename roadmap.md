@@ -42,6 +42,8 @@
 ## Current batch
 - [ ] Consolidate duplicate navigation destinations into work-based groups without changing permissions or losing shortcuts
 - [ ] Add smooth menu/page/logout transitions and verify desktop/mobile with reduced-motion support
+- [ ] Restyle sidebar without blue pills and add a persistent desktop minimize/expand control
+- [ ] Complete English-language page content, labels, dates and shared controls
 - [x] Quick Actions "Add" picker on dashboard
 - [x] Bangla/English (menus, dashboard, staff, attendance, users; other pages still Bangla) language switch
 - [x] Staff page UI cleanup; separate attendance page
