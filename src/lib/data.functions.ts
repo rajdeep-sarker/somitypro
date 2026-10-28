@@ -183,3 +183,17 @@ export const upsertRow = createServerFn({ method: "POST" })
     await admin.commitWrites([admin.wSet(fsDb, data.table, id, { ...data.values, id, created_at: new Date().toISOString() }), (await act()).logWrite(fsDb, context, "create", data.table, id, Object.keys(data.values))]);
     return { id };
   });
+
+/** Activity log for the admin and CTO, newest first. */
+export const listActivity = createServerFn({ method: "GET" })
+  .middleware([requireAppAuth])
+  .handler(async ({ context }) => {
+    const r = await rolesOf(context.userId);
+    if (!r.admin && !r.cto) throw new Error("শুধু অ্যাডমিন");
+    const admin = await db();
+    const rows = await admin.listCollection("activity_log");
+    return rows
+      .map((x) => ({ id: String(x["id"]), at: String(x["at"] ?? ""), user_name: String(x["user_name"] ?? ""), user_id: String(x["user_id"] ?? ""), action: String(x["action"] ?? ""), table: String(x["table"] ?? ""), row_id: String(x["row_id"] ?? ""), fields: String(x["fields"] ?? "") }))
+      .sort((a, b) => b.at.localeCompare(a.at))
+      .slice(0, 3000);
+  });

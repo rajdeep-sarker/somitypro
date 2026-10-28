@@ -83,6 +83,10 @@ export const loginWithPhone = createServerFn({ method: "POST" })
     if (!user || !(await verifyPassword(data.password, String(user["password_hash"] ?? "")))) {
       throw new Error("মোবাইল নম্বর বা পাসওয়ার্ড ভুল");
     }
+    try {
+      const admin = await db();
+      await admin.commitWrites([(await import("./activity.server")).logWrite(await admin.fsDb(), { userId: String(user["id"]), userName: String(user["full_name"] ?? "") }, "login", "auth_users", String(user["id"]))]);
+    } catch { /* logging must never block sign-in */ }
     return issueToken(user);
   });
 
