@@ -99,6 +99,7 @@ export const bulkCollect = createServerFn({ method: "POST" })
         if (paid >= Number(loan["total_payable"])) writes.push(admin.wUpdate(fsDb, "loans", id, { status: "closed" }));
       }
     }
+    writes.push((await import("./activity.server")).logWrite(fsDb, context, "bulk", "bulk_collection", data.batch, [`${data.rows.length}`]));
     writes.push(admin.wSet(fsDb, "bulk_batches", data.batch, { id: data.batch, kind: "collection", row_count: data.rows.length, created_by: context.userId, created_at: now }));
     await admin.commitWrites(writes);
     return { count: data.rows.length };
@@ -151,6 +152,7 @@ export const importMembers = createServerFn({ method: "POST" })
         }),
       );
     }
+    writes.push((await import("./activity.server")).logWrite(fsDb, context, "bulk", "members_import", data.batch, [`${data.rows.length}`]));
     writes.push(admin.wSet(fsDb, "bulk_batches", data.batch, { id: data.batch, kind: "members", row_count: data.rows.length, created_by: context.userId, created_at: now }));
     await admin.commitWrites(writes);
     return { count: data.rows.length };
@@ -205,8 +207,10 @@ export const editSavedEntry = createServerFn({ method: "POST" })
     for (const k of Object.keys(data.values)) before[k] = current[k] ?? null;
     const fsDb = await admin.fsDb();
     await admin.commitWrites([
+      ...(data && "from" in data ? [(await import("./activity.server")).logWrite(fsDb, context, "transfer", "banks", String((data as { from: string }).from))] : []),
       admin.wUpdate(fsDb, data.table, data.id, data.values),
       admin.wSet(fsDb, "entry_edit_history", crypto.randomUUID(), audit(data.table, data.id, before, data.values, context.userId)),
+      (await import("./activity.server")).logWrite(fsDb, context, "update", data.table, data.id, Object.keys(data.values)),
     ]);
     return { ok: true };
   });
@@ -228,6 +232,7 @@ export const correctLedgerEntry = createServerFn({ method: "POST" })
     for (const k of Object.keys(data.values)) before[k] = current[k] ?? null;
     const fsDb = await admin.fsDb();
     await admin.commitWrites([
+      ...(data && "from" in data ? [(await import("./activity.server")).logWrite(fsDb, context, "transfer", "banks", String((data as { from: string }).from))] : []),
       admin.wSet(fsDb, "ledger_revisions", crypto.randomUUID(), {
         transaction_id: data.id,
         revision_no: revisionNo,
@@ -240,6 +245,7 @@ export const correctLedgerEntry = createServerFn({ method: "POST" })
         edited_at: new Date().toISOString(),
       }),
       admin.wSet(fsDb, "entry_edit_history", crypto.randomUUID(), audit("ledger_transactions", data.id, before, data.values, context.userId)),
+      (await import("./activity.server")).logWrite(fsDb, context, "update", "ledger_transactions", data.id, Object.keys(data.values)),
     ]);
     return { ok: true };
   });
@@ -258,6 +264,7 @@ export const transferBank = createServerFn({ method: "POST" })
     const base = { member_id: null, loan_id: null, units: 0, txn_date: data.date, note: data.note ?? null, created_by: context.userId, created_at: now };
     const fsDb = await admin.fsDb();
     await admin.commitWrites([
+      ...(data && "from" in data ? [(await import("./activity.server")).logWrite(fsDb, context, "transfer", "banks", String((data as { from: string }).from))] : []),
       admin.wSet(fsDb, "ledger_transactions", crypto.randomUUID(), { ...base, account_id: data.from, type: "transfer_out", amount: data.amount, reference: ref }),
       admin.wSet(fsDb, "ledger_transactions", crypto.randomUUID(), { ...base, account_id: data.to, type: "transfer_in", amount: data.amount, reference: ref }),
     ]);

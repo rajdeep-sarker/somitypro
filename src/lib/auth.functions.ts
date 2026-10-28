@@ -127,7 +127,7 @@ export const resetAccountPassword = createServerFn({ method: "POST" })
     const user = await admin.getDocument("auth_users", data.userId);
     if (!user) throw new Error("অ্যাকাউন্ট পাওয়া যায়নি");
     const fsDb = await admin.fsDb();
-    await admin.commitWrites([admin.wUpdate(fsDb, "auth_users", data.userId, { password_hash: await hashPassword(data.password) })]);
+    await admin.commitWrites([admin.wUpdate(fsDb, "auth_users", data.userId, { password_hash: await hashPassword(data.password) }), (await import("./activity.server")).logWrite(fsDb, context, "password_reset", "auth_users", data.userId)]);
     return { success: true };
   });
 
@@ -211,7 +211,7 @@ export const ctoResetPassword = createServerFn({ method: "POST" })
     const admin = await db();
     if (!(await admin.getDocument("auth_users", data.userId))) throw new Error("ইউজার পাওয়া যায়নি");
     const fsDb = await admin.fsDb();
-    await admin.commitWrites([admin.wUpdate(fsDb, "auth_users", data.userId, { password_hash: await hashPassword(data.password) })]);
+    await admin.commitWrites([admin.wUpdate(fsDb, "auth_users", data.userId, { password_hash: await hashPassword(data.password) }), (await import("./activity.server")).logWrite(fsDb, context, "password_reset", "auth_users", data.userId)]);
     return { ok: true };
   });
 
