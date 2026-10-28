@@ -48,3 +48,5 @@
 - [ ] CTO announcement banner: popup shown for the next N logins per user, closes only via ×
 - [ ] Reset all somiti data to zero (keep logins/settings)
 - [ ] Activity log: every change by every user with time (admin/CTO view)
+- [ ] Signature setup for printed member statements (multiple signatures, per screenshot)
+- [ ] Somiti logo upload shown everywhere a logo appears
