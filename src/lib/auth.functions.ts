@@ -163,10 +163,17 @@ export const setupCtoAccount = createServerFn({ method: "POST" })
     const roles = await admin.listCollection("user_roles");
     if (roles.some((r) => r["role"] === "cto")) throw new Error("CTO অ্যাকাউন্ট আগে থেকেই আছে");
     const email = phoneToEmail(data.phone);
-    if (await findAuthUser(email)) throw new Error("এই নম্বরে অ্যাকাউন্ট আছে");
+    const existing = await findAuthUser(email);
+    const fsDb = await admin.fsDb();
+    if (existing) {
+      // Promote an existing login only when its owner's password is supplied.
+      if (!(await verifyPassword(data.password, String(existing["password_hash"] ?? "")))) throw new Error("এই নম্বরে অ্যাকাউন্ট আছে");
+      if (roles.some((r) => r["user_id"] === existing["id"] && r["role"] === "admin")) throw new Error("অ্যাডমিনকে CTO করা যাবে না");
+      await admin.commitWrites([admin.wSet(fsDb, "user_roles", crypto.randomUUID(), { user_id: String(existing["id"]), role: "cto" })]);
+      return { ok: true };
+    }
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
-    const fsDb = await admin.fsDb();
     await admin.commitWrites([
       admin.wSet(fsDb, "auth_users", id, { id, email, password_hash: await hashPassword(data.password), full_name: data.name, phone: data.phone, created_at: now }),
       admin.wSet(fsDb, "profiles", id, { id, full_name: data.name, phone: data.phone, created_at: now }),
