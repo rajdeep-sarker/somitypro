@@ -167,7 +167,7 @@ export const setupCtoAccount = createServerFn({ method: "POST" })
     const fsDb = await admin.fsDb();
     if (existing) {
       // Promote an existing login only when its owner's password is supplied.
-      if (!(await verifyPassword(data.password, String(existing["password_hash"] ?? "")))) throw new Error("এই নম্বরে অ্যাকাউন্ট আছে");
+      if (!(await verifyPassword(data.password, String(existing["password_hash"] ?? "")))) throw new Error("এই নম্বরের পাসওয়ার্ড মেলেনি");
       if (roles.some((r) => r["user_id"] === existing["id"] && r["role"] === "admin")) throw new Error("অ্যাডমিনকে CTO করা যাবে না");
       await admin.commitWrites([admin.wSet(fsDb, "user_roles", crypto.randomUUID(), { user_id: String(existing["id"]), role: "cto" })]);
       return { ok: true };
