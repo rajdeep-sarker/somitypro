@@ -11,6 +11,7 @@ import { bnDate, todayISO } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { CenterProvider, CenterSelector, useCenterScope } from "@/components/CenterScope";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const menuSections = [
   { label: "সারসংক্ষেপ", items: [
@@ -74,6 +75,10 @@ function ShellContent({ children }: { children: ReactNode }) {
   const preloadController = useRef<AbortController | null>(null);
   const { data: settings = [] } = useRows("somiti_settings", { order: "id" });
   const name = settings[0]?.name ?? "সমিতি";
+  const [user, setUser] = useState<{ full_name?: string; phone?: string; email: string } | null>(null);
+  useEffect(() => { void auth.getUser().then(({ data }) => setUser(data.user)); }, []);
+  const userName = user?.full_name || "অ্যাডমিন";
+  const initial = userName.trim().charAt(0) || "অ";
 
   useEffect(() => {
     const controller = new AbortController();
