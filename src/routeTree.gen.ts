@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAttendanceRouteImport } from './routes/_authenticated/attendance'
 import { Route as AuthenticatedBanksRouteImport } from './routes/_authenticated/banks'
 import { Route as AuthenticatedCashRouteImport } from './routes/_authenticated/cash'
 import { Route as AuthenticatedCentersRouteImport } from './routes/_authenticated/centers'
@@ -51,6 +52,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAttendanceRoute = AuthenticatedAttendanceRouteImport.update({
+  id: '/attendance',
+  path: '/attendance',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedBanksRoute = AuthenticatedBanksRouteImport.update({
   id: '/banks',
@@ -185,6 +191,7 @@ const ApiPublicMigrateRoute = ApiPublicMigrateRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/attendance': typeof AuthenticatedAttendanceRoute
   '/banks': typeof AuthenticatedBanksRoute
   '/cash': typeof AuthenticatedCashRoute
   '/centers': typeof AuthenticatedCentersRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/attendance': typeof AuthenticatedAttendanceRoute
   '/banks': typeof AuthenticatedBanksRoute
   '/cash': typeof AuthenticatedCashRoute
   '/centers': typeof AuthenticatedCentersRoute
@@ -245,6 +253,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/attendance': typeof AuthenticatedAttendanceRoute
   '/_authenticated/banks': typeof AuthenticatedBanksRoute
   '/_authenticated/cash': typeof AuthenticatedCashRoute
   '/_authenticated/centers': typeof AuthenticatedCentersRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/attendance'
     | '/banks'
     | '/cash'
     | '/centers'
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/attendance'
     | '/banks'
     | '/cash'
     | '/centers'
@@ -335,6 +346,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/attendance'
     | '/_authenticated/banks'
     | '/_authenticated/cash'
     | '/_authenticated/centers'
@@ -391,6 +403,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/attendance': {
+      id: '/_authenticated/attendance'
+      path: '/attendance'
+      fullPath: '/attendance'
+      preLoaderRoute: typeof AuthenticatedAttendanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/banks': {
       id: '/_authenticated/banks'
@@ -571,6 +590,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAttendanceRoute: typeof AuthenticatedAttendanceRoute
   AuthenticatedBanksRoute: typeof AuthenticatedBanksRoute
   AuthenticatedCashRoute: typeof AuthenticatedCashRoute
   AuthenticatedCentersRoute: typeof AuthenticatedCentersRoute
@@ -598,6 +618,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAttendanceRoute: AuthenticatedAttendanceRoute,
   AuthenticatedBanksRoute: AuthenticatedBanksRoute,
   AuthenticatedCashRoute: AuthenticatedCashRoute,
   AuthenticatedCentersRoute: AuthenticatedCentersRoute,

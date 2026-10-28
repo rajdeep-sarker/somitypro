@@ -38,3 +38,10 @@
 - [x] Firebase: copy + compare page in Settings, members mirrored on save
 - [ ] Firebase: move logins and switch every page to read/save in Firebase (section by section)
 - [x] Dashboard quick search, favorites, insight charts
+
+## Current batch
+- [ ] Quick Actions "Add" picker on dashboard
+- [ ] Bangla/English language switch
+- [ ] Staff page UI cleanup; separate attendance page
+- [ ] User Management (admin-only) with per-section permissions; users see only allowed menus
+- [ ] Admin-only "Changes needed" request box that emails the owner (needs email domain)
