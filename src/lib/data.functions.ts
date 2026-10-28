@@ -43,14 +43,16 @@ async function rolesOf(userId: string) {
   const key = (p: Row) => LEGACY_MODULES[String(p["module"])] ?? String(p["module"]);
   return {
     admin: roles.some((r) => r["user_id"] === userId && r["role"] === "admin"),
+    cto: roles.some((r) => r["user_id"] === userId && r["role"] === "cto"),
     view: new Set(mine.map(key)),
     modules: new Set(mine.filter((p) => p["can_write"] === true).map(key)),
   };
 }
 
 async function requireWrite(userId: string, table: string, values?: Row) {
-  const { admin, modules } = await rolesOf(userId);
+  const { admin, cto, modules } = await rolesOf(userId);
   if (admin) return;
+  if (cto) throw new Error("CTO অ্যাকাউন্ট সমিতির তথ্য বদলাতে পারে না");
   if (ADMIN_ONLY_WRITE.has(table) || ADMIN_ONLY_EXTRA.has(table)) throw new Error("শুধু অ্যাডমিন এই পরিবর্তন করতে পারবেন");
   const moduleKey = MODULE_TABLES[table];
   if (moduleKey && moduleKey !== "__account__" && !modules.has(moduleKey)) throw new Error("এই বিভাগে এন্ট্রির অনুমতি নেই");
@@ -85,14 +87,18 @@ export const myAccess = createServerFn({ method: "GET" })
   .middleware([requireAppAuth])
   .handler(async ({ context }) => {
     const r = await rolesOf(context.userId);
-    return { admin: r.admin, view: [...r.view], write: [...r.modules] };
+    return { admin: r.admin, cto: r.cto, view: [...r.view], write: [...r.modules] };
   });
 
 export const listRows = createServerFn({ method: "GET" })
   .middleware([requireAppAuth])
   .inputValidator(tableSchema)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const admin = await db();
+    const me = await rolesOf(context.userId);
+    // The CTO account never reads somiti records.
+    if (me.cto && data.table !== "somiti_settings") return [];
+    if (data.table === "user_roles") return (await admin.listCollection("user_roles")).filter((r) => r["role"] !== "cto");
     if (data.table === "ledger_transactions") {
       const [txns, revisions] = await Promise.all([admin.listCollection("ledger_transactions"), admin.listCollection("ledger_revisions")]);
       return applyRevisions(txns, revisions);

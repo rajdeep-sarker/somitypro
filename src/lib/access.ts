@@ -6,13 +6,13 @@ export const accessQueryOptions = {
   queryKey: ["auth", "access"],
   queryFn: async () => {
     const a = await myAccess();
-    return { admin: a.admin, view: a.view, write: a.write };
+    return { admin: a.admin, cto: a.cto, view: a.view, write: a.write };
   },
   staleTime: 60_000,
 };
 
-export function toAccess(a: { admin: boolean; view: string[] } | undefined): Access {
-  return { admin: a?.admin ?? false, view: new Set(a?.view ?? []) };
+export function toAccess(a: { admin: boolean; cto?: boolean; view: string[] } | undefined): Access {
+  return { admin: a?.admin ?? false, cto: a?.cto ?? false, view: new Set(a?.view ?? []) };
 }
 
 export function useAccess() {
