@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireAppAuth } from "./auth-middleware";
 import { FIREBASE_TABLES } from "./firebase-format";
+import { ctoDirectory } from "./cto-directory";
 
 // All app data lives in Firestore. The browser never talks to Firestore
 // directly; every read/write goes through these functions, which check the
@@ -37,6 +38,17 @@ export const myAccess = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const r = await (await perm()).rolesOf(context.userId);
     return { admin: r.admin, cto: r.cto, view: [...r.view], write: [...r.modules] };
+  });
+
+/** Read-only CTO identity for the administrator; role editing remains unchanged. */
+export const adminCtoDirectory = createServerFn({ method: "GET" })
+  .middleware([requireAppAuth])
+  .handler(async ({ context }) => {
+    const me = await (await perm()).rolesOf(context.userId);
+    if (!me.admin) throw new Error("শুধু অ্যাডমিন / Admin only");
+    const database = await db();
+    const [roles, profiles] = await Promise.all([database.listCollection("user_roles"), database.listCollection("profiles")]);
+    return ctoDirectory(me.admin, roles, profiles);
   });
 
 export const listRows = createServerFn({ method: "GET" })
