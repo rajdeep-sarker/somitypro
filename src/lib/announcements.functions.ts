@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireAppAuth } from "./auth-middleware";
+import { announcementAudience } from "./announcement-audience";
 
 // CTO banner: one active announcement, shown to each user for their next N
 // app visits. Views are counted per user in "announcement_views".
@@ -19,6 +20,19 @@ export const getAnnouncement = createServerFn({ method: "GET" })
     const rows = await admin.listCollection("announcements");
     const a = rows.find((r) => r["active"] === true);
     return a ? { id: String(a["id"]), title: String(a["title"] ?? ""), message: String(a["message"] ?? ""), shows: Number(a["shows"] ?? 1) } : null;
+  });
+
+export const getAnnouncementAudience = createServerFn({ method: "GET" })
+  .middleware([requireAppAuth])
+  .handler(async ({ context }) => {
+    const { admin, cto } = await load(context.userId);
+    if (!cto) throw new Error("শুধু CTO / CTO only");
+    const [banners, views, profiles, roles] = await Promise.all([
+      admin.listCollection("announcements"), admin.listCollection("announcement_views"),
+      admin.listCollection("profiles"), admin.listCollection("user_roles"),
+    ]);
+    return banners.map((b) => ({ id: String(b["id"]), title: String(b["title"] ?? ""), active: b["active"] === true, createdAt: String(b["created_at"] ?? ""), viewers: announcementAudience(cto, String(b["id"]), views, profiles, roles) }))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   });
 
 export const saveAnnouncement = createServerFn({ method: "POST" })
@@ -61,6 +75,6 @@ export const takeAnnouncement = createServerFn({ method: "POST" })
     const seen = Number(view?.["count"] ?? 0);
     if (seen >= Number(a["shows"] ?? 1)) return null;
     const fsDb = await admin.fsDb();
-    await admin.commitWrites([admin.wSet(fsDb, "announcement_views", key, { id: key, count: seen + 1 })]);
+    await admin.commitWrites([admin.wSet(fsDb, "announcement_views", key, { id: key, announcement_id: String(a["id"]), user_id: context.userId, count: seen + 1, last_seen_at: new Date().toISOString() })]);
     return { title: String(a["title"] ?? ""), message: String(a["message"] ?? "") };
   });
