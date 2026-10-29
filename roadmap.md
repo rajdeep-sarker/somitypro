@@ -40,7 +40,7 @@
 - [x] Dashboard quick search, favorites, insight charts
 
 ## Current batch
-- [ ] Show CTO identity and capabilities read-only in admin User Management
+- [x] Show CTO identity and capabilities read-only in admin User Management
 - [x] Consolidate duplicate navigation destinations into work-based groups without changing permissions or losing shortcuts
 - [x] Add smooth menu/page/logout transitions and verify desktop/mobile with reduced-motion support
 - [x] Restyle sidebar without blue pills and add a persistent desktop minimize/expand control
