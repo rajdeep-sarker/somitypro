@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ShieldCheck, UserCog, KeyRound, Eye, PencilLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PageHeader } from "@/components/kit";
 import { permissionSections } from "@/components/menu";
 import { useRows } from "@/lib/db";
-import { deleteRow, upsertRow } from "@/lib/data.functions";
+import { adminCtoDirectory, deleteRow, upsertRow } from "@/lib/data.functions";
 import { createStaffLogin } from "@/lib/auth.functions";
 import { useLang } from "@/lib/i18n";
 import { pageHead } from "@/lib/metadata";
@@ -30,6 +30,8 @@ function Users() {
   const { t } = useLang();
   const qc = useQueryClient();
   const login = useServerFn(createStaffLogin);
+  const fetchCto = useServerFn(adminCtoDirectory);
+  const ctoQuery = useQuery({ queryKey: ["admin-cto-directory"], queryFn: () => fetchCto() });
   const { data: staff = [] } = useRows("staff");
   const { data: perms = [] } = useRows("staff_permissions");
   const { data: roles = [] } = useRows("user_roles");
@@ -68,6 +70,20 @@ function Users() {
   return (
     <div className="space-y-5">
       <PageHeader title={t("ইউজার ম্যানেজমেন্ট", "User Management")} subtitle={t("কে কোন অংশ দেখতে ও এন্ট্রি করতে পারবে তা ঠিক করুন — শুধু অ্যাডমিন", "Decide who can view and enter data in each section — admin only")} />
+      <section className="space-y-4 border-b pb-5" aria-label={t("CTO পরিচয় ও ক্ষমতা", "CTO identity and capabilities")}>
+        <h2 className="flex items-center gap-2 text-lg font-semibold"><ShieldCheck className="size-5 text-primary" />{t("CTO — টেকনিক্যাল ম্যানেজার", "CTO — Technical Manager")}</h2>
+        {ctoQuery.isPending ? <p className="text-muted-foreground">{t("লোড হচ্ছে…", "Loading…")}</p> : ctoQuery.isError ? <div className="flex items-center gap-3"><p className="text-destructive">{t("CTO তথ্য দেখা যায়নি", "Could not load CTO details")}</p><Button variant="outline" onClick={() => void ctoQuery.refetch()}>{t("আবার চেষ্টা", "Retry")}</Button></div> : ctoQuery.data?.length ? <div className="flex flex-wrap gap-4">{ctoQuery.data.map((account) => <div key={account.id} className="min-w-0 rounded-lg border bg-card px-4 py-3"><p className="break-words font-semibold">{account.name}</p><p className="text-muted-foreground">{account.phone || t("মোবাইল নম্বর নেই", "No mobile number")}</p><span className="text-sm font-medium text-primary">CTO</span></div>)}</div> : <p className="text-muted-foreground">{t("কোনো CTO অ্যাকাউন্ট যুক্ত নেই", "No CTO account assigned")}</p>}
+        <div className="grid gap-4 md:grid-cols-2">
+          <div><h3 className="font-semibold">{t("যা করতে পারবেন", "Can do")}</h3><ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+            <li>{t("অ্যাডমিনের পাঠানো অনুরোধ দেখতে এবং বাস্তবায়িত বা বাতিল হিসেবে উত্তর দিতে পারবেন।", "View admin-forwarded requests and reply as implemented or declined.")}</li>
+            <li>{t("ঘোষণার ব্যানার প্রকাশ বা বন্ধ করতে এবং কতবার দেখাবে তা নির্ধারণ করতে পারবেন।", "Publish or stop announcement banners and set their display count.")}</li>
+            <li>{t("সকল ব্যবহারকারীর পরিবর্তনের লগ দেখতে পারবেন।", "View all users’ change logs.")}</li>
+            <li>{t("অ্যাডমিন ও কর্মীদের লগইন তালিকা দেখে পাসওয়ার্ড রিসেট করতে পারবেন।", "View admin and staff login accounts and reset their passwords.")}</li>
+            <li>{t("বর্তমান পাসওয়ার্ড দিয়ে নিজের মোবাইল নম্বর ও পাসওয়ার্ড পরিবর্তন করতে পারবেন।", "Change their own mobile number and password using their current password.")}</li>
+          </ul></div>
+          <div><h3 className="font-semibold">{t("যা করতে পারবেন না", "Cannot do")}</h3><p className="mt-2 text-sm text-muted-foreground">{t("সমিতির সদস্য ও লেনদেনের তথ্য দেখা বা এন্ট্রি করা এবং User Management থেকে রোল বা অনুমতি পরিবর্তন করা।", "View or enter somiti member and transaction data, or change roles and permissions through User Management.")}</p></div>
+        </div>
+      </section>
       <div className="grid gap-5 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <aside className="space-y-2 rounded-2xl border bg-card p-3 shadow-card">
           <p className="px-2 text-sm font-semibold text-muted-foreground">{t("কর্মী / ইউজার", "Staff / Users")}</p>
