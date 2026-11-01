@@ -1,29 +1,29 @@
-# Somitypro
+# SomityPro — সমবায় সমিতি ব্যবস্থাপনা সিস্টেম
 
-https://somitypro.com/
-
-User- 01711290040
-
-pass-@S001618
-
-
-Website banaya deo same etar motoi.  Web e login kore sobgula feature check koro check kore dekho tarpor baniye dao same or jate at least feature gula thake sob.
-
-This project was built with [Lovable](https://lovable.dev).
+A Bengali-first savings & loan cooperative (somiti) management web app — dashboard, members, savings, DPS, FDR, loans, collection, funds, banking, staff attendance & salary, reports, receipts, and role-based administration.
 
 **Live app**: https://somitypro.lovable.app
 
-## Build with Lovable
+Built with [Lovable](https://lovable.dev). Continue developing in the [Lovable editor](https://lovable.dev/projects/d534ca7c-5bf9-4eb9-9039-e8d08b881e6b).
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/d534ca7c-5bf9-4eb9-9039-e8d08b881e6b).
+## Features
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+- **Dashboard** — module quick-search, favorites, custom quick actions, and multiple insight charts
+- **Members & Centers** — member registry with photo/NID uploads, center-based views, bulk import
+- **Savings & Deposits** — savings accounts, DPS, FDR with immutable ledger entries
+- **Loans & Collection** — loan issuing, installment collection, due lists, bulk collection
+- **Accounts & Funds** — cash, bank accounts, shares, investments, security funds (module-tagged ledger)
+- **Reports & Receipts** — date-filtered reports, printable statements with signature slots and logo
+- **Staff & Attendance** — staff attendance and salary management
+- **Administration** — role-based access (permissions per feature section), activity log, change requests (staff → admin → CTO), announcement banners, system settings
 
-## Development
+## Technology
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+- React 19 + TanStack Start (SSR + server functions)
+- Tailwind CSS v4, Bengali/English language toggle
+- Firebase Firestore for app data, Cloudflare R2 for member documents
+
+## Local Development
 
 ```sh
 git clone <this-repository-url>
@@ -31,3 +31,9 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Build with Lovable
+
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
