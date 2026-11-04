@@ -94,9 +94,9 @@ function Index() {
                 </Button>
               </div>
               <div className="mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-primary-foreground/15 pt-6">
-                {([["১৩০০+", "সদস্য"], ["৬+", "সেবা"], ["২৪/৭", "অ্যাক্সেস"]] as const).map(([n, l]) => (
+                {([["members", "সদস্য"], ["৬+", "সেবা"], ["২৪/৭", "অ্যাক্সেস"]] as const).map(([n, l]) => (
                   <div key={l}>
-                    <div className="font-display text-2xl text-gold">{uiText(n)}</div>
+                    <div className="font-display text-2xl text-gold">{n === "members" ? <MemberStat /> : uiText(n)}</div>
                     <div className="text-sm opacity-80">{uiText(l)}</div>
                   </div>
                 ))}
