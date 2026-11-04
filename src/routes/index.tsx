@@ -1,14 +1,14 @@
 import { useLang } from "@/lib/i18n";
 import { uiText } from "@/lib/ui-translation";
 import { SomitiLogo } from "@/components/Branding";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { auth } from "@/lib/app-client";
-import { publicMemberCount } from "@/lib/data.functions";
 import { bn } from "@/lib/format";
 import { PiggyBank, HandCoins, CalendarClock, Landmark, FileBarChart, Users, ShieldCheck, ArrowRight, Lock, Smartphone, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import hero from "@/assets/landing-hero.jpg";
+
 
 
 export const Route = createFileRoute("/")({
@@ -41,8 +41,16 @@ const trust = [
 ];
 
 function MemberStat() {
-  const count = Route.useLoaderData() as number;
-  return <>{bn(count)}</>;
+  const [count, setCount] = useState<number | null>(null);
+  useEffect(() => {
+    let active = true;
+    fetch("/api/public/member-count")
+      .then((r) => r.json() as Promise<{ count: number | null }>)
+      .then((d) => { if (active && d.count !== null) setCount(d.count); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
+  return <>{count === null ? "" : bn(count)}</>;
 }
 
 function Index() {
