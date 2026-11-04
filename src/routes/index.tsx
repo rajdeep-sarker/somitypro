@@ -54,7 +54,7 @@ const trust = [
 ];
 
 function MemberStat() {
-  const { data: count } = useSuspenseQuery(memberCountQuery);
+  const count = Route.useLoaderData() as number;
   return <>{bn(count)}</>;
 }
 
