@@ -46,6 +46,11 @@ const trust = [
   { icon: Languages, t: "বাংলা ও ইংরেজি", d: "এক ক্লিকে ভাষা পরিবর্তন" },
 ];
 
+function MemberStat() {
+  const { data: count } = useSuspenseQuery(memberCountQuery);
+  return <>{bn(count)}</>;
+}
+
 function Index() {
   useLang();
   const navigate = useNavigate();
