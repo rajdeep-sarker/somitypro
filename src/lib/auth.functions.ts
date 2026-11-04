@@ -90,22 +90,7 @@ export const loginWithPhone = createServerFn({ method: "POST" })
     return issueToken(user);
   });
 
-export const signUpAccount = createServerFn({ method: "POST" })
-  .validator(z.object({ phone: z.string().regex(/^01\d{9}$/), password: z.string().min(6).max(128), name: z.string().min(1).max(120) }))
-  .handler(async ({ data }) => {
-    const email = phoneToEmail(data.phone);
-    if (await findAuthUser(email)) throw new Error("এই নম্বরে অ্যাকাউন্ট আছে — লগইন করুন");
-    const admin = await db();
-    const id = crypto.randomUUID();
-    const now = new Date().toISOString();
-    const user = { id, email, password_hash: await hashPassword(data.password), full_name: data.name, phone: data.phone, created_at: now };
-    const fsDb = await admin.fsDb();
-    await admin.commitWrites([
-      admin.wSet(fsDb, "auth_users", id, user),
-      admin.wSet(fsDb, "profiles", id, { id, full_name: data.name, phone: data.phone, created_at: now }),
-    ]);
-    return issueToken(user);
-  });
+// Public self-registration is intentionally absent: only an admin can create logins (createStaffLogin).
 
 export const changeOwnPassword = createServerFn({ method: "POST" })
   .middleware([requireAppAuth])

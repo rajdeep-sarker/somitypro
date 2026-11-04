@@ -31,9 +31,7 @@ function AuthPage() {
   useLang();
 
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
   const [phone, setPhone] = useState("");
-  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [remember, setRemember] = useState(false);
@@ -53,13 +51,9 @@ function AuthPage() {
     setBusy(true);
     const email = phoneToEmail(phone);
     chooseLoginPersistence(remember, sessionStorage, localStorage);
-    const res =
-      mode === "login"
-        ? await auth.signInWithPassword({ email, password })
-        : await auth.signUp({ email, password, options: { data: { full_name: name, phone } } });
+    const res = await auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (res.error) { toast.error(mode === "login" ? uiText("মোবাইল নম্বর বা পাসওয়ার্ড ভুল") : res.error.message); return; }
-    if (!res.data.session) { toast.success(uiText("অ্যাকাউন্ট তৈরি হয়েছে, এখন লগইন করুন")); return; }
+    if (res.error || !res.data.session) { toast.error(uiText("মোবাইল নম্বর বা পাসওয়ার্ড ভুল")); return; }
     navigate({ to: "/dashboard" });
   }
 
@@ -71,32 +65,24 @@ function AuthPage() {
             <SomitiLogo className="size-9" />
           </div>
           <h1 className="font-display text-xl">{uiText("সোনালী সঞ্চয় ও ঋণদান সমবায় সমিতি লিমিটেড")}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{mode === "login" ? uiText("আপনার অ্যাকাউন্টে লগইন করুন") : uiText("নতুন অ্যাকাউন্ট তৈরি করুন")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{uiText("আপনার অ্যাকাউন্টে লগইন করুন")}</p>
         </div>
         <form onSubmit={submit} className="space-y-4">
-          {mode === "signup" && (
-            <Field label={uiText("আপনার নাম")}>
-              <Input value={name} onChange={(e) => setName(e.target.value)} required />
-            </Field>
-          )}
           <Field label={uiText("মোবাইল নম্বর")}>
             <Input aria-label={uiText("মোবাইল নম্বর")} autoComplete="username" inputMode="tel" placeholder="01XXXXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} required />
           </Field>
           <Field label={uiText("পাসওয়ার্ড")}>
-            <Input aria-label={uiText("পাসওয়ার্ড")} autoComplete={mode === "login" ? "current-password" : "new-password"} type="password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <Input aria-label={uiText("পাসওয়ার্ড")} autoComplete="current-password" type="password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} required />
           </Field>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <label className="flex min-h-11 items-center gap-2 text-sm"><Checkbox checked={remember} onCheckedChange={v => setRemember(v === true)} />Remember Me</label>
-            {mode === "login" && <Button type="button" variant="link" className="h-auto whitespace-normal p-0 text-sm" onClick={() => setHelp(!help)}>{uiText("পাসওয়ার্ড ভুলে গেছেন?")}</Button>}
+            {<Button type="button" variant="link" className="h-auto whitespace-normal p-0 text-sm" onClick={() => setHelp(!help)}>{uiText("পাসওয়ার্ড ভুলে গেছেন?")}</Button>}
           </div>
-          {help && mode === "login" && <div role="status" className="space-y-2 border-l-2 border-primary bg-secondary p-3 text-sm text-secondary-foreground"><p>{uiText("পাসওয়ার্ড রিসেটের জন্য সমিতির অ্যাডমিনের সঙ্গে যোগাযোগ করুন। আপনার নিবন্ধিত মোবাইল নম্বর ও পরিচয় দিন।")}</p><p>{uiText("পরিচয় যাচাইয়ের পর অ্যাডমিন নতুন পাসওয়ার্ড দেবেন। লগইনের পর সেটিং থেকে নিজের পাসওয়ার্ড পরিবর্তন করুন।")}</p></div>}
+          {help && <div role="status" className="space-y-2 border-l-2 border-primary bg-secondary p-3 text-sm text-secondary-foreground"><p>{uiText("পাসওয়ার্ড রিসেটের জন্য সমিতির অ্যাডমিনের সঙ্গে যোগাযোগ করুন। আপনার নিবন্ধিত মোবাইল নম্বর ও পরিচয় দিন।")}</p><p>{uiText("পরিচয় যাচাইয়ের পর অ্যাডমিন নতুন পাসওয়ার্ড দেবেন। লগইনের পর সেটিং থেকে নিজের পাসওয়ার্ড পরিবর্তন করুন।")}</p></div>}
           <Button type="submit" className="w-full" size="lg" disabled={busy}>
-            {busy ? uiText("অপেক্ষা করুন...") : mode === "login" ? uiText("লগইন") : uiText("অ্যাকাউন্ট তৈরি")}
+            {busy ? uiText("অপেক্ষা করুন...") : uiText("লগইন")}
           </Button>
         </form>
-        <Button variant="link" className="mt-4 h-auto w-full whitespace-normal text-center text-sm" onClick={() => { setMode(mode === "login" ? "signup" : "login"); setHelp(false); }}>
-          {mode === "login" ? uiText("নতুন অ্যাকাউন্ট তৈরি করুন") : uiText("আগেই অ্যাকাউন্ট আছে? লগইন করুন")}
-        </Button>
       </div>
     </div>
   );
