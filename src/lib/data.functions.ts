@@ -51,6 +51,13 @@ export const adminCtoDirectory = createServerFn({ method: "GET" })
     return ctoDirectory(me.admin, roles, profiles);
   });
 
+/** Public landing-page stat: how many members are registered right now. */
+export const publicMemberCount = createServerFn({ method: "GET" }).handler(async () => {
+  const admin = await db();
+  const members = await admin.listCollection("members");
+  return members.filter((m) => String(m["status"] ?? "active") !== "inactive").length;
+});
+
 export const listRows = createServerFn({ method: "GET" })
   .middleware([requireAppAuth])
   .validator(tableSchema)
