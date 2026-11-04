@@ -17,7 +17,7 @@ const memberCountQuery = {
 };
 
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(memberCountQuery),
+  // loader removed for bisect
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },
