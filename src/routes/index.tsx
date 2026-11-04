@@ -3,12 +3,21 @@ import { uiText } from "@/lib/ui-translation";
 import { SomitiLogo } from "@/components/Branding";
 import { useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { auth } from "@/lib/app-client";
+import { publicMemberCount } from "@/lib/data.functions";
+import { bn } from "@/lib/format";
 import { PiggyBank, HandCoins, CalendarClock, Landmark, FileBarChart, Users, ShieldCheck, ArrowRight, Lock, Smartphone, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import hero from "@/assets/landing-hero.jpg";
 
+const memberCountQuery = {
+  queryKey: ["public", "member-count"],
+  queryFn: () => publicMemberCount(),
+};
+
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(memberCountQuery),
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },
