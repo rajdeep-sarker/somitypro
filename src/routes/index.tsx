@@ -12,14 +12,6 @@ import hero from "@/assets/landing-hero.jpg";
 
 
 export const Route = createFileRoute("/")({
-  loader: async () => {
-    try {
-      return await publicMemberCount();
-    } catch (e) {
-      console.error("member count failed:", e);
-      return 0;
-    }
-  },
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },
