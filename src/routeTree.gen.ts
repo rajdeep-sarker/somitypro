@@ -40,6 +40,7 @@ import { Route as AuthenticatedLoansCollectRouteImport } from './routes/_authent
 import { Route as AuthenticatedLoansDueRouteImport } from './routes/_authenticated/loans.due'
 import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
 import { Route as AuthenticatedMembersIdRouteImport } from './routes/_authenticated/members.$id'
+import { Route as ApiPublicMemberCountRouteImport } from './routes/api/public/member-count'
 import { Route as ApiPublicMigrateRouteImport } from './routes/api/public/migrate'
 
 const IndexRoute = IndexRouteImport.update({
@@ -200,6 +201,11 @@ const AuthenticatedMembersIdRoute = AuthenticatedMembersIdRouteImport.update({
   path: '/members/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicMemberCountRoute = ApiPublicMemberCountRouteImport.update({
+  id: '/api/public/member-count',
+  path: '/api/public/member-count',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicMigrateRoute = ApiPublicMigrateRouteImport.update({
   id: '/api/public/migrate',
   path: '/api/public/migrate',
@@ -235,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/loans/collect': typeof AuthenticatedLoansCollectRoute
   '/loans/due': typeof AuthenticatedLoansDueRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
+  '/api/public/member-count': typeof ApiPublicMemberCountRoute
   '/api/public/migrate': typeof ApiPublicMigrateRoute
   '/loans/': typeof AuthenticatedLoansIndexRoute
   '/members/': typeof AuthenticatedMembersIndexRoute
@@ -268,6 +275,7 @@ export interface FileRoutesByTo {
   '/loans/collect': typeof AuthenticatedLoansCollectRoute
   '/loans/due': typeof AuthenticatedLoansDueRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
+  '/api/public/member-count': typeof ApiPublicMemberCountRoute
   '/api/public/migrate': typeof ApiPublicMigrateRoute
   '/loans': typeof AuthenticatedLoansIndexRoute
   '/members': typeof AuthenticatedMembersIndexRoute
@@ -303,6 +311,7 @@ export interface FileRoutesById {
   '/_authenticated/loans/collect': typeof AuthenticatedLoansCollectRoute
   '/_authenticated/loans/due': typeof AuthenticatedLoansDueRoute
   '/_authenticated/members/$id': typeof AuthenticatedMembersIdRoute
+  '/api/public/member-count': typeof ApiPublicMemberCountRoute
   '/api/public/migrate': typeof ApiPublicMigrateRoute
   '/_authenticated/loans/': typeof AuthenticatedLoansIndexRoute
   '/_authenticated/members/': typeof AuthenticatedMembersIndexRoute
@@ -338,6 +347,7 @@ export interface FileRouteTypes {
     | '/loans/collect'
     | '/loans/due'
     | '/members/$id'
+    | '/api/public/member-count'
     | '/api/public/migrate'
     | '/loans/'
     | '/members/'
@@ -371,6 +381,7 @@ export interface FileRouteTypes {
     | '/loans/collect'
     | '/loans/due'
     | '/members/$id'
+    | '/api/public/member-count'
     | '/api/public/migrate'
     | '/loans'
     | '/members'
@@ -405,6 +416,7 @@ export interface FileRouteTypes {
     | '/_authenticated/loans/collect'
     | '/_authenticated/loans/due'
     | '/_authenticated/members/$id'
+    | '/api/public/member-count'
     | '/api/public/migrate'
     | '/_authenticated/loans/'
     | '/_authenticated/members/'
@@ -414,6 +426,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicMemberCountRoute: typeof ApiPublicMemberCountRoute
   ApiPublicMigrateRoute: typeof ApiPublicMigrateRoute
 }
 
@@ -636,6 +649,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMembersIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/member-count': {
+      id: '/api/public/member-count'
+      path: '/api/public/member-count'
+      fullPath: '/api/public/member-count'
+      preLoaderRoute: typeof ApiPublicMemberCountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/migrate': {
       id: '/api/public/migrate'
       path: '/api/public/migrate'
@@ -715,6 +735,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicMemberCountRoute: ApiPublicMemberCountRoute,
   ApiPublicMigrateRoute: ApiPublicMigrateRoute,
 }
 export const routeTree = rootRouteImport

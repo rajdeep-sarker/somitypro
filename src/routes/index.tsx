@@ -1,12 +1,15 @@
 import { useLang } from "@/lib/i18n";
 import { uiText } from "@/lib/ui-translation";
 import { SomitiLogo } from "@/components/Branding";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { auth } from "@/lib/app-client";
+import { bn } from "@/lib/format";
 import { PiggyBank, HandCoins, CalendarClock, Landmark, FileBarChart, Users, ShieldCheck, ArrowRight, Lock, Smartphone, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import hero from "@/assets/landing-hero.jpg";
+
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -36,6 +39,19 @@ const trust = [
   { icon: Smartphone, t: "মোবাইলে ব্যবহারযোগ্য", d: "মাঠ থেকেই কিস্তি আদায় ও জমা" },
   { icon: Languages, t: "বাংলা ও ইংরেজি", d: "এক ক্লিকে ভাষা পরিবর্তন" },
 ];
+
+function MemberStat() {
+  const [count, setCount] = useState<number | null>(null);
+  useEffect(() => {
+    let active = true;
+    fetch("/api/public/member-count")
+      .then((r) => r.json() as Promise<{ count: number | null }>)
+      .then((d) => { if (active && d.count !== null) setCount(d.count); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
+  return <>{count === null ? "" : bn(count)}</>;
+}
 
 function Index() {
   useLang();
@@ -85,9 +101,9 @@ function Index() {
                 </Button>
               </div>
               <div className="mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-primary-foreground/15 pt-6">
-                {([["১৩০০+", "সদস্য"], ["৬+", "সেবা"], ["২৪/৭", "অ্যাক্সেস"]] as const).map(([n, l]) => (
+                {([["members", "সদস্য"], ["৬+", "সেবা"], ["২৪/৭", "অ্যাক্সেস"]] as const).map(([n, l]) => (
                   <div key={l}>
-                    <div className="font-display text-2xl text-gold">{uiText(n)}</div>
+                    <div className="font-display text-2xl text-gold">{n === "members" ? <MemberStat /> : uiText(n)}</div>
                     <div className="text-sm opacity-80">{uiText(l)}</div>
                   </div>
                 ))}
