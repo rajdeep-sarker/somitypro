@@ -1,6 +1,6 @@
 import { brokeredPreviewStorage } from "@/integrations/supabase/previewAuthStorage";
 import { createLoginStorage } from "./login-storage";
-import { changeOwnPassword, loginWithPhone, renewSession, signUpAccount } from "./auth.functions";
+import { changeOwnPassword, loginWithPhone, renewSession } from "./auth.functions";
 
 // App session storage (Firebase-backed auth). The session token is kept in
 // the Remember-Me aware storage adapter, exactly like before.
