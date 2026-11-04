@@ -1,6 +1,6 @@
 import { brokeredPreviewStorage } from "@/integrations/supabase/previewAuthStorage";
 import { createLoginStorage } from "./login-storage";
-import { changeOwnPassword, loginWithPhone, renewSession, signUpAccount } from "./auth.functions";
+import { changeOwnPassword, loginWithPhone, renewSession } from "./auth.functions";
 
 // App session storage (Firebase-backed auth). The session token is kept in
 // the Remember-Me aware storage adapter, exactly like before.
@@ -65,16 +65,6 @@ export const auth = {
       return { data: { session: { access_token: r.token, user: r.user }, user: r.user }, error: null };
     } catch (error) {
       return { data: { session: null, user: null }, error: error instanceof Error ? error : new Error("লগইন হয়নি") };
-    }
-  },
-  async signUp({ email, password, options }: { email: string; password: string; options?: { data?: { full_name?: string; phone?: string } } }): Promise<Result<{ session: Session | null; user: User | null }>> {
-    try {
-      const r = await signUpAccount({ data: { phone: options?.data?.phone ?? email.split("@")[0] ?? "", password, name: options?.data?.full_name ?? "" } });
-      await store().setItem(KEY, r.token);
-      emit("SIGNED_IN");
-      return { data: { session: { access_token: r.token, user: r.user }, user: r.user }, error: null };
-    } catch (error) {
-      return { data: { session: null, user: null }, error: error instanceof Error ? error : new Error("অ্যাকাউন্ট তৈরি হয়নি") };
     }
   },
   async signOut(): Promise<void> {
